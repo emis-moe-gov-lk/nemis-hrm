@@ -1,0 +1,27 @@
+---
+project_name: cemis
+project_root: /opt/cemis
+
+app_env: production
+app_debug: 'false'
+app_url: http://localhost:8080
+docker_app_port: 8080
+
+db_connection: mysql
+db_host: mysql
+db_port: 3306
+db_database: nemis
+db_username: cemis
+db_password: change-me
+docker_db_port: 3308
+
+compose_project_src: "{{ playbook_dir }}/.."
+compose_excludes:
+  - ".git"
+  - ".github"
+  - ".vscode"
+  - "node_modules"
+  - "vendor"
+  - "storage/logs"
+  - ".env"
+  - ".codex"

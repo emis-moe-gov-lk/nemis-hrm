@@ -1,0 +1,51 @@
+---
+- name: Deploy Laravel application with Docker Compose
+  hosts: app
+  become: true
+  vars:
+    docker_packages:
+      - docker.io
+      - docker-compose-v2
+      - python3-docker
+      - rsync
+  tasks:
+    - name: Install Docker and deployment dependencies
+      ansible.builtin.apt:
+        name: "{{ docker_packages }}"
+        state: present
+        update_cache: true
+
+    - name: Ensure Docker service is running
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create project directory
+      ansible.builtin.file:
+        path: "{{ project_root }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Sync project files to remote host
+      ansible.posix.synchronize:
+        src: "{{ compose_project_src }}/"
+        dest: "{{ project_root }}/"
+        delete: true
+        rsync_opts: "{{ compose_excludes | map('regex_replace', '^(.*)$', '--exclude=\\1') | list }}"
+
+    - name: Write Docker environment file
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/../templates/env.docker.j2"
+        dest: "{{ project_root }}/.env.docker"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Start application stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ project_root }}"
+        state: present
+        build: always
