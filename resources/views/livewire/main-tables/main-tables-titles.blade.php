@@ -36,11 +36,11 @@
             {{-- TITLES CARDS GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
                 @forelse ($titles as $key => $data)
-                    <div class="group relative flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-md hover:border-indigo-500/30 transition-all duration-200">
+                    <div class="group relative flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-3xl p-5 shadow-sm hover:shadow-md hover:border-indigo-500/30 transition-all duration-200">
                         
                         <div class="flex items-center gap-4">
                             {{-- Index / ID Avatar --}}
-                            <div class="flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-400 font-black text-xs border border-slate-100 dark:border-slate-700 uppercase">
+                            <div class="flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-500 font-black text-xs border border-slate-200 dark:border-slate-700 uppercase">
                                 {{ $data->title_id }}
                             </div>
 
@@ -50,7 +50,7 @@
                                 </h3>
                                 <div class="flex items-center gap-1.5">
                                     <div class="w-1.5 h-1.5 rounded-full {{ $data->active_status ? 'bg-emerald-500' : 'bg-rose-500' }}"></div>
-                                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">
                                         {{ $data->active_status ? 'Available' : 'Disabled' }}
                                     </span>
                                 </div>
@@ -77,7 +77,7 @@
                 @empty
                     <div class="col-span-full py-20 text-center">
                         <flux:icon.identification size="xl" class="mx-auto text-slate-200 mb-4" />
-                        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest">{{ __('No Titles Defined') }}</h3>
+                        <h3 class="text-sm font-black text-slate-500 uppercase tracking-widest">{{ __('No Titles Defined') }}</h3>
                     </div>
                 @endforelse
             </div>

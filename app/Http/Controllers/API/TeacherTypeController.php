@@ -36,6 +36,7 @@ class TeacherTypeController extends Controller
     public function show($id)
     {
         $type = TeacherType::find($id);
+        /** @var \App\Models\TeacherType|null $type */
 
         if (!$type) {
             return response()->json([

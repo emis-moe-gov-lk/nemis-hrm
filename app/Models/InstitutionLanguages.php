@@ -5,6 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class InstitutionLanguages
+ *
+ * @property string $id
+ * @property string $language
+ */
 class InstitutionLanguages extends Model
 {
     use HasFactory;

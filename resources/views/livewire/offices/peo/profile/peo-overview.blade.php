@@ -1,20 +1,11 @@
 <section class="w-full">
-    <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">{{ __('Provincial Department of Education') }}</flux:heading>
-
-        <flux:subheading size="lg" class="mb-6">
-            {{ __('Statistics about provincial education structure and staff distribution.') }}
-        </flux:subheading>
-        <flux:separator variant="subtle" />
-    </div>
-
     <x-offices.peo.peo-layout :officeId="$officeId">
         <!-- Main Stats -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
             <!-- Zonal Offices -->
             <div
                 class="group relative overflow-hidden rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700
-                        bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900
+                        bg-linear-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900
                         hover:shadow-xl hover:-translate-y-1 transition">
                 <div
                     class="absolute top-0 right-0 w-20 h-20 bg-violet-100 dark:bg-violet-900/20 rounded-full
@@ -24,14 +15,14 @@
                 <div class="relative">
                     <div class="text-4xl font-bold text-slate-900 dark:text-white">{{ $zonalOfficeCount }}</div>
                     <div class="text-lg font-semibold text-slate-800 dark:text-slate-200 mt-1">Zonal Offices</div>
-                    <div class="text-sm text-slate-500 dark:text-slate-400">Zones under Provinces</div>
+                    <div class="text-sm text-slate-500 dark:text-slate-500">Zones under Provinces</div>
                 </div>
             </div>
 
             <!-- Divisions -->
             <div
                 class="group relative overflow-hidden rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700
-                        bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900
+                        bg-linear-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900
                         hover:shadow-xl hover:-translate-y-1 transition">
                 <div
                     class="absolute top-0 right-0 w-20 h-20 bg-amber-100 dark:bg-amber-900/20 rounded-full
@@ -43,7 +34,7 @@
                     <div class="text-lg font-semibold text-slate-800 dark:text-slate-200 mt-1">
                         Divisional Offices
                     </div>
-                    <div class="text-sm text-slate-500 dark:text-slate-400">
+                    <div class="text-sm text-slate-500 dark:text-slate-500">
                         Divisions under Zones
                     </div>
                 </div>
@@ -52,7 +43,7 @@
             <!-- Institutions -->
             <div
                 class="group relative overflow-hidden rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700
-                        bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900
+                        bg-linear-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900
                         hover:shadow-xl hover:-translate-y-1 transition">
                 <div
                     class="absolute top-0 right-0 w-20 h-20 bg-rose-100 dark:bg-rose-900/20 rounded-full
@@ -62,7 +53,7 @@
                 <div class="relative">
                     <div class="text-4xl font-bold text-slate-900 dark:text-white">{{ $institutionCount }}</div>
                     <div class="text-lg font-semibold text-slate-800 dark:text-slate-200 mt-1">Institutions</div>
-                    <div class="text-sm text-slate-500 dark:text-slate-400">
+                    <div class="text-sm text-slate-500 dark:text-slate-500">
                         Schools under Divisions
                     </div>
                 </div>
@@ -71,7 +62,7 @@
             <!-- Students -->
             <div
                 class="group relative overflow-hidden rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700
-                        bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900
+                        bg-linear-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900
                         hover:shadow-xl hover:-translate-y-1 transition">
                 <div
                     class="absolute top-0 right-0 w-20 h-20 bg-blue-100 dark:bg-blue-900/20 rounded-full
@@ -81,7 +72,7 @@
                 <div class="relative">
                     <div class="text-4xl font-bold text-slate-900 dark:text-white">{{ $studentCount }}</div>
                     <div class="text-lg font-semibold text-slate-800 dark:text-slate-200 mt-1">Students</div>
-                    <div class="text-sm text-slate-500 dark:text-slate-400">Estimated Total Students</div>
+                    <div class="text-sm text-slate-500 dark:text-slate-500">Estimated Total Students</div>
                 </div>
             </div>
 
@@ -92,7 +83,7 @@
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-xl font-bold text-slate-900 dark:text-white">Staff by Service</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    <p class="text-sm text-slate-500 dark:text-slate-500 mt-1">
                         Distribution of staff across services
                     </p>
                 </div>
@@ -137,7 +128,7 @@
                        bg-white dark:bg-slate-800 hover:shadow-lg hover:-translate-y-1 transition">
 
                     <!-- Gradient accent -->
-                    <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b {{ $gradientClass }}"></div>
+                    <div class="absolute top-0 left-0 w-1 h-full bg-linear-to-b {{ $gradientClass }}"></div>
 
                     <div class="ml-3">
                         <div class="flex items-start justify-between mb-3">
@@ -164,14 +155,14 @@
                             <div class="text-base font-semibold text-slate-800 dark:text-slate-200 line-clamp-1">
                                 {{ $service['name_en'] }}
                             </div>
-                            <div class="text-xs text-slate-500 dark:text-slate-400">
+                            <div class="text-xs text-slate-500 dark:text-slate-500">
                                 Total Staff in this Service
                             </div>
                         </div>
 
                         <!-- Progress bar -->
                         <div class="mt-4">
-                            <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+                            <div class="flex justify-between text-xs text-slate-500 dark:text-slate-500 mb-1">
                                 <span>Capacity</span>
                                 <span>{{ round($percentage) }}%</span>
                             </div>

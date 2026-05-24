@@ -19,17 +19,19 @@
 
           // auto-open group by current route
           if (@js(request()->routeIs('offices.*'))) this.openGroup = 'offices';
-          if (@js(request()->routeIs('teacher.*','principal.*','sleas.*','slas.*','sltes.*','sltas.*','slacs.*','dos.*','mso.*'))) this.openGroup = 'employers';
+          if (@js(request()->routeIs('teacher.*','principal.*','sleas.*','slas.*','sltes.*','sltas.*','slacs.*','dos.*','mso.*', 'employees.*'))) this.openGroup = 'employees';
         }
       }"
     x-init="init()">
     {{-- MOBILE OVERLAY --}}
     <div
-        class="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden"
+        class="fixed inset-0 z-40 bg-indigo-600/40 backdrop-blur-sm lg:hidden"
         x-show="sidebarOpen"
         x-transition.opacity
         x-cloak
         @click="sidebarOpen=false"></div>
+
+    @include('partials.page-spinner')
 
     <div class="min-h-screen lg:flex lg:gap-2 lg:px-2 lg:py-2">
 
@@ -38,9 +40,9 @@
             class="
                 fixed inset-y-0 left-0 z-50 w-75
                 bg-white/90 backdrop-blur
-                border border-slate-100
-                dark:bg-zinc-900/90 dark:border-zinc-800
-                rounded-none lg:rounded-2xl
+                border border-slate-200
+                dark:bg-zinc-900/90 dark:border-zinc-700
+                rounded-none
                 shadow-[0_20px_60px_-30px_rgba(15,23,42,0.25)]
                 overflow-hidden
                 transform transition-transform duration-300
@@ -54,15 +56,18 @@
             <div class="px-5 pt-5 pb-4">
                 <div class="flex items-center justify-between lg:justify-start">
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-3" wire:navigate>
-                        <div class="h-10 w-10 rounded-2xl bg-indigo-600/10 dark:bg-indigo-500/20 flex items-center justify-center overflow-hidden">
-                            <x-app-logo />
+                        <div class="h-12 w-12 p-1 rounded-xl bg-indigo-600/10 dark:bg-indigo-500/20 flex items-center justify-center overflow-hidden">
+                            <x-app-logo-icon class="h-full w-full object-contain" />
                         </div>
 
                         <div class="leading-tight">
                             <div class="text-sm font-extrabold tracking-tight text-slate-900 dark:text-white">
-                                EMIS <span class="text-slate-400 font-semibold dark:text-zinc-500">v1.3</span>
+                                EMIS
+                                @if (!empty($systemVersion))
+                                <span class="text-slate-500 font-semibold dark:text-zinc-400">V{{ ltrim($systemVersion, 'vV') }}</span>
+                                @endif
                             </div>
-                            <div class="text-xs font-semibold text-slate-400 dark:text-zinc-500">
+                            <div class="text-xs font-semibold text-slate-500 dark:text-zinc-400">
                                 Human Resource Management
                             </div>
                         </div>
@@ -71,10 +76,10 @@
                     {{-- MOBILE CLOSE --}}
                     <button
                         type="button"
-                        class="lg:hidden rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-2.5 py-2 text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-zinc-700/50"
+                        class="lg:hidden h-9 w-9 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-zinc-800 text-slate-500 dark:text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-600 dark:hover:text-rose-400 transition-all active:scale-90"
                         @click="sidebarOpen=false">
-                        <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
@@ -94,7 +99,7 @@
 
                 {{-- PLATFORM --}}
                 <div class="px-3 mb-2">
-                    <div class="text-[11px] font-extrabold tracking-widest text-slate-400 uppercase">
+                    <div class="text-[11px] font-extrabold tracking-widest text-slate-500 uppercase">
                         Platform
                     </div>
                 </div>
@@ -105,10 +110,7 @@
                         class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
                        {{ request()->routeIs('dashboard') ? $activePill : $inactivePill }}">
                         <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('dashboard') ? $iconActive : $iconInactive }}">
-                            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 22V12h6v10" />
-                            </svg>
+                            <flux:icon.home variant="micro" />
                         </span>
                         <span class="text-[13px] font-semibold">Dashboard</span>
                         <span class="ms-auto h-1.5 w-1.5 rounded-full {{ request()->routeIs('dashboard') ? 'bg-white' : 'bg-transparent group-hover:bg-slate-300 dark:group-hover:bg-zinc-600' }}"></span>
@@ -119,24 +121,19 @@
                         class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
                            {{ request()->routeIs('my-profile.*') ? $activePill : $inactivePill }}">
                         <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('my-profile.*') ? $iconActive : $iconInactive }}">
-                            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 21v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-                            </svg>
+                            <flux:icon.user variant="micro" />
                         </span>
                         <span class="text-[13px] font-semibold">My Profile</span>
                     </a>
                     @endcan
 
                     {{-- Teacher Transfer --}}
-                    @can('my-profile.general.view')
-                    <a href="{{ route('my-transfer.teacher-transfer-potal') }}" wire:navigate
+                    @can('employee.mytransfer')
+                    <a href="{{ route('my-transfer') }}" wire:navigate
                         class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
-                           {{ request()->routeIs('my-transfer.*') ? $activePill : $inactivePill }}">
-                        <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('my-transfer.*') ? $iconActive : $iconInactive }}">
-                            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
+                           {{ request()->routeIs('my-transfer') ? $activePill : $inactivePill }}">
+                        <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('my-transfer') ? $iconActive : $iconInactive }}">
+                            <flux:icon.bolt variant="micro" />
                         </span>
                         <span class="text-[13px] font-semibold">My Transfer</span>
                     </a>
@@ -148,10 +145,7 @@
                         class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
                        {{ request()->routeIs('alerts.*') ? $activePill : $inactivePill }}">
                         <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('alerts.*') ? $iconActive : $iconInactive }}">
-                            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a3 3 0 0 0 6 0" />
-                            </svg>
+                            <flux:icon.bell variant="micro" />
                         </span>
                         <span class="text-[13px] font-semibold">Alerts</span>
                     </a>
@@ -166,10 +160,7 @@
                         class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
                            {{ request()->routeIs('roles.*') ? $activePill : $inactivePill }}">
                         <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('roles.*') ? $iconActive : $iconInactive }}">
-                            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 13a5 5 0 0 0 7.54.54l2.12-2.12a5 5 0 0 0-7.07-7.07l-1.06 1.06" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 11a5 5 0 0 0-7.54-.54L4.34 12.58a5 5 0 0 0 7.07 7.07l1.06-1.06" />
-                            </svg>
+                            <flux:icon.finger-print variant="micro" />
                         </span>
                         <span class="text-[13px] font-semibold">Roles</span>
                     </a>
@@ -178,11 +169,7 @@
                         class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
                            {{ request()->routeIs('main-tables.*') ? $activePill : $inactivePill }}">
                         <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('main-tables.*') ? $iconActive : $iconInactive }}">
-                            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3l7 4v6c0 5-3 8-7 8s-7-3-7-8V7l7-4z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11v4" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8h.01" />
-                            </svg>
+                            <flux:icon.table-cells variant="micro" />
                         </span>
                         <span class="text-[13px] font-semibold">Main Tables</span>
                     </a>
@@ -193,12 +180,7 @@
                         class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
                            {{ request()->routeIs('users.*') ? $activePill : $inactivePill }}">
                         <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('users.*') ? $iconActive : $iconInactive }}">
-                            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 3.13a4 4 0 0 1 0 7.75" />
-                            </svg>
+                            <flux:icon.users variant="micro" />
                         </span>
                         <span class="text-[13px] font-semibold">Users</span>
                     </a>
@@ -209,317 +191,82 @@
                         class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
                            {{ request()->routeIs('cadre-dms-approved.*') ? $activePill : $inactivePill }}">
                         <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('cadre-dms-approved.*') ? $iconActive : $iconInactive }}">
-                            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h6v6H3z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15h6v6H3z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 3h6v6h-6z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9h6v6H9z" />
-                            </svg>
+                            <flux:icon.squares-2x2 variant="micro" />
                         </span>
                         <span class="text-[13px] font-semibold">DMS Approved Cadre</span>
                     </a>
                     @endcan
 
                     @can('institution.list.view')
-                    <a href="{{ route('institutions.index') }}" wire:navigate
+                    <a href="{{ route('find-institutions.index') }}" wire:navigate
                         class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
-                           {{ request()->routeIs('institutions.*') ? $activePill : $inactivePill }}">
-                        <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('institutions.*') ? $iconActive : $iconInactive }}">
-                            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10l9-6 9 6" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10v10h14V10" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20v-6h6v6" />
-                            </svg>
+                           {{ request()->routeIs('find-institutions.*') ? $activePill : $inactivePill }}">
+                        <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('find-institutions.*') ? $iconActive : $iconInactive }}">
+                            <flux:icon.academic-cap variant="micro" />
                         </span>
                         <span class="text-[13px] font-semibold">Institutions</span>
                     </a>
                     @endcan
 
-                    @can('institution.list.view')
+                    @can('institution-group.index.view')
                     <a href="{{ route('institution-groups.index') }}" wire:navigate
                         class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
                            {{ request()->routeIs('institution-groups.*') ? $activePill : $inactivePill }}">
                         <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('institution-groups.*') ? $iconActive : $iconInactive }}">
-                            <svg class="h-3 w-3 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 7.125C2.25 6.504 2.754 6 3.375 6h6c.621 0 1.125.504 1.125 1.125v3.75c0 .621-.504 1.125-1.125 1.125h-6a1.125 1.125 0 0 1-1.125-1.125v-3.75zM14.25 8.625c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v8.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 0 1-1.125-1.125v-8.25zM3.75 16.125c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 0 1-1.125-1.125v-2.25z" />
-                            </svg>
+                            <flux:icon.rectangle-group variant="micro" />
                         </span>
                         <span class="text-[13px] font-semibold">Institution Groups</span>
                     </a>
                     @endcan
+
+                    {{-- National School --}}
+                    @can('national-school.overview.view')
+                    <a href="{{ route('national-school.overview') }}" wire:navigate
+                        class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
+                           {{ request()->routeIs('national-school.*') ? $activePill : $inactivePill }}">
+                        <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('national-school.*') ? $iconActive : $iconInactive }}">
+                            <flux:icon.building-library variant="micro" />
+                        </span>
+                        <span class="text-[13px] font-semibold">National School</span>
+                    </a>
+                    @endcan
+
+                    {{-- Transfer --}}
+                    @can('transfer.portal.view')
+                    <a href="{{ route('transfer.index-module') }}" wire:navigate
+                        class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
+                           {{ request()->routeIs('transfer.*', 'transfer-board.*') ? $activePill : $inactivePill }}">
+                        <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('transfer.*', 'transfer-board.*') ? $iconActive : $iconInactive }}">
+                            <flux:icon.arrows-right-left variant="micro" />
+                        </span>
+                        <span class="text-[13px] font-semibold">Transfer</span>
+                    </a>
+                    @endcan
+
+                    {{-- Offices --}}
+                    @can('office.overview')
+                    <a href="{{ route('offices.index') }}" wire:navigate
+                        class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
+                           {{ request()->routeIs('offices.*') ? $activePill : $inactivePill }}">
+                        <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('offices.*') ? $iconActive : $iconInactive }}">
+                            <flux:icon.building-office-2 variant="micro" />
+                        </span>
+                        <span class="text-[13px] font-semibold">Offices</span>
+                    </a>
+                    @endcan
+
+                    {{-- Employees --}}
+                    @can('teacher.list.view')
+                    <a href="{{ route('employees.overview') }}" wire:navigate
+                        class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
+                           {{ request()->routeIs('employees.*', 'teacher.*','principal.*','sleas.*','slas.*','sltes.*','sltas.*','slacs.*','dos.*','mso.*') ? $activePill : $inactivePill }}">
+                        <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('employees.*', 'teacher.*','principal.*','sleas.*','slas.*','sltes.*','sltas.*','slacs.*','dos.*','mso.*') ? $iconActive : $iconInactive }}">
+                            <flux:icon.user-group variant="micro" />
+                        </span>
+                        <span class="text-[13px] font-semibold">Employees</span>
+                    </a>
+                    @endcan
                 </nav>
-
-                {{-- NATIONAL SCHOOL --}}
-                <div class="mt-3 px-2">
-                    <button
-                        type="button"
-                        class="w-full flex items-center justify-between px-3 py-2 rounded-xl
-                               text-[11px] font-bold tracking-widest text-slate-400 dark:text-zinc-500 uppercase
-                               hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition"
-                        @click.stop="toggleGroup('nationalSchool')">
-                        National School
-                        <svg class="h-4 w-4 transition"
-                            :class="openGroup === 'nationalSchool' ? 'rotate-180' : ''"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-
-                    <div x-show="openGroup === 'nationalSchool'" x-collapse class="mt-1 space-y-1 px-2">
-                        <a href="{{ route('national-school.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('national-school.list') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            School List
-                        </a>
-                        <a href="{{ route('national-school.teacher-list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('national-school.teacher-list') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Teacher List
-                        </a>
-                        <a href="{{ route('national-school.sleas-list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('national-school.sleas-list') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            SLEAS Officers List
-                        </a>
-                        <a href="{{ route('national-school.principal-list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('national-school.principal-list') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            SLPS Officers List
-                        </a>
-                        <a href="{{ route('national-school.dms-approved-cadre') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('national-school.dms-approved-cadre') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            DMS Approved Cadre
-                        </a>
-
-                    </div>
-                </div>
-
-                {{-- TRANSFER MODULE --}}
-                <div class="mt-4 px-2">
-                    <button
-                        type="button"
-                        class="w-full flex items-center justify-between px-3 py-2 rounded-xl
-                               text-[11px] font-bold tracking-widest text-slate-400 dark:text-zinc-500 uppercase
-                               hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition"
-                        @click.stop="toggleGroup('transfer')">
-                        Transfer
-                        <svg class="h-4 w-4 transition"
-                            :class="openGroup === 'transfer' ? 'rotate-180' : ''"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-
-                    <div x-show="openGroup === 'transfer'" x-collapse class="mt-1 space-y-1 px-2">
-                        <a href="{{ route('transfer.index-module') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('transfer.index-module') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Overview
-                        </a>
-
-                        <a href="{{ route('transfer.transfer-policies') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('transfer.transfer-policies') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Transfer Policy
-                        </a>
-                        <a href="{{ route('transfer.teacher-transfer-request') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('transfer.teacher-transfer-request') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Teacher Transfer Request
-                        </a>
-                        <a href="{{ route('transfer-board.province-teacher-transfer') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('transfer-board.province-teacher-transfer') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Province Teacher Transfer Board
-                        </a>
-                        <a href="{{ route('transfer-board.province-teacher-appeal') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('transfer-board.province-teacher-appeal') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Provincial Teacher Appeal Board
-                        </a>
-                        <a href="{{ route('transfer-board.zone-teacher-transfer') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('transfer-board.zone-teacher-transfer') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Zone Teacher Transfer Board
-                        </a>
-                        <a href="{{ route('transfer-board.zone-teacher-appeal') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('transfer-board.zone-teacher-appeal') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Zonal Teacher Appeal Board
-                        </a>
-                        <a href="{{ route('transfer-board.ntional-teacher-transfer') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('transfer-board.ntional-teacher-transfer') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            National Teacher Transfer Board
-                        </a>
-                    </div>
-                </div>
-
-                {{-- OFFICES GROUP --}}
-                <div class="mt-4 px-2">
-                    <button
-                        type="button"
-                        class="w-full flex items-center justify-between px-3 py-2 rounded-xl
-                               text-[11px] font-bold tracking-widest text-slate-400 dark:text-zinc-500 uppercase
-                               hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition"
-                        @click.stop="toggleGroup('offices')">
-                        Offices
-                        <svg class="h-4 w-4 transition"
-                            :class="openGroup === 'offices' ? 'rotate-180' : ''"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-
-                    <div x-show="openGroup === 'offices'" x-collapse class="mt-1 space-y-1 px-2">
-                        <a href="{{ route('offices.index') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                           {{ request()->routeIs('offices.index') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Overview
-                        </a>
-
-                        @can('office.moe.list.view')
-                        <a href="{{ route('offices.moe.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('offices.moe.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Education Ministries
-                        </a>
-                        @endcan
-
-                        @can('office.pmoe.list.view')
-                        <a href="{{ route('offices.pmoe.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('offices.pmoe.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Provincial Ministries
-                        </a>
-                        @endcan
-
-                        @can('office.peo.list.view')
-                        <a href="{{ route('offices.peo.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('offices.peo.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Provincial Offices
-                        </a>
-                        @endcan
-
-                        @can('office.zeo.list.view')
-                        <a href="{{ route('offices.zeo.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('offices.zeo.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Zonal Offices
-                        </a>
-                        @endcan
-
-                        @can('office.deo.list.view')
-                        <a href="{{ route('offices.deo.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('offices.deo.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Divisional Offices
-                        </a>
-                        @endcan
-
-                        @can('office.institution.list.view')
-                        <a href="{{ route('offices.institutions.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('offices.institutions.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Institutions
-                        </a>
-                        @endcan
-                    </div>
-                </div>
-
-                {{-- EMPLOYERS GROUP --}}
-                <div class="mt-3 px-2">
-                    <button
-                        type="button"
-                        class="w-full flex items-center justify-between px-3 py-2 rounded-xl
-                               text-[11px] font-bold tracking-widest text-slate-400 dark:text-zinc-500 uppercase
-                               hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition"
-                        @click.stop="toggleGroup('employers')">
-                        Employers
-                        <svg class="h-4 w-4 transition"
-                            :class="openGroup === 'employers' ? 'rotate-180' : ''"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-
-                    <div x-show="openGroup === 'employers'" x-collapse class="mt-1 space-y-1 px-2">
-                        @can('teacher.list.view')
-                        <a href="{{ route('teacher.overview') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('teacher.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Teachers
-                        </a>
-                        @endcan
-
-                        @can('principal.list.view')
-                        <a href="{{ route('principal.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('principal.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Principals
-                        </a>
-                        @endcan
-
-                        @can('sleas.list.view')
-                        <a href="{{ route('sleas.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('sleas.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Edu. Directors
-                        </a>
-                        @endcan
-
-                        @can('slas.list.view')
-                        <a href="{{ route('slas.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('slas.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Edu. Secretaries
-                        </a>
-                        @endcan
-
-                        @can('sltes.list.view')
-                        <a href="{{ route('sltes.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('sltes.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Teacher Educators
-                        </a>
-                        @endcan
-
-                        @can('sltas.list.view')
-                        <a href="{{ route('sltas.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('sltas.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Teacher Advisers
-                        </a>
-                        @endcan
-
-                        @can('slacs.list.view')
-                        <a href="{{ route('slacs.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('slacs.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Accountants
-                        </a>
-                        @endcan
-
-                        @can('dos.list.view')
-                        <a href="{{ route('dos.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('dos.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Development Officers
-                        </a>
-                        @endcan
-
-                        @can('mso.list.view')
-                        <a href="{{ route('mso.list') }}" wire:navigate
-                            class="block rounded-xl px-3 py-2 text-[13px] font-semibold
-                               {{ request()->routeIs('mso.*') ? 'bg-indigo-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800/50' }}">
-                            Mng. Assistant
-                        </a>
-                        @endcan
-                    </div>
-                </div>
-
             </div>
 
             {{-- FOOTER --}}
@@ -528,7 +275,7 @@
 
 
                 {{-- Expandable user card (Alpine) --}}
-                <div class="mt-4 rounded-2xl border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 p-3"
+                <div class="mt-4 rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900/50 p-3"
                     x-data="{ open: false }">
 
                     {{-- Header row (click to expand) --}}
@@ -543,12 +290,12 @@
                             <div class="truncate text-[13px] font-semibold text-slate-900 dark:text-white">
                                 {{ auth()->user()->name }}
                             </div>
-                            <div class="truncate text-xs font-semibold text-slate-400 dark:text-zinc-500">
+                            <div class="truncate text-xs font-semibold text-slate-500 dark:text-zinc-400">
                                 {{ auth()->user()->email }}
                             </div>
                         </div>
 
-                        <span class="shrink-0 grid place-items-center h-8 w-8 rounded-xl bg-slate-50 dark:bg-zinc-800 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-700 transition">
+                        <span class="shrink-0 grid place-items-center h-8 w-8 rounded-xl bg-slate-50 dark:bg-zinc-800 text-slate-500 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-zinc-700 transition">
                             <svg class="h-4 w-4 transition-transform duration-200"
                                 :class="open ? '' : 'rotate-180'"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -587,7 +334,7 @@
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit"
-                                class="w-full rounded-xl bg-slate-900 hover:bg-slate-800 transition px-3 py-2 text-[13px] font-semibold text-white">
+                                class="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 transition px-3 py-2 text-[13px] font-semibold text-white">
                                 Log Out
                             </button>
                         </form>
@@ -605,14 +352,19 @@
                     <div class="flex items-center gap-3 lg:hidden">
                         <button
                             type="button"
-                            class="rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 shadow-sm"
+                            class="h-10 w-10 flex items-center justify-center rounded-xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-slate-300 dark:border-zinc-700 shadow-sm text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-900 transition-all active:scale-95"
                             @click="sidebarOpen=true">
-                            <svg class="h-3 w-3 text-slate-700 dark:text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                         </button>
 
-                        <div class="text-sm font-extrabold dark:text-white">EMIS v1.3</div>
+                        <div class="text-sm font-extrabold dark:text-white">
+                            EMIS
+                            @if (!empty($systemVersion))
+                            {{ ' V' . ltrim($systemVersion, 'vV') }}
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>

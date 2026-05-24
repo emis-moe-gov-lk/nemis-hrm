@@ -13,10 +13,10 @@ class MobitelSmsService
 
     public function __construct()
     {
-        $this->url      = config('services.mobitel.url');
-        $this->user     = config('services.mobitel.user');
-        $this->password = config('services.mobitel.password');
-        $this->alias    = config('services.mobitel.alias');
+        $this->url      = (string) config('services.mobitel.url', '');
+        $this->user     = (string) config('services.mobitel.user', '');
+        $this->password = (string) config('services.mobitel.password', '');
+        $this->alias    = (string) config('services.mobitel.alias', '');
     }
 
     /**

@@ -3,11 +3,11 @@
         @csrf
         <div class="space-y-6">
             {{-- Header section --}}
-            <div>
-                <flux:heading size="lg">{{ __('Verify profile data') }}</flux:heading>
-                <flux:text class="mt-2 text-balance">
+            <div class="pb-4 border-b border-slate-200 dark:border-zinc-700">
+                <h3 class="text-sm font-black tracking-widest text-slate-900 dark:text-white uppercase">{{ __('Verify profile data') }}</h3>
+                <p class="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mt-0.5">
                     {{ __('To verify these profile data, please verify your identity by entering your current password.') }}
-                </flux:text>
+                </p>
             </div>
 
             <flux:separator variant="subtle" />
@@ -46,25 +46,22 @@
             </div>
 
             {{-- Action Buttons --}}
-            <div class="flex items-center">
-                <flux:spacer />
+            <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-slate-200 dark:border-zinc-700">
+                {{-- Assuming this is in a modal/slideover, a cancel button is helpful --}}
+                <flux:button variant="ghost" x-on:click="$dispatch('close')" class="font-bold rounded-xl h-11">
+                    {{ __('Cancel') }}
+                </flux:button>
 
-                <div class="flex gap-3">
-                    {{-- Assuming this is in a modal/slideover, a cancel button is helpful --}}
-                    <flux:button variant="ghost" x-on:click="$dispatch('close')">
-                        {{ __('Cancel') }}
-                    </flux:button>
-
-                    <flux:button 
-                        type="submit" 
-                        variant="primary" 
-                        wire:loading.attr="disabled"
-                    >
-                        {{-- Loading indicator for UX --}}
-                        <span wire:loading.remove>{{ __('Verify & Save') }}</span>
-                        <span wire:loading>{{ __('Verifying...') }}</span>
-                    </flux:button>
-                </div>
+                <flux:button 
+                    type="submit" 
+                    variant="primary" 
+                    wire:loading.attr="disabled"
+                    class="font-black rounded-xl h-11 bg-indigo-600 dark:bg-white text-white dark:text-slate-900"
+                >
+                    {{-- Loading indicator for UX --}}
+                    <span wire:loading.remove>{{ __('Verify & Save') }}</span>
+                    <span wire:loading>{{ __('Verifying...') }}</span>
+                </flux:button>
             </div>
         </div>
     </form>

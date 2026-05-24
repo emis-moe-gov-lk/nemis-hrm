@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Auth;
 
+use App\Services\Auth\MfaManager;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -55,6 +56,8 @@ class ResetPassword extends Component
                     'password' => Hash::make($this->password),
                     'remember_token' => Str::random(60),
                 ])->save();
+
+                app(MfaManager::class)->handleCredentialSensitiveChange($user);
 
                 event(new PasswordReset($user));
             }

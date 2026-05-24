@@ -1,42 +1,33 @@
-<div class="max-w-7xl mx-left px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-    {{-- Header Section --}}
-    <header class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <flux:heading size="xl" level="1" class="!font-black tracking-tight text-slate-900 dark:text-white">
-                    {{ __('Zonal Offices') }}
-                </flux:heading>
-                <flux:badge variant="ghost" size="sm" class="bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 font-bold border-amber-100 dark:border-amber-500/20 uppercase tracking-tighter">
-                    {{ $province->name }} Province
-                </flux:badge>
-            </div>
-            <flux:subheading size="lg">
-                {{ __('Administrative hubs governing divisional clusters within') }} {{ $province->short_name }}.
-            </flux:subheading>
-        </div>
-
-        <div class="flex items-center gap-3">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <x-page-header
+        title="Zonal Offices"
+        subtitle="Administrative hubs governing divisional clusters within {{ $province->name }} province."
+        icon="building-office-2"
+        :breadcrumbs="[
+            'Administrative Hierarchy' => route('offices.index'),
+            'Zonal Education' => route('offices.zeo.list')
+        ]"
+    >
+        <x-slot:actions>
             @can('office.zeo.create')
-                <flux:button href="{{ route('offices.zeo.create') }}" variant="primary" icon="plus" wire:navigate>
+                <flux:button href="{{ route('offices.zeo.create') }}" variant="primary" icon="plus" class="h-11 bg-indigo-600! hover:bg-indigo-700! text-white! shadow-lg shadow-indigo-200/50 dark:shadow-none border-none" wire:navigate>
                     New Zonal Office
                 </flux:button>
             @endcan
-        </div>
-    </header>
-
-    <flux:separator variant="subtle" />
+        </x-slot:actions>
+    </x-page-header>
 
     {{-- Zonal Office List --}}
     <div class="space-y-4">
         @forelse ($zonalEducationOffices as $data)
-            <div class="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-2 pr-6 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-500/30">
+            <div class="group bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-4xl p-2 pr-6 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-500/30">
                 <div class="flex flex-col lg:flex-row lg:items-center gap-6">
                     
                     {{-- Identity Block --}}
                     <div class="flex items-center gap-4 p-3 lg:w-80 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
                         <div class="relative">
                             <div class="h-14 w-14 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-800 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
-                                <flux:icon.building-office class="size-8 text-slate-500 dark:text-slate-400" />
+                                <flux:icon.building-office class="size-8 text-slate-500 dark:text-slate-500" />
                             </div>
                             
                             {{-- Status Pulse --}}
@@ -46,7 +37,7 @@
                         </div>
                         
                         <div class="overflow-hidden">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-0.5">
                                 WPID: {{ $data->workplace_id }}
                             </p>
                             <h3 class="text-base font-extrabold text-slate-900 dark:text-white wrap">
@@ -61,18 +52,18 @@
                     <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 lg:px-0">
                         {{-- Address --}}
                         <div class="flex flex-col justify-center">
-                            <div class="flex items-center gap-2 text-slate-400 mb-1">
+                            <div class="flex items-center gap-2 text-slate-500 mb-1">
                                 <flux:icon.map-pin variant="micro" class="size-3.5" />
                                 <span class="text-[10px] font-bold uppercase tracking-wider">Zone HQ</span>
                             </div>
-                            <p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-1 italic">
+                            <p class="text-xs text-slate-600 dark:text-slate-500 line-clamp-1 italic">
                                 {{ $data->address }}
                             </p>
                         </div>
 
                         {{-- Hierarchy --}}
                         <div class="flex flex-col justify-center">
-                            <div class="flex items-center gap-2 text-slate-400 mb-1">
+                            <div class="flex items-center gap-2 text-slate-500 mb-1">
                                 <flux:icon.globe-asia-australia variant="micro" class="size-3.5" />
                                 <span class="text-[10px] font-bold uppercase tracking-wider">Provincial Link</span>
                             </div>
@@ -118,7 +109,7 @@
                 </div>
             </div>
         @empty
-            <div class="flex flex-col items-center justify-center py-24 bg-slate-50 dark:bg-slate-800/40 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+            <div class="flex flex-col items-center justify-center py-24 bg-slate-50 dark:bg-slate-800/40 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                 <flux:icon.map class="size-16 text-slate-200 dark:text-slate-700 mb-4" />
                 <h3 class="text-xl font-black text-slate-900 dark:text-white">No Zonal Hubs Found</h3>
                 <p class="text-slate-500 text-sm max-w-xs text-center">We couldn't find any zonal offices under the {{ $province->name }} province.</p>

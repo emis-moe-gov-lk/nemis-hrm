@@ -126,6 +126,7 @@ class InstitutionController extends Controller
     public function update(Request $request, $id)
     {
         $institution = Institution::find($id);
+        /** @var \App\Models\Institution|null $institution */
 
         if (!$institution) {
             return response()->json([

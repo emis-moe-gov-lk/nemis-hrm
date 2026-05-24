@@ -36,6 +36,7 @@ class ServiceController extends Controller
     public function show($id)
     {
         $service = Service::find($id);
+        /** @var \App\Models\Service|null $service */
 
         if (!$service) {
             return response()->json([

@@ -37,6 +37,7 @@ class TeacherCategoryController extends Controller
     public function show($id)
     {
         $category = TeacherCategory::find($id);
+        /** @var \App\Models\TeacherCategory|null $category */
 
         if (!$category) {
             return response()->json([

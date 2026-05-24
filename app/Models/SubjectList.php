@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * Class SubjectList
+ *
+ * @property string $subject_id
+ * @property string $name
+ */
 class SubjectList extends Model
 {
     use HasFactory;
@@ -261,14 +267,14 @@ class SubjectList extends Model
      */
     public function transferBoardSubjects()
     {
-        return $this->hasMany(TransferBoardSubject::class, 'subject_id', 'subject_id');
+        return $this->hasMany(TeacherTransferBoardSubject::class, 'subject_id', 'subject_id');
     }
 
     public function transferBoards()
     {
         return $this->belongsToMany(
-            TransferBoard::class,
-            'transfer_board_subjects',
+            TeacherTransferBoard::class,
+            'teacher_transfer_board_subjects',
             'subject_id',
             'board_id',
             'subject_id',

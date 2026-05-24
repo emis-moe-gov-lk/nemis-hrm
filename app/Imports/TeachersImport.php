@@ -140,7 +140,6 @@ class TeachersImport implements ToModel, WithHeadingRow, WithValidation, SkipsEm
                     'appointment_id' => $appointmentId,
                     'employee_id' => $people->people_id,
                     'appoint_date' => $row['current_appoint_date'] ?? null,
-                    'service_id' => $row['current_service_id'] ?? null,
                     'rank_id' => $row['current_rank_id'] ?? null, // FIXED: removed extra $
                     'office_level_id' => 'OLID006',
                     'position_id' => 'POS001',

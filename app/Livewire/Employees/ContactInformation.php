@@ -9,18 +9,21 @@ use App\Models\DistrictsList;
 use Illuminate\Support\Facades\DB;
 use App\Rules\UniqueEmailAcrossTables;
 use App\Rules\UniquePhoneAcrossTables;
+use Illuminate\Http\Request;
+use App\Http\Controllers\PeopleController;
 
 class ContactInformation extends Component
 {
-    public $peopleId;
-    public $canEdit;
-    public $employee;
-    public $showModalContactInfo = false; // control modal visibility
+    public string $peopleId;
+    public bool $canEdit = false;
+    public People $employee;
+    public bool $showModalContactInfo = false; // control modal visibility
 
     // -------------------------
     // Contact Details
     // -------------------------
-    public $contact, $email;
+    public ?string $contact = null;
+    public ?string $email = null;
 
     // -------------------------
     // Validation Rules
@@ -51,50 +54,44 @@ class ContactInformation extends Component
         $this->validateOnly($propertyName);
     }
 
-    public function mount($peopleId)
+    public function mount(string $peopleId)
     {
         $this->employee = People::where('people_id', $peopleId)->first();
-        // $this->canEdit = $canEdit;
-
+        //$this->canEdit = $canEdit;
+    
         $this->contact = $this->employee->phone;
         $this->email = $this->employee->email;
     }
 
     public function editContactInfo()
     {
-        // Direct validation
-        $validated = $this->validate([
-            'contact' => [
-                'required',
-                'string',
-                'min:10',
-                'max:10',
-                new UniquePhoneAcrossTables($this->employee?->people_id),
-            ],
-            'email' => [
-                'required',
-                'email',
-                new UniqueEmailAcrossTables($this->employee?->people_id),
-            ],
+        $request = new Request([
+            'people_id' => $this->employee->people_id,
+            'phone' => $this->contact,
+            'email' => $this->email,
         ]);
 
-        DB::beginTransaction(); // Start transaction
-        try {
-            // Update directly
-            $this->employee->update([
-                'phone' => $this->contact,
-                'email' => $this->email,
-            ]);
+        $controller = new PeopleController();
+        $response = $controller->updateContactDetails($request);
+        $result = $response->getData();
 
-            DB::commit(); // Commit only if all operations succeeded
-
-            session()->flash('success', 'Contact information updated successfully.');
-            // Close modal
+        if ($result->status === 'success') {
+            session()->flash('success', $result->message ?? 'Contact information updated successfully.');
             $this->showModalContactInfo = false;
             return $this->redirect(url()->previous(), navigate: true);
-        } catch (Exception $e) {
-            DB::rollBack(); // Rollback on any failure
-            session()->flash('error', 'An error occurred while updating contact information: ' . $e->getMessage());
+        } else {
+            if ($result->status === 'validation_error') {
+                foreach ($result->errors as $field => $messages) {
+                    $propertyMap = [
+                        'phone' => 'contact',
+                        'email' => 'email',
+                    ];
+                    $propertyName = $propertyMap[$field] ?? $field;
+                    $this->addError($propertyName, $messages[0]);
+                }
+            } else {
+                session()->flash('error', $result->message ?? 'An error occurred.');
+            }
         }
     }
 

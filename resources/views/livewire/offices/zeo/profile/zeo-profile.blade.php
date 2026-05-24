@@ -1,156 +1,188 @@
 <section class="w-full">
-    <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">{{ __('Zonal Education Office') }}</flux:heading>
-        <flux:subheading size="lg" class="mb-6">
-            {{ __('Statistics about Zonal Education Office structure and staff distribution.') }}
-        </flux:subheading>
-        <flux:separator variant="subtle" />
-    </div>
-
     <x-offices.zeo.zeo-layout :officeId="$id">
+        {{-- 1. Header Section --}}
+        <header class="mb-10">
+            <flux:heading size="xl" level="1" class="text-3xl! font-black tracking-tight text-slate-900 dark:text-white leading-none mb-3">
+                {{ __('ZEo profile') }}
+            </flux:heading>
+            <flux:subheading size="lg" class="text-slate-500 dark:text-slate-500 font-medium max-w-2xl">
+                {{ __('Manage and view the profile of the zonal education officer, their roles, and professional history within this zonal education office region.') }}
+            </flux:subheading>
+        </header>
+        <div class="mt-8 space-y-10">
+            {{-- Main Content Card --}}
+            <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] shadow-sm overflow-hidden">
+                <div class="p-8 md:p-12 space-y-12">
 
-        <div class="antialiased min-h-screen">
-
-            {{-- Main Content --}}
-            <div class="max-w-5xl bg-white dark:bg-gray-800 p-6 rounded-b-lg">
-
-                {{-- Main Content --}}
-                <div class="space-y-6">
-
-                    {{-- 1. Administration Information --}}
-                    <section>
-                        <div class="mb-3">
-                            <div class="flex items-baseline justify-between py-2">
-                                <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200">Administration Information</h2>
+                    {{-- Administration Information Section --}}
+                    <div class="relative">
+                        <div class="absolute -left-12 top-0 bottom-0 w-1 bg-indigo-500 rounded-full opacity-20 hidden md:block"></div>
+                        <section>
+                            <div class="mb-3">
+                                <div class="flex items-baseline justify-between py-2">
+                                    <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200">Administration Information</h2>
+                                </div>
+                                <flux:separator variant="subtle" />
                             </div>
-                            <flux:separator variant="subtle" />
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
+                                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Provincial Department of Education</p>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        {{ $zonalEducationOffice->provincialEducationOffice->short_name ?? 'N/A' }}
+                                    </p>
+                                </div>
+                                <div class="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
+                                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">District</p>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        {{ $zonalEducationOffice->district->district_name ?? 'N/A' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    {{-- Contact Details Section --}}
+                    <div class="relative pt-12 border-t border-slate-200 dark:border-slate-700">
+                        <div class="absolute -left-12 top-12 bottom-0 w-1 bg-blue-500 rounded-full opacity-20 hidden md:block"></div>
+                        <section>
+                            <div class="mb-3">
+                                <div class="flex items-baseline justify-between py-2">
+                                    <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200">Contact Details</h2>
+                                    <flux:modal.trigger name="edit-zeo-contact">
+                                        <flux:button>Edit</flux:button>
+                                    </flux:modal.trigger>
+                                </div>
+                                <flux:separator variant="subtle" />
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
+                                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Email</p>
+                                    <p class="text-sm font-medium text-blue-600 dark:text-blue-400">
+                                        <a href="mailto:{{ $zonalEducationOffice->email }}">{{ $zonalEducationOffice->email ?? 'N/A' }}</a>
+                                    </p>
+                                </div>
+                                <div class="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
+                                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Phone</p>
+                                    <p class="text-sm font-medium text-blue-600 dark:text-blue-400">
+                                        <a href="tel:{{ $zonalEducationOffice->phone }}">{{ $zonalEducationOffice->phone ?? 'N/A' }}</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    {{-- Location Section --}}
+                    <div class="relative pt-12 border-t border-slate-200 dark:border-slate-700">
+                        <div class="absolute -left-12 top-12 bottom-0 w-1 bg-emerald-500 rounded-full opacity-20 hidden md:block"></div>
+                        <section>
+                            <div class="mb-3">
+                                <div class="flex items-baseline justify-between py-2">
+                                    <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200">Location</h2>
+                                    <flux:modal.trigger name="edit-zeo-location">
+                                        <flux:button>Edit</flux:button>
+                                    </flux:modal.trigger>
+                                </div>
+                                <flux:separator variant="subtle" />
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="col-span-2 p-3 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
+                                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Address</p>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        {{ $zonalEducationOffice->address ?? 'N/A' }}
+                                    </p>
+                                </div>
+                                <div class="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
+                                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Latitude</p>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        {{ $zonalEducationOffice->latitude ?? 'N/A' }}
+                                    </p>
+                                </div>
+                                <div class="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
+                                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Longitude</p>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        {{ $zonalEducationOffice->longitude ?? 'N/A' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    {{-- System Hash / Footer Meta --}}
+                    <div class="pt-8 mt-12 border-t border-slate-200 dark:border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-3 px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <flux:icon name="key" variant="micro" class="text-slate-500" />
+                            <span class="text-[10px] font-mono text-slate-500 dark:text-slate-500 uppercase tracking-widest">
+                                {{ __('System Key:') }} <span class="text-indigo-600 dark:text-indigo-400 font-bold">{{ $zonalEducationOffice->id }}</span>
+                            </span>
                         </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-                            <div
-                                class="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Provincial department of Education</p>
-                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $zonalEducationOffice->provincialEducationOffice->short_name ?? 'N/A' }}
-                                </p>
-                            </div>
-                            <div
-                                class="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">District</p>
-                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $zonalEducationOffice->district->district_name ?? 'N/A' }}
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
-                    {{-- 2. Contact Information --}}
-                    <section>
-                        <div class="mb-3">
-                            <div class="flex items-baseline justify-between py-2">
-                                <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200">Contact Details</h2>
-                                <flux:button icon="pencil-square" size="sm" variant="primary">Edit</flux:button>
-                            </div>
-                            <flux:separator variant="subtle" />
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-                            {{-- Email --}}
-                            <div
-                                class="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Email</p>
-                                <p class="text-sm font-medium text-blue-600 dark:text-blue-400">
-                                    <a href="mailto:{{ $zonalEducationOffice->email }}">{{ $zonalEducationOffice->email ?? 'N/A' }}</a>
-                                </p>
-                            </div>
-
-                            {{-- Phone --}}
-                            <div
-                                class="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Phone</p>
-                                <p class="text-sm font-medium text-blue-600 dark:text-blue-400">
-                                    <a href="tel:{{ $zonalEducationOffice->phone }}">{{ $zonalEducationOffice->phone ?? 'N/A' }}</a>
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
-                    {{-- 3. Location --}}
-                    <section>
-                        <div class="mb-3">
-                            <div class="flex items-baseline justify-between py-2">
-                                <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200">Location</h2>
-                                <flux:button icon="pencil-square" size="sm" variant="primary">Edit</flux:button>
-                            </div>
-                            <flux:separator variant="subtle" />
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {{-- Address --}}
-                            <div
-                                class="col-span-2 p-3 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Address</p>
-                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $zonalEducationOffice->address ?? 'N/A' }}
-                                </p>
-                            </div>
-                            <div
-                                class="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Latitude</p>
-                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $zonalEducationOffice->latitude ?? 'N/A' }}
-                                </p>
-                            </div>
-
-                            <div
-                                class="p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Longitude</p>
-                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $zonalEducationOffice->longitude ?? 'N/A' }}
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
-                    {{-- 4. Mission & Vision --}}
-                    <section>
-                        <div class="mb-3">
-                            <div class="flex items-baseline justify-between py-2">
-                                <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200">Mission & Vision</h2>
-                                <flux:button icon="pencil-square" size="sm" variant="primary">Edit</flux:button>
-                            </div>
-                            <flux:separator variant="subtle" />
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div
-                                class="p-3 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Mission</p>
-                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $zonalEducationOffice->mission ?? 'N/A' }}
-                                </p>
-                            </div>
-
-                            <div
-                                class="p-3 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Vision</p>
-                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $zonalEducationOffice->vision ?? 'N/A' }}
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
-                    {{-- 5. System Hash --}}
-                    <section class="pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <p class="text-xs font-mono text-gray-500 dark:text-gray-600">
-                            **System Key (Hash):** {{ $zonalEducationOffice->id }}
+                        <p class="text-[10px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-[0.3em]">
+                            {{ __('CEMIS Core Infrastructure') }}
                         </p>
-                    </section>
+                    </div>
 
                 </div>
             </div>
         </div>
 
-        </x-offices.zoe.zeo-layout>
+        {{-- ── Edit Contact Details Modal ───────────────────────────────── --}}
+        <flux:modal name="edit-zeo-contact" class="md:w-130">
+            <div class="space-y-6">
+                <div>
+                    <flux:heading size="lg">Update Contact Details</flux:heading>
+                    <flux:text class="mt-1">Update the email address and phone number for this office.</flux:text>
+                </div>
+                <form wire:submit.prevent="updateContactDetails" class="space-y-4">
+                    @csrf
+                    <flux:field>
+                        <flux:input label="Email" id="email" type="email" wire:model.live="email" placeholder="office@email.com" />
+                        @error('email') <flux:error>{{ $message }}</flux:error> @enderror
+                    </flux:field>
+                    <flux:field>
+                        <flux:input label="Phone" id="phone" type="text" wire:model.live="phone" placeholder="+94 11 234 5678" />
+                        @error('phone') <flux:error>{{ $message }}</flux:error> @enderror
+                    </flux:field>
+                    <div class="flex justify-end gap-3 pt-2">
+                        <flux:modal.close>
+                            <flux:button variant="ghost">Cancel</flux:button>
+                        </flux:modal.close>
+                        <flux:button type="submit" variant="primary">Save Changes</flux:button>
+                    </div>
+                </form>
+            </div>
+        </flux:modal>
+
+        {{-- ── Edit Location Modal ──────────────────────────────────────── --}}
+        <flux:modal name="edit-zeo-location" class="md:w-130">
+            <div class="space-y-6">
+                <div>
+                    <flux:heading size="lg">Update Location</flux:heading>
+                    <flux:text class="mt-1">Update the office address and geographic coordinates.</flux:text>
+                </div>
+                <form wire:submit.prevent="updateLocation" class="space-y-4">
+                    @csrf
+                    <flux:field>
+                        <flux:textarea label="Address" wire:model.live="address" placeholder="Enter full office address" rows="3" />
+                        @error('address') <flux:error>{{ $message }}</flux:error> @enderror
+                    </flux:field>
+                    <div class="grid grid-cols-2 gap-4">
+                        <flux:field>
+                            <flux:input label="Latitude" id="latitude" type="text" wire:model.live="latitude" placeholder="e.g. 6.9271" />
+                            @error('latitude') <flux:error>{{ $message }}</flux:error> @enderror
+                        </flux:field>
+                        <flux:field>
+                            <flux:input label="Longitude" id="longitude" type="text" wire:model.live="longitude" placeholder="e.g. 79.8612" />
+                            @error('longitude') <flux:error>{{ $message }}</flux:error> @enderror
+                        </flux:field>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-2">
+                        <flux:modal.close>
+                            <flux:button variant="ghost">Cancel</flux:button>
+                        </flux:modal.close>
+                        <flux:button type="submit" variant="primary">Save Changes</flux:button>
+                    </div>
+                </form>
+            </div>
+        </flux:modal>
+
+    </x-offices.zeo.zeo-layout>
 </section>

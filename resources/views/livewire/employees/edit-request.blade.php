@@ -48,7 +48,7 @@
                                     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
                                         
                                         {{-- Card Header --}}
-                                        <div class="bg-gray-50 dark:bg-gray-800/50 px-4 py-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                                        <div class="bg-gray-50 dark:bg-gray-800/50 px-4 py-2 border-b border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-1">
                                             <span class="text-xs font-bold text-gray-600 dark:text-gray-400 tracking-wider">
                                                 {{ $editRequest->complaint_request_ref }}
                                             </span>
@@ -85,7 +85,7 @@
                                                 'bg-red-50/30 dark:bg-red-900/10' => $isRejected,
                                                 'bg-emerald-50/30 dark:bg-emerald-900/10' => $isApproved,
                                             ])>
-                                                <div class="flex items-center justify-between mb-4">
+                                                <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
                                                     <div class="flex items-center gap-2">
                                                         <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Decision:</span>
                                                         {{-- Decision Badge Color matches Status --}}

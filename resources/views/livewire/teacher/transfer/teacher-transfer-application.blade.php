@@ -1,9 +1,9 @@
-<div class="max-w-5xl mx-auto px-4 py-8">
+<div class="max-w-7xl mx-auto px-4 py-8">
     {{-- Header Banner --}}
     <div class="relative overflow-hidden mb-8 rounded-2xl 
             bg-white dark:bg-slate-900 
             p-8 md:p-10 shadow-lg 
-            border border-slate-200 dark:border-slate-800">
+            border border-slate-300 dark:border-slate-700">
 
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
 
@@ -14,13 +14,13 @@
                     @if($applicationId)
                     {{ __('Edit Transfer Application') }} <span class="text-indigo-600 dark:text-indigo-500 font-extrabold ml-1">#{{ $applicationId }}</span>
                     @else
-                    {{ __('SLTS Transfer Application') }} <span class="text-slate-400 dark:text-slate-500 font-medium ml-1">({{ __('New Request') }})</span>
+                    {{ __('SLTS Transfer Application') }} <span class="text-slate-500 dark:text-slate-500 font-medium ml-1">({{ __('New Request') }})</span>
                     @endif
                 </flux:heading>
 
                 <flux:subheading
                     class="max-w-2xl text-base leading-relaxed 
-                       text-slate-600 dark:text-slate-400">
+                       text-slate-600 dark:text-slate-500">
                     {{ __('Submit your application for institutional transfer. Please ensure all details are accurate before final submission.') }}
                 </flux:subheading>
             </div>
@@ -55,14 +55,14 @@
         <div class="space-y-8">
 
             {{-- Section 1: Teacher Profile Synopsis --}}
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200 dark:border-zinc-800 p-8 shadow-sm">
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-300 dark:border-zinc-700 p-8 shadow-sm">
                 <flux:heading size="lg" class="mb-6 flex items-center gap-2">
                     <flux:icon name="user-circle" variant="mini" class="text-indigo-500" />
                     {{ __('Applicant Profile Synopsis') }}
                 </flux:heading>
 
                 <div class="grid grid-cols-1">
-                    <div class="bg-slate-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800">
+                    <div class="bg-slate-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-slate-200 dark:border-zinc-700">
                         <p class="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mb-1">{{ __('Name') }}</p>
                         <p class="font-bold text-slate-900 dark:text-zinc-100">{{ $teacherName }}</p>
                         <p class="text-sm text-slate-500 mt-1">{{ __('Employee ID: ') . $employeeId }}</p>
@@ -76,7 +76,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
-                    <div class="bg-slate-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800">
+                    <div class="bg-slate-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-slate-200 dark:border-zinc-700">
                         <p class="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mb-1">{{ __('Current Station') }}</p>
                         <p class="font-bold text-slate-900 dark:text-zinc-100">{{ $currentWorkplaceName }}</p>
                         <p class="text-sm text-slate-500 mt-1">{{ $currentWorkplaceAddress }}</p>
@@ -86,7 +86,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-slate-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800">
+                    <div class="bg-slate-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-slate-200 dark:border-zinc-700">
                         <p class="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mb-1">{{ __('Service Details') }}</p>
                         <p class="font-bold text-slate-900 dark:text-zinc-100">{{ $firstWorkplaceName }}</p>
                         <p class="text-sm text-slate-500 mt-1">{{ $firstWorkplaceAddress }}</p>
@@ -97,7 +97,7 @@
                     </div>
                 </div>
 
-                <div class="mt-2 pt-2 border-t border-slate-100 dark:border-zinc-800 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="mt-2 pt-2 border-t border-slate-200 dark:border-zinc-700 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-indigo-50/30 dark:bg-indigo-900/10 p-4 rounded-2xl border border-indigo-100/50 dark:border-indigo-900/20">
                         <p class="text-xs font-bold text-indigo-500/70 dark:text-indigo-400 uppercase tracking-widest mb-1">{{ __('Permanent Address') }}</p>
                         <p class="text-sm font-medium text-slate-900 dark:text-zinc-100 italic">{{ $permanentAddress }}</p>
@@ -111,7 +111,7 @@
             </div>
 
             {{-- Section 1B: Address Confirmation for Application --}}
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200 dark:border-zinc-800 p-8 shadow-sm">
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-300 dark:border-zinc-700 p-8 shadow-sm">
                 <flux:heading size="lg" class="mb-2 flex items-center gap-2">
                     <flux:icon name="map-pin" variant="mini" class="text-indigo-500" />
                     {{ __('Address for This Application') }}
@@ -121,7 +121,7 @@
                 </p>
 
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    <div x-data="{ showMap: false }" class="rounded-2xl border border-slate-200 bg-slate-50/60 p-5 dark:border-zinc-800 dark:bg-zinc-800/30">
+                    <div x-data="{ showMap: false }" class="rounded-2xl border border-slate-300 bg-slate-50/60 p-5 dark:border-zinc-700 dark:bg-zinc-800/30">
                         <div class="flex items-start justify-between gap-4">
                             <div>
                                 <p class="text-sm font-bold text-slate-900 dark:text-zinc-100">{{ __('Permanent Address') }}</p>
@@ -166,11 +166,11 @@
                                 </div>
                             </div>
 
-                            <div class="rounded-xl border border-dashed border-slate-200 px-3 py-2 text-xs font-medium text-slate-500 dark:border-zinc-700 dark:text-zinc-400">
+                            <div class="rounded-xl border border-dashed border-slate-300 px-3 py-2 text-xs font-medium text-slate-500 dark:border-zinc-700 dark:text-zinc-400">
                                 {{ __('Pinned coordinates') }}: <span class="font-mono text-slate-700 dark:text-zinc-200">{{ $this->resolvedPermanentCoordinates }}</span>
                             </div>
 
-                            <div x-show="showMap" x-cloak class="rounded-2xl border border-slate-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900">
+                            <div x-show="showMap" x-cloak class="rounded-2xl border border-slate-300 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900">
                                 <x-maps.leaflet-picker
                                     lat="permanentLatitude"
                                     lng="permanentLongitude"
@@ -180,7 +180,7 @@
                         </div>
                     </div>
 
-                    <div x-data="{ showMap: false }" class="rounded-2xl border border-slate-200 bg-slate-50/60 p-5 dark:border-zinc-800 dark:bg-zinc-800/30">
+                    <div x-data="{ showMap: false }" class="rounded-2xl border border-slate-300 bg-slate-50/60 p-5 dark:border-zinc-700 dark:bg-zinc-800/30">
                         <div class="flex items-start justify-between gap-4">
                             <div>
                                 <p class="text-sm font-bold text-slate-900 dark:text-zinc-100">{{ __('Temporary Address') }}</p>
@@ -225,11 +225,11 @@
                                 </div>
                             </div>
 
-                            <div class="rounded-xl border border-dashed border-slate-200 px-3 py-2 text-xs font-medium text-slate-500 dark:border-zinc-700 dark:text-zinc-400">
+                            <div class="rounded-xl border border-dashed border-slate-300 px-3 py-2 text-xs font-medium text-slate-500 dark:border-zinc-700 dark:text-zinc-400">
                                 {{ __('Pinned coordinates') }}: <span class="font-mono text-slate-700 dark:text-zinc-200">{{ $this->resolvedTemporaryCoordinates }}</span>
                             </div>
 
-                            <div x-show="showMap" x-cloak class="rounded-2xl border border-slate-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900">
+                            <div x-show="showMap" x-cloak class="rounded-2xl border border-slate-300 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900">
                                 <x-maps.leaflet-picker
                                     lat="temporaryLatitude"
                                     lng="temporaryLongitude"
@@ -242,7 +242,7 @@
             </div>
 
             {{-- Section 2: Transfer Type & Reason --}}
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200 dark:border-zinc-800 p-8 shadow-sm">
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-300 dark:border-zinc-700 p-8 shadow-sm">
                 <flux:heading size="lg" class="mb-6 flex items-center gap-2">
                     <flux:icon name="document-text" variant="mini" class="text-indigo-500" />
                     {{ __('Transfer Details') }}
@@ -250,11 +250,21 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                     <div class="max-w-md">
-                        <flux:select wire:model.live="policyId" label="{{ __('Transfer Type') }}" placeholder="{{ __('Select transfer type...') }}" :invalid="$errors->has('policyId')">
-                            @foreach($transferPolicies as $id => $title)
-                            <option value="{{ $id }}">{{ __($title) }}</option>
-                            @endforeach
-                        </flux:select>
+                        @if($lockPolicySelection)
+                            <div class="rounded-2xl border border-indigo-100 bg-indigo-50/40 px-4 py-4 dark:border-indigo-900/40 dark:bg-indigo-950/20">
+                                <p class="text-xs font-bold uppercase tracking-widest text-indigo-500/70 dark:text-indigo-300">{{ __('Transfer Type') }}</p>
+                                <p class="mt-2 font-bold text-slate-900 dark:text-zinc-100">{{ $transferPolicies[$policyId] ?? __('Selected policy') }}</p>
+                                <p class="mt-2 text-xs font-medium text-slate-500 dark:text-zinc-400">
+                                    {{ __('This application is tied to the policy you opened. To switch policies, go back and choose another policy first.') }}
+                                </p>
+                            </div>
+                        @else
+                            <flux:select wire:model.live="policyId" label="{{ __('Transfer Type') }}" placeholder="{{ __('Select transfer type...') }}" :invalid="$errors->has('policyId')">
+                                @foreach($transferPolicies as $id => $title)
+                                <option value="{{ $id }}">{{ __($title) }}</option>
+                                @endforeach
+                            </flux:select>
+                        @endif
                     </div>
 
                     <div class="max-w-md">
@@ -286,35 +296,35 @@
                 </div>
             </div>
 
-            {{-- Section 3: Transfer catogory --}}
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200 dark:border-zinc-800 p-8 shadow-sm">
+            {{-- Section 3: Transfer category --}}
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-300 dark:border-zinc-700 p-8 shadow-sm">
                 <flux:heading size="lg" class="mb-2 flex items-center gap-2">
                     <flux:icon name="map-pin" variant="mini" class="text-indigo-500" />
-                    {{ __('Transfer Category') }}
+                    {{ __('Category') }}
                 </flux:heading>
-                <p class="text-sm text-slate-500 mb-6">{{ __('Select the appropriate transfer category and target location.') }}</p>
+                <p class="text-sm text-slate-500 mb-6">{{ __('Select the appropriate category and target location.') }}</p>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                    <flux:select wire:model.live="transferCategoryId" label="{{ __('Category') }}" placeholder="{{ __('Select Category...') }}">
-                        @foreach($transferCatagory as $catagory)
-                        <option value="{{ $catagory['id'] }}">{{ $catagory['name'] }}</option>
+                    <flux:select wire:model.live="transferSubCategoryId" label="{{ __('Category') }}" placeholder="{{ __('Select Category...') }}">
+                        @foreach($transferSubCategories as $subCategory)
+                        <option value="{{ $subCategory['id'] }}">{{ $subCategory['name'] }}</option>
                         @endforeach
                     </flux:select>
 
                     @if($this->shouldChooseTargetProvince)
                     <flux:select wire:model.live="selectedProvinceId" label="{{ __('Target Province') }}" placeholder="{{ __('Select Province...') }}">
-                        @foreach($provincialEducationOffices as $province)
+                        @foreach($this->availableTargetProvinceOptions as $province)
                         <option value="{{ $province->workplace_id }}">{{ $province->name }}</option>
                         @endforeach
                     </flux:select>
-                    @elseif($transferCategoryId)
+                    @elseif($transferSubCategoryId)
                     <flux:input label="{{ __('Target Province') }}" value="{{ $this->resolvedTargetProvinceName }}" disabled />
                     @endif
                 </div>
             </div>
 
             {{-- Section 3: Preferences --}}
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200 dark:border-zinc-800 p-8 shadow-sm">
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-300 dark:border-zinc-700 p-8 shadow-sm">
                 <flux:heading size="lg" class="mb-2 flex items-center gap-2">
                     <flux:icon name="map-pin" variant="mini" class="text-indigo-500" />
                     {{ __('Station Preferences') }}
@@ -332,15 +342,19 @@
                     $isFirst = $i === 1;
                     @endphp
 
-                    <div wire:key="pref-slot-{{ $i }}" class="grid grid-cols-1 md:grid-cols-5 gap-6 items-start p-4 rounded-2xl border border-slate-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-900/10 transition-colors hover:border-indigo-100 dark:hover:border-indigo-900/30">
+                    <div wire:key="pref-slot-{{ $i }}" class="grid grid-cols-1 md:grid-cols-5 gap-6 items-start p-4 rounded-2xl border border-slate-200 dark:border-zinc-700 bg-slate-50/30 dark:bg-zinc-900/10 transition-colors hover:border-indigo-100 dark:hover:border-indigo-900/30">
                         {{-- Target Zone --}}
                         <flux:field class="md:col-span-2">
                             <flux:label>{{ __('Target Zone for :ord Preference', ['ord' => $ordinal]) }}</flux:label>
+                            @if($this->isCurrentZoneLocked)
+                            <flux:input value="{{ $this->resolvedPrimaryTargetZoneName }}" disabled />
+                            @else
                             <flux:select wire:model.live="selectedZones.{{ $i }}" placeholder="{{ $isFirst ? __('Select Zone...') : __('Select Zone (Optional)...') }}" :invalid="$errors->has('selectedZones.'.$i)">
                                 @foreach($zonalEducationOffices as $zone)
                                 <option value="{{ $zone->workplace_id }}">{{ $zone->name }}</option>
                                 @endforeach
                             </flux:select>
+                            @endif
                             <flux:error name="selectedZones.{{ $i }}" />
                         </flux:field>
 
@@ -373,93 +387,95 @@
                 </div>
             </div>
 
-            {{-- Section 4: Achievements --}}
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200 dark:border-zinc-800 p-8 shadow-sm">
-                <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                    <div>
-                        <flux:heading size="lg" class="mb-2 flex items-center gap-2">
-                            <flux:icon name="trophy" variant="mini" class="text-indigo-500" />
-                            {{ __('Achievements for Transfer Score') }}
-                        </flux:heading>
-                        <p class="text-sm text-slate-500">{{ __('Add zonal, provincial, or national achievements to support the board scoring review. This section is optional.') }}</p>
+            @if($policyAllowsAchievements)
+                {{-- Section 4: Achievements --}}
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-300 dark:border-zinc-700 p-8 shadow-sm">
+                    <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                        <div>
+                            <flux:heading size="lg" class="mb-2 flex items-center gap-2">
+                                <flux:icon name="trophy" variant="mini" class="text-indigo-500" />
+                                {{ __('Achievements for Transfer Score') }}
+                            </flux:heading>
+                            <p class="text-sm text-slate-500">{{ __('Add zonal, provincial, or national achievements to support the board scoring review. This section is optional.') }}</p>
+                        </div>
+                        <flux:button type="button" wire:click="addAchievement" variant="ghost" icon="plus" size="sm">{{ __('Add Achievement') }}</flux:button>
                     </div>
-                    <flux:button type="button" wire:click="addAchievement" variant="ghost" icon="plus" size="sm">{{ __('Add Achievement') }}</flux:button>
-                </div>
 
-                <div class="space-y-4">
-                    @foreach($achievements as $index => $achievement)
-                        <div wire:key="achievement-{{ $index }}" class="rounded-2xl border border-slate-100 bg-slate-50/60 p-4 dark:border-zinc-800 dark:bg-zinc-800/30">
-                            <div class="mb-4 flex items-start justify-between gap-3">
-                                <div>
-                                    <p class="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-zinc-400">{{ __('Achievement') }} {{ $index + 1 }}</p>
-                                    <p class="mt-1 text-xs leading-relaxed text-slate-500 dark:text-zinc-400">{{ __('Uncheck to keep the record but exclude it from transfer scoring.') }}</p>
+                    <div class="space-y-4">
+                        @foreach($achievements as $index => $achievement)
+                            <div wire:key="achievement-{{ $index }}" class="rounded-2xl border border-slate-200 bg-slate-50/60 p-4 dark:border-zinc-700 dark:bg-zinc-800/30">
+                                <div class="mb-4 flex items-start justify-between gap-3">
+                                    <div>
+                                        <p class="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-zinc-400">{{ __('Achievement') }} {{ $index + 1 }}</p>
+                                        <p class="mt-1 text-xs leading-relaxed text-slate-500 dark:text-zinc-400">{{ __('Uncheck to keep the record but exclude it from transfer scoring.') }}</p>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <label class="flex cursor-pointer items-center gap-2 rounded-xl border border-indigo-100 bg-white/90 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50/60 dark:border-indigo-900/40 dark:bg-zinc-900/80 dark:text-zinc-200 dark:hover:border-indigo-800 dark:hover:bg-indigo-950/20">
+                                            <flux:checkbox wire:model.live="achievements.{{ $index }}.is_included" />
+                                            <span>{{ __('Enable') }}</span>
+                                        </label>
+
+                                        @if(count($achievements) > 1)
+                                            <flux:button type="button" wire:click="removeAchievement({{ $index }})" variant="ghost" icon="trash" size="xs">{{ __('Remove') }}</flux:button>
+                                        @endif
+                                    </div>
                                 </div>
 
-                                <div class="flex items-center gap-2">
-                                    <label class="flex cursor-pointer items-center gap-2 rounded-xl border border-indigo-100 bg-white/90 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50/60 dark:border-indigo-900/40 dark:bg-zinc-900/80 dark:text-zinc-200 dark:hover:border-indigo-800 dark:hover:bg-indigo-950/20">
-                                        <flux:checkbox wire:model.live="achievements.{{ $index }}.is_included" />
-                                        <span>{{ __('Enable') }}</span>
-                                    </label>
+                                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                                    <flux:field>
+                                        <flux:select wire:model.live="achievements.{{ $index }}.achievement_type" label="{{ __('Type') }}" placeholder="{{ __('Select type...') }}">
+                                            @foreach($achievementTypes as $typeKey => $typeLabel)
+                                                <option value="{{ $typeKey }}">{{ __($typeLabel) }}</option>
+                                            @endforeach
+                                        </flux:select>
+                                        <flux:error name="achievements.{{ $index }}.achievement_type" />
+                                    </flux:field>
 
-                                    @if(count($achievements) > 1)
-                                        <flux:button type="button" wire:click="removeAchievement({{ $index }})" variant="ghost" icon="trash" size="xs">{{ __('Remove') }}</flux:button>
+                                    <flux:field>
+                                        <flux:select wire:model="achievements.{{ $index }}.achievement_level" label="{{ __('Level') }}" placeholder="{{ __('Select level...') }}">
+                                            @foreach($achievementLevels as $levelKey => $levelLabel)
+                                                <option value="{{ $levelKey }}">{{ __($levelLabel) }}</option>
+                                            @endforeach
+                                        </flux:select>
+                                        <flux:error name="achievements.{{ $index }}.achievement_level" />
+                                    </flux:field>
+
+                                    <flux:field class="xl:col-span-2">
+                                        <flux:input wire:model="achievements.{{ $index }}.title" label="{{ __('Title / Award') }}" placeholder="{{ __('Example: Provincial ICT Innovation Award') }}" />
+                                        <flux:error name="achievements.{{ $index }}.title" />
+                                    </flux:field>
+
+                                    <flux:field class="md:col-span-2">
+                                        <flux:input wire:model="achievements.{{ $index }}.event_name" label="{{ __('Event / Competition') }}" placeholder="{{ __('Optional event or competition name') }}" />
+                                        <flux:error name="achievements.{{ $index }}.event_name" />
+                                    </flux:field>
+
+                                    <flux:field>
+                                        <flux:input type="date" wire:model="achievements.{{ $index }}.achievement_date" label="{{ __('Date') }}" />
+                                        <flux:error name="achievements.{{ $index }}.achievement_date" />
+                                    </flux:field>
+
+                                    <flux:field class="md:col-span-2 xl:col-span-3">
+                                        <flux:input wire:model="achievements.{{ $index }}.details" label="{{ __('Details') }}" placeholder="{{ __('Briefly mention what, where, and when.') }}" />
+                                        <flux:error name="achievements.{{ $index }}.details" />
+                                    </flux:field>
+
+                                    @if(($achievement['achievement_type'] ?? '') === 'student')
+                                        <flux:field class="md:col-span-2 xl:col-span-4">
+                                            <flux:textarea wire:model="achievements.{{ $index }}.contribution_details" rows="2" label="{{ __('Teacher Contribution') }}" placeholder="{{ __('Required for student achievements. Explain your major contribution.') }}" />
+                                            <flux:error name="achievements.{{ $index }}.contribution_details" />
+                                        </flux:field>
                                     @endif
                                 </div>
                             </div>
-
-                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-                                <flux:field>
-                                    <flux:select wire:model.live="achievements.{{ $index }}.achievement_type" label="{{ __('Type') }}" placeholder="{{ __('Select type...') }}">
-                                        @foreach($achievementTypes as $typeKey => $typeLabel)
-                                            <option value="{{ $typeKey }}">{{ __($typeLabel) }}</option>
-                                        @endforeach
-                                    </flux:select>
-                                    <flux:error name="achievements.{{ $index }}.achievement_type" />
-                                </flux:field>
-
-                                <flux:field>
-                                    <flux:select wire:model="achievements.{{ $index }}.achievement_level" label="{{ __('Level') }}" placeholder="{{ __('Select level...') }}">
-                                        @foreach($achievementLevels as $levelKey => $levelLabel)
-                                            <option value="{{ $levelKey }}">{{ __($levelLabel) }}</option>
-                                        @endforeach
-                                    </flux:select>
-                                    <flux:error name="achievements.{{ $index }}.achievement_level" />
-                                </flux:field>
-
-                                <flux:field class="xl:col-span-2">
-                                    <flux:input wire:model="achievements.{{ $index }}.title" label="{{ __('Title / Award') }}" placeholder="{{ __('Example: Provincial ICT Innovation Award') }}" />
-                                    <flux:error name="achievements.{{ $index }}.title" />
-                                </flux:field>
-
-                                <flux:field class="md:col-span-2">
-                                    <flux:input wire:model="achievements.{{ $index }}.event_name" label="{{ __('Event / Competition') }}" placeholder="{{ __('Optional event or competition name') }}" />
-                                    <flux:error name="achievements.{{ $index }}.event_name" />
-                                </flux:field>
-
-                                <flux:field>
-                                    <flux:input type="date" wire:model="achievements.{{ $index }}.achievement_date" label="{{ __('Date') }}" />
-                                    <flux:error name="achievements.{{ $index }}.achievement_date" />
-                                </flux:field>
-
-                                <flux:field class="md:col-span-2 xl:col-span-3">
-                                    <flux:input wire:model="achievements.{{ $index }}.details" label="{{ __('Details') }}" placeholder="{{ __('Briefly mention what, where, and when.') }}" />
-                                    <flux:error name="achievements.{{ $index }}.details" />
-                                </flux:field>
-
-                                @if(($achievement['achievement_type'] ?? '') === 'student')
-                                    <flux:field class="md:col-span-2 xl:col-span-4">
-                                        <flux:textarea wire:model="achievements.{{ $index }}.contribution_details" rows="2" label="{{ __('Teacher Contribution') }}" placeholder="{{ __('Required for student achievements. Explain your major contribution.') }}" />
-                                        <flux:error name="achievements.{{ $index }}.contribution_details" />
-                                    </flux:field>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
-            </div>
+            @endif
 
             {{-- Section 5: Declarations --}}
-            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200 dark:border-zinc-800 p-8 shadow-sm">
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-300 dark:border-zinc-700 p-8 shadow-sm">
                 <flux:heading size="lg" class="mb-6 flex items-center gap-2">
                     <flux:icon name="check-badge" variant="mini" class="text-indigo-500" />
                     {{ __('Declarations') }}
@@ -492,8 +508,8 @@
     @else
     {{-- Step 2: Application Summary & Confirmation --}}
     <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200 dark:border-zinc-800 p-8 shadow-sm">
-            <div class="flex items-center justify-between mb-8 border-b border-slate-100 dark:border-zinc-800 pb-6">
+        <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-300 dark:border-zinc-700 p-8 shadow-sm">
+            <div class="flex items-center justify-between mb-8 border-b border-slate-200 dark:border-zinc-700 pb-6">
                 <div>
                     <flux:heading size="lg" class="flex items-center gap-2">
                         <flux:icon name="clipboard-document-check" variant="mini" class="text-indigo-500" />
@@ -505,7 +521,7 @@
             </div>
 
             {{-- Detailed Summary Grid --}}
-            <div class="space-y-10">
+            <div class="space-y-8">
                 {{-- Profile Info --}}
                 <section>
                     <h3 class="text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -514,32 +530,32 @@
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div>
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">{{ __('Full Name') }}</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Full Name') }}</p>
                             <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ $teacherName }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">{{ __('EMP ID / NIC') }}</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('EMP ID / NIC') }}</p>
                             <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ $employeeId }} | {{ $nic }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">{{ __('Current Station') }}</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Current Station') }}</p>
                             <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ $currentWorkplaceName }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">{{ __('Service at Current') }}</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Service at Current') }}</p>
                             <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ $currentServiceStationTotal }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">{{ __('Total Service') }}</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Total Service') }}</p>
                             <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ $serviceTotal }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">{{ __('Permanent Address') }}</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Permanent Address') }}</p>
                             <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word italic text-sm">{{ $permanentAddress }}</p>
                             <p class="mt-1 text-[11px] font-mono text-slate-500 dark:text-zinc-400">{{ $this->resolvedPermanentCoordinates }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">{{ __('Temporary Address') }}</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Temporary Address') }}</p>
                             <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word italic text-sm">{{ $this->resolvedTemporaryAddress }}</p>
                             <p class="mt-1 text-[11px] font-mono text-slate-500 dark:text-zinc-400">{{ $this->resolvedTemporaryCoordinates }}</p>
                         </div>
@@ -554,30 +570,30 @@
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                         <div>
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">{{ __('Transfer Type') }}</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Transfer Type') }}</p>
                             <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ $transferPolicies[$policyId] ?? 'N/A' }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">{{ __('Reason Category') }}</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Reason Category') }}</p>
                             <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ collect($transferReasonTypes)->firstWhere('id', $transferReasonTypeId)['name'] ?? 'N/A' }}</p>
                         </div>
                         @if($transferReasonTypeId === 'other')
                         <div class="md:col-span-2">
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">{{ __('Detailed Reason') }}</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Detailed Reason') }}</p>
                             <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ $transferReason }}</p>
                         </div>
                         @endif
                         <div>
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">{{ __('Transfer Category') }}</p>
-                            <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ $this->selectedTransferCategoryName ?: 'N/A' }}</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Category') }}</p>
+                            <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ $this->selectedTeacherTransferCategoryName ?: 'N/A' }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">{{ __('Target Province') }}</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Target Province') }}</p>
                             <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ $this->resolvedTargetProvinceName }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">{{ __('Target Zone') }}</p>
-                            <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ $zonalEducationOffices->where('workplace_id', $this->selectedZoneId)->first()->name ?? 'N/A' }}</p>
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Target Zone') }}</p>
+                            <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ $this->resolvedPrimaryTargetZoneName }}</p>
                         </div>
                     </div>
                 </section>
@@ -591,7 +607,7 @@
                     <div class="space-y-3">
                         @foreach(range(1, $maxPreferences) as $i)
                         @if(!empty($preferences[$i] ?? ''))
-                        <div class="flex items-center gap-4 p-3 bg-slate-50 dark:bg-zinc-800/40 rounded-xl border border-slate-100 dark:border-zinc-800">
+                        <div class="flex items-center gap-4 p-3 bg-slate-50 dark:bg-zinc-800/40 rounded-xl border border-slate-200 dark:border-zinc-700">
                             <span class="shrink-0 w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-sm">{{ $i }}</span>
                             <span class="font-medium text-slate-800 dark:text-zinc-200 wrap-break-word">{{ ($institutionsLists[$i] ?? collect())->where('workplace_id', $preferences[$i])->first()->name ?? 'N/A' }}</span>
                         </div>
@@ -606,7 +622,7 @@
                         return filled($achievement['title'] ?? '') || filled($achievement['achievement_level'] ?? '') || filled($achievement['details'] ?? '');
                     });
                 @endphp
-                @if($filledAchievements->isNotEmpty())
+                @if($policyAllowsAchievements && $filledAchievements->isNotEmpty())
                 <section>
                     <h3 class="text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
                         <span class="w-1 h-4 bg-indigo-500 rounded-full"></span>
@@ -614,7 +630,7 @@
                     </h3>
                     <div class="space-y-3">
                         @foreach($filledAchievements as $achievement)
-                            <div class="p-3 bg-slate-50 dark:bg-zinc-800/40 rounded-xl border border-slate-100 dark:border-zinc-800">
+                            <div class="p-3 bg-slate-50 dark:bg-zinc-800/40 rounded-xl border border-slate-200 dark:border-zinc-700">
                                 <div class="flex flex-wrap items-center gap-2">
                                     <flux:badge color="blue" size="xs">{{ $achievementLevels[$achievement['achievement_level'] ?? ''] ?? __('Level N/A') }}</flux:badge>
                                     <flux:badge variant="neutral" size="xs">{{ $achievementTypes[$achievement['achievement_type'] ?? ''] ?? __('Type N/A') }}</flux:badge>

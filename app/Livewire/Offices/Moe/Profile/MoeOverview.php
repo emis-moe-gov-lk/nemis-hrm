@@ -28,7 +28,9 @@ class MoeOverview extends Component
         $this->officeId = $id;
 
         // Dummy data (replace with actual relationships if needed)
-        $this->studentCount = 0;
+        // Calculate Nationwide Student Population for current year
+        $this->studentCount = \App\Models\InstitutionStudentAdmission::where('academic_year', date('Y'))
+            ->sum(\Illuminate\Support\Facades\DB::raw('male_count + female_count'));
         $this->provincialMinistryCount = ProvincialMinistryOfEducationOffice::count();
         $this->provincialDeptCount = ProvincialEducationOffice::count();
         $this->zonalOfficeCount = ZonalEducationOffice::count();
@@ -37,8 +39,8 @@ class MoeOverview extends Component
         // Count staff per service
         $this->serviceCounts = Service::all()->map(function ($service) {
             $count = \App\Models\People::whereHas('currentAppointment', function ($q) use ($service) {
-                $q->where('service_id', $service->service_id)
-                  ->whereNotNull('workplace_id');
+                $q->whereNotNull('workplace_id')
+                  ->whereHas('appointment', fn($sq) => $sq->where('service_id', $service->service_id));
             })->active()->count();
 
             return (object)[

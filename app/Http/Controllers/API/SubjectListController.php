@@ -54,6 +54,7 @@ class SubjectListController extends Controller
     public function show($id)
     {
         $subject = SubjectList::find($id);
+        /** @var \App\Models\SubjectList|null $subject */
 
         if (!$subject) {
             return response()->json([

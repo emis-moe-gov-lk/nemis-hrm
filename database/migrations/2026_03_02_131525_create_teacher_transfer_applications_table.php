@@ -54,12 +54,12 @@ return new class extends Migration
             // short unique name
             $table->unique('transfer_application_id', 'tta_app_unique');
 
-            $table->foreign('policy_id')->references('policy_id')->on('transfer_policies');
+            $table->foreign('policy_id')->references('policy_id')->on('teacher_transfer_policies');
             $table->foreign('appointment_id')->references('appointment_id')->on('employer_appointments');
             $table->foreign('employee_id')->references('people_id')->on('people');
             $table->foreign('target_province')->references('workplace_id')->on('provincial_education_offices');
             $table->foreign('current_workplace')->references('workplace_id')->on('workplaces');
-            $table->foreign('transfer_category')->references('transfer_category_id')->on('transfer_categories');
+            $table->foreign('transfer_category')->references('transfer_category_id')->on('teacher_transfer_categories');
             $table->foreign('cwp_facilities_id')->references('facilities_id')->on('institutional_facilities');
 
             $table->foreign('created_by')->references('people_id')->on('people');

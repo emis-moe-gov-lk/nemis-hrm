@@ -1,8 +1,8 @@
-<div class="max-w-7xl mx-left pb-10 px-0 md:px-4">
+<div class="max-w-7xl mx-auto pb-10 px-0 md:px-4">
     {{-- 1. Profile Header Section --}}
     <div class="bg-white dark:bg-gray-900 rounded-2xl border-x border-b border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
         {{-- Cover Photo --}}
-        <div class="h-32 md:h-52 bg-gradient-to-r from-blue-600 to-indigo-600 relative">
+        <div class="h-32 md:h-52 bg-linear-to-r from-blue-600 to-indigo-600 relative">
             <div class="absolute inset-0 opacity-100 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
         </div>
 
@@ -31,7 +31,7 @@
 
                         <span class="hidden md:block w-1 h-1 bg-slate-300 rounded-full"></span>
 
-                        <p class="text-slate-500 dark:text-slate-400 font-medium text-sm md:text-base flex items-center justify-center md:justify-start gap-1.5">
+                        <p class="text-slate-500 dark:text-slate-500 font-medium text-sm md:text-base flex items-center justify-center md:justify-start gap-1.5">
                             <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-7h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                             </svg>
@@ -188,7 +188,7 @@
                         </x-alert>
 
                         {{-- User Summary (Read-only) --}}
-                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
 
                                 <div>

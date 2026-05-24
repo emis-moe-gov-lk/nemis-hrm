@@ -78,7 +78,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call(TransferReasonSeeder::class);
         $this->call(TransferScoreCriteriaSeeder::class);
-        //$this->call(TransferCategorySeeder::class);
+        $this->call(TeacherTransferSubCategorySeeder::class);
+        //$this->call(TeacherTransferCategorySeeder::class);
         $this->call(TeacherTransferRecommendationListSeeder::class);
         $this->call(TeacherTransferBoardRecommendationListSeeder::class);
 

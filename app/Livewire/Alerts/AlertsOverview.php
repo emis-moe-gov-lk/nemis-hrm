@@ -2,9 +2,10 @@
 
 namespace App\Livewire\Alerts;
 
-use App\Models\People;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class AlertsOverview extends Component
 {
@@ -17,10 +18,11 @@ class AlertsOverview extends Component
         $logged = Auth::user()->load('workplace');
         $workplace = $logged->workplace;
 
-        // If user has no workplace → show empty result
+        // If user has no workplace → set counts to 0 and return
         if (! $workplace) {
-            $employees = People::where('id', 0)->paginate(10);
-            return view('livewire.pending.verification', compact('employees'));
+            $this->pendingConfirmationCount = 0;
+            $this->pendingVerificationCount = 0;
+            return;
         }
 
         // Get allowed workplaces (hierarchy)
@@ -70,50 +72,43 @@ class AlertsOverview extends Component
 
         /*
         |--------------------------------------------------------------------------
-        | If user has no permission → show empty
+        | Main Query - Pending Confirmation
         |--------------------------------------------------------------------------
         */
-        if (empty($allowedServicesConfirm)) {
-            $employees = People::where('id', 0)->paginate(10);
-            return view('livewire.pending.verification', compact('employees'));
-        }
-
-        if (empty($allowedServicesVerify)) {
-            $employees = People::where('id', 0)->paginate(10);
-            return view('livewire.pending.verification', compact('employees'));
+        if (!empty($allowedServicesConfirm)) {
+            $cacheKey = 'alerts:pending-confirmation:' . $workplace->workplace_id . ':' . implode(',', $allowedServicesConfirm);
+            $this->pendingConfirmationCount = Cache::remember($cacheKey, 60, fn() => $this->countPendingAlerts($allowedWorkplaceIds, $allowedServicesConfirm, true, false));
+        } else {
+            $this->pendingConfirmationCount = 0;
         }
 
         /*
         |--------------------------------------------------------------------------
-        | Main Query
+        | Main Query - Pending Verification
         |--------------------------------------------------------------------------
         */
-        $pendingConfirmationCount = People::whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds, $allowedServicesConfirm) {
-            $q->whereIn('service_id', $allowedServicesConfirm)
-            ->whereIn('workplace_id', $allowedWorkplaceIds);
-        })
-        ->whereHas('appointment', function ($q) {
-            $q->where('is_verified', 1)
-            ->where('is_confirmed', 0);
-        })
-        ->count();
-
-        $pendingVerificationCount = People::whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds, $allowedServicesVerify) {
-            $q->whereIn('service_id', $allowedServicesVerify)
-            ->whereIn('workplace_id', $allowedWorkplaceIds);
-        })
-        ->whereHas('appointment', function ($q) {
-            $q->where('is_verified', 0)
-            ->where('is_confirmed', 0);
-        })
-        ->count();
-
-    $this->pendingConfirmationCount = $pendingConfirmationCount;
-    $this->pendingVerificationCount = $pendingVerificationCount;
-
+        if (!empty($allowedServicesVerify)) {
+            $cacheKey = 'alerts:pending-verification:' . $workplace->workplace_id . ':' . implode(',', $allowedServicesVerify);
+            $this->pendingVerificationCount = Cache::remember($cacheKey, 60, fn() => $this->countPendingAlerts($allowedWorkplaceIds, $allowedServicesVerify, false, false));
+        } else {
+            $this->pendingVerificationCount = 0;
+        }
     }
+
+    private function countPendingAlerts(array $allowedWorkplaceIds, array $allowedServices, bool $isVerified, bool $isConfirmed): int
+    {
+        return DB::table('employer_current_appointments')
+            ->join('employer_appointments', 'employer_appointments.appointment_id', '=', 'employer_current_appointments.appointment_id')
+            ->whereIn('employer_current_appointments.workplace_id', $allowedWorkplaceIds)
+            ->whereIn('employer_appointments.service_id', $allowedServices)
+            ->where('employer_appointments.is_verified', $isVerified ? 1 : 0)
+            ->where('employer_appointments.is_confirmed', $isConfirmed ? 1 : 0)
+            ->count(DB::raw('distinct employer_current_appointments.employee_id'));
+    }
+
     public function render()
     {
         return view('livewire.alerts.alerts-overview');
     }
 }
+

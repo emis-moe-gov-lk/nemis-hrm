@@ -128,6 +128,13 @@
 </head>
 
 <body>
+    @php
+        $boardDecision = $application->boardRecommendation;
+        $boardDecisionLabel = $boardDecision?->recommendationList?->decision ?? ucfirst((string) ($boardDecision?->recommendation_status ?? ''));
+        $approvedSchoolName = $boardDecision?->selectedSchool?->name ?? 'N/A';
+        $approvedZoneName = $boardDecision?->selectedZone?->name ?? 'N/A';
+    @endphp
+
     <htmlpageheader name="page-header">
         <table width="100%" style="vertical-align: bottom; border-bottom: 2px solid #1e293b; padding-bottom: 10px;">
             <tr>
@@ -220,6 +227,42 @@
             @endif
         </table>
     </div>
+
+    @if($boardDecision)
+    <div class="section">
+        <div class="section-title">Transfer Decision Summary</div>
+        <table class="data-table">
+            <tr>
+                <th>Decision</th>
+                <td>{{ $boardDecisionLabel ?: 'N/A' }}</td>
+                <th>Status</th>
+                <td>
+                    <span class="status-badge status-{{ $boardDecision->recommendation_status }}">
+                        {{ ucfirst($boardDecision->recommendation_status ?? 'pending') }}
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <th>Approved Zone</th>
+                <td>{{ $approvedZoneName }}</td>
+                <th>Approved School</th>
+                <td>{{ $approvedSchoolName }}</td>
+            </tr>
+            <tr>
+                <th>Effective Date</th>
+                <td>{{ $boardDecision->transfer_effective_date?->format('F d, Y') ?? 'N/A' }}</td>
+                <th>Decision Officer</th>
+                <td>{{ $boardDecision->creator?->name_with_initials ?? 'N/A' }}</td>
+            </tr>
+            @if(filled($boardDecision->recommendation_remarks))
+            <tr>
+                <th>Official Remarks</th>
+                <td colspan="3">{{ $boardDecision->recommendation_remarks }}</td>
+            </tr>
+            @endif
+        </table>
+    </div>
+    @endif
 
     <div class="section">
         <div class="section-title">Station Preferences</div>

@@ -6,24 +6,29 @@ use Exception;
 use App\Models\People;
 use Livewire\Component;
 use App\Models\BloodGroup;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use App\Http\Controllers\PeopleController;
+
 
 class HealthInformation extends Component
 {
-    public $peopleId;
-    public $canEdit;
-    public $employee;
-    public $showModalHealthInfo = false; // control modal visibility
+    public string $peopleId;
+    public bool $canEdit = false;
+    public People $employee;
+    public bool $showModalHealthInfo = false; // control modal visibility
 
     // -------------------------
-    // Personal Details
+    // Health Details
     // -------------------------
-    public $bloodGroup, $healthCondition, $healthProblem;
+    public ?string $bloodGroup = null;
+    public ?string $healthCondition = '';
+    public ?string $healthProblem = null;
 
     // -------------------------
     // Dropdown Options
     // -------------------------
-    public $bloodGroupOptions = [], $healthConditionOptions = [];
+    public array $bloodGroupOptions = [];
+    public array $healthConditionOptions = [];
 
     // -------------------------
     // Validation Rules
@@ -33,57 +38,61 @@ class HealthInformation extends Component
         return [
             'bloodGroup' => 'required|string',
             'healthCondition' => 'required|boolean',
-            'healthProblem' => 'required_if:healthCondition,false|string|max:1000',
+            'healthProblem' => 'required_if:healthCondition,0,false|string|max:1000',
         ];
     }
 
-    public function mount($peopleId)
+    public function mount(string $peopleId)
     {
         $this->employee = People::where('people_id', $peopleId)->first();
         //$this->canEdit = $canEdit;
 
-        $this->bloodGroupOptions = BloodGroup::all();
-        $this->healthConditionOptions = [true => 'Yes', false => 'No'];
+        $this->bloodGroupOptions = BloodGroup::all()->all();
+        $this->healthConditionOptions = ['1' => 'Yes', '0' => 'No'];
 
         $this->bloodGroup = $this->employee->blood_group_id;
-        $this->healthCondition = $this->employee->health_condition;
+        $this->healthCondition = $this->employee->health_condition !== null ? (string)$this->employee->health_condition : '';
         $this->healthProblem = $this->employee->health_problem;
     }
 
     public function updatedHealthCondition()
     {
-        if ($this->healthCondition == true) {
+        if ($this->healthCondition === '1') {
             $this->healthProblem = null;
         }
     }
 
     public function editHealthInfo()
     {
-        // Direct validation
-        $validated = $this->validate([
-            'bloodGroup' => 'required|string',
-            'healthCondition' => 'required|boolean',
-            'healthProblem' => 'nullable|string|max:1000',
+        $request = new Request([
+            'people_id' => $this->employee->people_id,
+            'blood_group_id' => $this->bloodGroup,
+            'health_condition' => $this->healthCondition,
+            'health_problem' => $this->healthProblem,
         ]);
 
+        $controller = new PeopleController();
+        $response = $controller->updateHealth($request);
+        $result = $response->getData();
 
-        DB::beginTransaction(); // Start transaction
-        try {
-            // Update directly
-            $this->employee->update([
-                'blood_group_id' => $this->bloodGroup,
-                'health_condition' => $this->healthCondition,
-                'health_problem' => $this->healthProblem,
-            ]);
-
-            DB::commit(); // Commit only if all operations succeeded
-            session()->flash('success', 'Health information updated successfully.');
-            // Close modal
+        if ($result?->status === 'success') {
+            session()->flash('success', $result?->message ?? 'Health information updated successfully.');
             $this->showModalHealthInfo = false;
             return $this->redirect(url()->previous(), navigate: true);
-        } catch (Exception $e) {
-            DB::rollBack(); // Rollback on any failure
-            session()->flash('error', 'An error occurred while updating health information: ' . $e->getMessage());
+        } else {
+            if ($result?->status === 'validation_error') {
+                foreach ($result?->errors as $field => $messages) {
+                    $propertyMap = [
+                        'blood_group_id' => 'bloodGroup',
+                        'health_condition' => 'healthCondition',
+                        'health_problem' => 'healthProblem',
+                    ];
+                    $propertyName = $propertyMap[$field] ?? $field;
+                    $this->addError($propertyName, $messages[0]);
+                }
+            } else {
+                session()->flash('error', $result?->message ?? 'An error occurred.');
+            }
         }
     }
 

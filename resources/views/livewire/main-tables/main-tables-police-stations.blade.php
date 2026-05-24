@@ -21,7 +21,7 @@
                     </flux:heading>
                     <div class="flex items-center gap-2">
                         <div class="h-1.5 w-8 bg-indigo-500 rounded-full"></div>
-                        <flux:subheading size="lg" class="!font-bold text-slate-400 uppercase tracking-widest text-[11px]">
+                        <flux:subheading size="lg" class="!font-bold text-slate-500 uppercase tracking-widest text-[11px]">
                             {{ __('Law Enforcement Units & Contact Directory') }}
                         </flux:subheading>
                     </div>
@@ -49,11 +49,11 @@
             {{-- CARD GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8 px-4">
                 @forelse ($police_stations as $key => $data)
-                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[3rem] p-8 hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.5)] hover:border-indigo-500/50 transition-all duration-500">
+                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[3rem] p-8 hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.5)] hover:border-indigo-500/50 transition-all duration-500">
                         
                         {{-- Card Header --}}
                         <div class="flex justify-between items-start mb-6">
-                            <span class="text-[10px] font-black uppercase tracking-widest px-4 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full border border-slate-200 dark:border-slate-700">
+                            <span class="text-[10px] font-black uppercase tracking-widest px-4 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 rounded-full border border-slate-300 dark:border-slate-700">
                                 {{ $data->police_station_id }}
                             </span>
                             
@@ -70,7 +70,7 @@
                             <h3 class="text-xl font-black text-slate-900 dark:text-white leading-tight uppercase tracking-tight group-hover:text-indigo-600 transition-colors">
                                 {{ $data->police_station_name }}
                             </h3>
-                            <div class="flex items-start gap-2 mt-3 text-slate-500 dark:text-slate-400">
+                            <div class="flex items-start gap-2 mt-3 text-slate-500 dark:text-slate-500">
                                 <flux:icon.map-pin variant="micro" class="shrink-0 mt-0.5" />
                                 <p class="text-xs font-medium leading-relaxed">
                                     {{ $data->address }}<br>
@@ -81,18 +81,18 @@
 
                         {{-- Contact Stack --}}
                         <div class="space-y-2 mb-8">
-                            <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+                            <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
                                 <flux:icon.phone variant="micro" class="text-indigo-500" />
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ $data->phone }}</span>
                             </div>
-                            <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50">
+                            <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
                                 <flux:icon.envelope variant="micro" class="text-indigo-500" />
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-300 truncate">{{ $data->email }}</span>
                             </div>
                         </div>
 
                         {{-- Card Actions --}}
-                        <div class="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div class="mt-auto pt-6 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
                              <div class="flex items-center gap-2 text-slate-300 font-bold text-xs uppercase tracking-widest">
                                 <flux:icon.hashtag variant="micro" />
                                 <span>{{ $police_stations->firstItem() + $key }}</span>
@@ -115,11 +115,11 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-32 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/40 rounded-[4rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-32 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/40 rounded-[4rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
                             <flux:icon.shield-check size="xl" class="text-slate-300" />
                         </div>
-                        <p class="text-slate-400 font-black uppercase tracking-[0.3em] text-sm">{{ __('No Stations Found') }}</p>
+                        <p class="text-slate-500 font-black uppercase tracking-[0.3em] text-sm">{{ __('No Stations Found') }}</p>
                     </div>
                 @endforelse
             </div>
@@ -185,7 +185,7 @@
         <flux:modal wire:model="showModelEditPoliceStation" name="edit-police-station" class="w-full max-w-lg rounded-[3rem] p-12">
             <div class="space-y-8">
                 <div class="flex items-center gap-5">
-                    <div class="w-16 h-16 bg-slate-900 dark:bg-white rounded-[1.5rem] flex items-center justify-center text-white dark:text-slate-900 shadow-2xl">
+                    <div class="w-16 h-16 bg-indigo-600 dark:bg-white rounded-[1.5rem] flex items-center justify-center text-white dark:text-slate-900 shadow-2xl">
                         <flux:icon.pencil-square size="lg" />
                     </div>
                     <div>

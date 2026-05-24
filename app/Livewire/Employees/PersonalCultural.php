@@ -13,25 +13,37 @@ use App\Helpers\NicHelper;
 use App\Models\GenderList;
 use App\Models\CivilStatus;
 use App\Rules\UniqueHashedNic;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\PeopleController;
 
 class PersonalCultural extends Component
 {
-    public $peopleId;
-    public $canEdit;
-    public $employee;
-    public $showModalPersonalInfo = false; // control modal visibility
+    public string $peopleId;
+    public bool $canEdit = false;
+    public People $employee;
+    public bool $showModalPersonalInfo = false; // control modal visibility
 
     // -------------------------
     // Personal Details
     // -------------------------
-    public $nic, $title, $fullName, $gender, $birthday, $religion;
-    public $ethnicity, $civilStatus;
+    public ?string $nic = null;
+    public ?string $title = null;
+    public ?string $fullName = null;
+    public ?string $gender = null;
+    public ?string $birthday = null;
+    public ?string $religion = null;
+    public ?string $ethnicity = null;
+    public ?string $civilStatus = null;
 
-     // -------------------------
+    // -------------------------
     // Dropdown Options
     // -------------------------
-    public $titleOptions = [], $religionOptions = [], $genderOptions = [], $ethnicityOptions = [], $civilStatusOptions = [];
+    public array $titleOptions = [];
+    public array $religionOptions = [];
+    public array $genderOptions = [];
+    public array $ethnicityOptions = [];
+    public array $civilStatusOptions = [];
 
     // -------------------------
     // Validation Rules
@@ -51,21 +63,21 @@ class PersonalCultural extends Component
     }
 
     // 🔹 Live validation as user types
-    public function updated($propertyName)
+    public function updated(string $propertyName)
     {
         $this->validateOnly($propertyName);
     }
 
-    public function mount($peopleId)
+    public function mount(string $peopleId)
     {
         $this->employee = People::where('people_id', $peopleId)->first();
         // $this->canEdit = $canEdit;
 
-        $this->titleOptions = Title::all();
-        $this->genderOptions = GenderList::all();
-        $this->religionOptions = Religion::all();
-        $this->ethnicityOptions = Ethnicity::all();
-        $this->civilStatusOptions = CivilStatus::all();
+        $this->titleOptions = Title::active()->get()->all();
+        $this->genderOptions = GenderList::active()->get()->all();
+        $this->religionOptions = Religion::active()->get()->all();
+        $this->ethnicityOptions = Ethnicity::active()->get()->all();
+        $this->civilStatusOptions = CivilStatus::active()->get()->all();
 
         $this->nic = $this->employee->nic;
         $this->title = $this->employee->title_id;
@@ -79,53 +91,47 @@ class PersonalCultural extends Component
 
     public function editPersonalInfo()
     {
-        // Direct validation
-        $validated = $this->validate([
-            'title' => 'required|string',
-            'nic' => ['required', 'string', 'regex:/^(\d{9}[vVxX]|\d{12})$/', new UniqueHashedNic($this->employee->people_id)],
-            'fullName' => 'required|string|max:255',
-            'gender' => 'required|string',
-            'birthday' => 'required|date',
-            'religion' => 'required|string',
-            'ethnicity' => 'required|string',
-            'civilStatus' => 'required|string',
+        $request = new Request([
+            'people_id' => $this->employee->people_id,
+            'title_id' => $this->title,
+            'nic' => $this->nic,
+            'full_name' => $this->fullName,
+            'gender_id' => $this->gender,
+            'date_of_birth' => $this->birthday,
+            'religion_id' => $this->religion,
+            'ethnicity_id' => $this->ethnicity,
+            'civil_status_id' => $this->civilStatus,
         ]);
 
-        DB::beginTransaction(); // Start transaction
-        try {
-            $nic = NicHelper::normalize($this->nic);
-            // Check NIC validity
-            if (!NicHelper::checkNicValid($nic)) {
-                $this->addError('nic', 'Invalid NIC number');
-                return;
-            }
-            // Update directly
-            $this->employee->update([
-                'nic' => $nic,
-                //'nic_hash' => hash('sha256', strtoupper($this->nic)),
-                'title_id' => $this->title,
-                'full_name' => $this->fullName,
-                'name_with_initials' => People::generateInitials($this->fullName),
-                'gender_id' => $this->gender,
-                'date_of_birth' => $this->birthday,
-                'religion_id' => $this->religion,
-                'ethnicity_id' => $this->ethnicity,
-                'civil_status_id' => $this->civilStatus,
-            ]);
+        $controller = new PeopleController();
+        $response = $controller->updatePersonal($request);
+        $result = $response->getData();
 
-            DB::commit(); // Commit only if all operations succeeded
-
-            session()->flash('success', 'Personal information updated successfully.');
-            // Close modal
+        if ($result->status === 'success') {
+            session()->flash('success', $result->message ?? 'Personal information updated successfully.');
             $this->showModalPersonalInfo = false;
             return $this->redirect(url()->previous(), navigate: true);
-            
-        } catch (Exception $e) {
-            DB::rollBack(); // Rollback on any failure
-            session()->flash('error', 'An error occurred while updating personal information: ' . $e->getMessage());
+        } else {
+            if ($result->status === 'validation_error') {
+                foreach ($result->errors as $field => $messages) {
+                    $propertyMap = [
+                        'full_name' => 'fullName',
+                        'gender_id' => 'gender',
+                        'date_of_birth' => 'birthday',
+                        'religion_id' => 'religion',
+                        'ethnicity_id' => 'ethnicity',
+                        'civil_status_id' => 'civilStatus',
+                        'title_id' => 'title',
+                    ];
+                    $propertyName = $propertyMap[$field] ?? $field;
+                    $this->addError($propertyName, $messages[0]);
+                }
+            } else {
+                session()->flash('error', $result->message ?? 'An error occurred.');
+            }
         }
     }
-    
+
     public function render()
     {
         return view('livewire.employees.personal-cultural');

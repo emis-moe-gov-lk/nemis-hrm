@@ -9,7 +9,7 @@
                         {{ __('Recruitment Categories') }}
                     </flux:heading>
                     <flux:subheading size="lg" class="flex items-center gap-2">
-                        <flux:icon.user-plus variant="micro" class="text-slate-400" />
+                        <flux:icon.user-plus variant="micro" class="text-slate-500" />
                         {{ __('Manage principal recruitment streams and entry types') }}
                     </flux:subheading>
                 </div>
@@ -36,11 +36,11 @@
             {{-- CATEGORY LIST --}}
             <div class="space-y-3">
                 @forelse ($principalrecruitmentcategories as $key => $data)
-                    <div class="group flex flex-col md:flex-row md:items-center justify-between p-4 md:p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 gap-4">
+                    <div class="group flex flex-col md:flex-row md:items-center justify-between p-4 md:p-6 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-4xl hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 gap-4">
                         
                         <div class="flex items-center gap-6">
                             {{-- Index --}}
-                            <div class="hidden md:flex shrink-0 w-12 h-12 items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-xs font-black text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                            <div class="hidden md:flex shrink-0 w-12 h-12 items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-black text-slate-500 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                                 {{ $principalrecruitmentcategories->firstItem() + $key }}
                             </div>
 
@@ -78,9 +78,9 @@
                         </div>
                     </div>
                 @empty
-                    <div class="py-20 text-center bg-slate-50/50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="py-20 text-center bg-slate-50/50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <flux:icon.user-plus size="xl" class="mx-auto text-slate-200 mb-4" />
-                        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest">{{ __('No Categories Defined') }}</h3>
+                        <h3 class="text-sm font-black text-slate-500 uppercase tracking-widest">{{ __('No Categories Defined') }}</h3>
                     </div>
                 @endforelse
             </div>

@@ -37,6 +37,7 @@ class TitleController extends Controller
     public function show($id)
     {
         $title = Title::find($id);
+        /** @var \App\Models\Title|null $title */
 
         if (!$title) {
             return response()->json([

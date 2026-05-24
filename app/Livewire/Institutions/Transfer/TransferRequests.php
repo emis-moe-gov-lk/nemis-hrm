@@ -7,6 +7,8 @@ use App\Models\Institution;
 use App\Models\TeacherTransferApplication;
 use App\Models\TeacherTransferApplicationRecommendation;
 use App\Models\TeacherTransferRecommendationList;
+use App\Models\TeacherTransferPolicyStep;
+use App\Support\Transfer\TransferAccess;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -22,13 +24,19 @@ class TransferRequests extends Component
     public $recommendationDecision;
     public $recommendationRemarks;
     public $recommendationOptions = [];
+    public bool $approvalReadOnly = false;
+    public ?string $approvalWindowMessage = null;
 
     public function mount($id)
     {
         $this->id = $id;
-        $this->institution = Institution::findOrFail($this->id);
+        $this->institution = Institution::query()
+            ->where('id', $this->id)
+            ->orWhere('workplace_id', $this->id)
+            ->firstOrFail();
+        abort_unless(TransferAccess::canViewInstitutionRequests(Auth::user(), $this->institution), 403);
 
-        // Fetch recommendation options for School level (OLID006)
+        // Fetch institution-level approval options for School level (OLID006)
         $this->recommendationOptions = TeacherTransferRecommendationList::where('office_level_id', 'OLID006')
             ->active()
             ->get();
@@ -36,21 +44,26 @@ class TransferRequests extends Component
 
     public function openRecommendationModal($applicationId)
     {
-        $this->selectedApplication = TeacherTransferApplication::with('employee')->findOrFail($applicationId);
-        
-        // Check for existing recommendation at this workplace
-        $existing = TeacherTransferApplicationRecommendation::where('transfer_application_id', $this->selectedApplication->transfer_application_id)
-            ->where('workplace_id', $this->institution->workplace_id)
-            ->first();
+        $this->prepareApprovalModal($applicationId);
 
-        if ($existing) {
-            $this->recommendationDecision = $existing->transfer_recommendation_list_id;
-            $this->recommendationRemarks = $existing->remarks;
-        } else {
-            $this->recommendationDecision = '';
-            $this->recommendationRemarks = '';
+        if (!$this->canEditInstitutionApproval($this->selectedApplication)) {
+            $this->closeRecommendationModal();
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Institution approval can be edited only before the institution approval closing date.',
+            ]);
+
+            return;
         }
-        
+
+        $this->approvalReadOnly = false;
+        $this->showRecommendationModal = true;
+    }
+
+    public function viewRecommendationModal($applicationId)
+    {
+        $this->prepareApprovalModal($applicationId);
+        $this->approvalReadOnly = true;
         $this->showRecommendationModal = true;
     }
 
@@ -58,10 +71,28 @@ class TransferRequests extends Component
     {
         $this->showRecommendationModal = false;
         $this->selectedApplication = null;
+        $this->approvalReadOnly = false;
+        $this->approvalWindowMessage = null;
     }
 
     public function submitRecommendation()
     {
+        abort_unless(
+            $this->selectedApplication
+                && TransferAccess::canViewInstitutionRequests(Auth::user(), $this->institution)
+                && $this->selectedApplication->current_workplace === $this->institution->workplace_id,
+            403
+        );
+
+        if ($this->approvalReadOnly || !$this->canEditInstitutionApproval($this->selectedApplication)) {
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Institution approval is closed for editing.',
+            ]);
+
+            return;
+        }
+
         $this->validate([
             'recommendationDecision' => 'required',
             'recommendationRemarks' => 'nullable|string|max:500',
@@ -71,7 +102,7 @@ class TransferRequests extends Component
 
         DB::beginTransaction();
         try {
-            // Save recommendation
+            // Save institution-level approval.
             TeacherTransferApplicationRecommendation::updateOrCreate(
                 [
                     'transfer_application_id' => $this->selectedApplication->transfer_application_id,
@@ -86,10 +117,21 @@ class TransferRequests extends Component
                 ]
             );
 
-            // Handle rejection or advance step
-            if (Str::contains(strtolower($decision->decision), 'reject') || Str::contains(strtolower($decision->decision), 'can’t be released') || Str::contains(strtolower($decision->decision), 'can t be released')) {
+            // Handle rejection/release refusal or advance step.
+            $decisionText = str_replace(["'", "\xE2\x80\x99"], '', strtolower($decision->decision));
+            $isRejectedDecision = Str::contains($decisionText, [
+                'reject',
+                'cannot be released',
+                'cant be released',
+                'can t be released',
+                'not recommended',
+            ]);
+
+            $institutionStep = $this->institutionApprovalStep($this->selectedApplication);
+
+            if ($isRejectedDecision) {
                 $this->selectedApplication->update(['status' => 'rejected']);
-            } else {
+            } elseif ($this->selectedApplication->current_step <= ($institutionStep?->step_order ?? $this->selectedApplication->current_step)) {
                 // Advance to next step based on policy
                 $nextStep = $this->selectedApplication->policy->steps
                     ->where('step_order', '>', $this->selectedApplication->current_step)
@@ -110,26 +152,94 @@ class TransferRequests extends Component
             DB::commit();
 
             $this->closeRecommendationModal();
-            $this->dispatch('notify', ['type' => 'success', 'message' => 'Recommendation submitted successfully.']);
+            $this->dispatch('notify', ['type' => 'success', 'message' => 'Institution approval submitted successfully.']);
         } catch (\Exception $e) {
             DB::rollBack();
             $this->dispatch('notify', ['type' => 'error', 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
 
+    public function institutionApprovalStep(TeacherTransferApplication $application): ?TeacherTransferPolicyStep
+    {
+        return $application->policy?->steps?->firstWhere('office_level_id', 'OLID006');
+    }
+
+    public function canEditInstitutionApproval(?TeacherTransferApplication $application): bool
+    {
+        if (!$application || !TransferAccess::canViewInstitutionRequests(Auth::user(), $this->institution)) {
+            return false;
+        }
+
+        if ($application->current_workplace !== $this->institution->workplace_id) {
+            return false;
+        }
+
+        if ($application->relationLoaded('boardRecommendation')) {
+            if ($application->boardRecommendation) {
+                return false;
+            }
+        } elseif ($application->boardRecommendation()->exists()) {
+            return false;
+        }
+
+        $step = $this->institutionApprovalStep($application);
+
+        if (!$step?->end_date) {
+            return false;
+        }
+
+        return now()->lte($step->end_date->copy()->endOfDay());
+    }
+
+    protected function prepareApprovalModal($applicationId): void
+    {
+        abort_unless(TransferAccess::canViewInstitutionRequests(Auth::user(), $this->institution), 403);
+
+        $this->selectedApplication = TeacherTransferApplication::with([
+            'employee',
+            'policy.steps.officeLevel',
+            'category.transferSubCategory',
+            'transferSubCategory',
+        ])->findOrFail($applicationId);
+
+        abort_unless($this->selectedApplication->current_workplace === $this->institution->workplace_id, 403);
+
+        $existing = $this->existingInstitutionApproval($this->selectedApplication);
+
+        $this->recommendationDecision = $existing?->transfer_recommendation_list_id ?? '';
+        $this->recommendationRemarks = $existing?->remarks ?? '';
+
+        $step = $this->institutionApprovalStep($this->selectedApplication);
+        $this->approvalWindowMessage = $step?->end_date
+            ? 'Institution approval closes on ' . $step->end_date->format('M d, Y') . '.'
+            : 'No institution approval closing date is configured.';
+    }
+
+    protected function existingInstitutionApproval(TeacherTransferApplication $application): ?TeacherTransferApplicationRecommendation
+    {
+        return TeacherTransferApplicationRecommendation::with('recommendation')
+            ->where('transfer_application_id', $application->transfer_application_id)
+            ->where('workplace_id', $this->institution->workplace_id)
+            ->first();
+    }
+
     public function render()
     {
         $transferRequests = TeacherTransferApplication::with([
-            'employee',
+            'employee.title',
             'currentWorkplace',
-            'policy.steps',
-            'category',
+            'policy.steps.officeLevel',
+            'category.transferSubCategory',
+            'transferSubCategory',
             'teacher.appointmentSubject',
             'teacher.mainSubject',
             'teacher.secondarySubject',
+            'boardRecommendation',
             'recommendations' => function($query) {
                 $query->where('workplace_id', $this->institution->workplace_id);
-            }
+            },
+            'recommendations.recommendation',
+            'recommendations.approver',
         ])
             ->where('current_workplace', $this->institution->workplace_id)
             ->get();

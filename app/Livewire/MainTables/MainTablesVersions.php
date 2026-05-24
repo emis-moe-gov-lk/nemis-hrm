@@ -2,35 +2,36 @@
 
 namespace App\Livewire\MainTables;
 
-use Livewire\Component;
 use App\Models\Versions;
-use Illuminate\Validation\Rule;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
+use Livewire\Component;
 
 class MainTablesVersions extends Component
 {
     public $showModelNewVersion = false;
     public $versionId, $version, $releaseDate, $title, $description, $isLatest = false;
 
+    public $showModelEditVersion = false;
+    public $editVersionId, $updateVersionId, $updateVersion, $updateReleaseDate, $updateTitle, $updateDescription, $updateIsLatest;
 
-    // 🔹 Validation rules
     protected function rules()
     {
         if ($this->editVersionId) {
-            // ✅ Editing existing record
             return [
                 'updateVersionId' => [
                     'required',
                     'string',
-                    'regex:/^[VER]{3}\d{3}$/',
+                    'regex:/^VER\d{3,4}$/',
                     Rule::unique('versions', 'version_id')->ignore($this->editVersionId),
                 ],
                 'updateVersion' => [
                     'required',
                     'string',
                     'max:50',
-                    Rule::unique('versions', 'version_id')->ignore($this->editVersionId),
+                    Rule::unique('versions', 'version')->ignore($this->editVersionId),
                 ],
                 'updateReleaseDate' => 'required|date',
                 'updateTitle' => 'required|string|max:50',
@@ -43,7 +44,7 @@ class MainTablesVersions extends Component
             'versionId' => [
                 'required',
                 'string',
-                'regex:/^[VER]{3}\d{3}$/',
+                'regex:/^VER\d{3,4}$/',
                 Rule::unique('versions', 'version_id'),
             ],
             'version' => [
@@ -59,108 +60,115 @@ class MainTablesVersions extends Component
         ];
     }
 
-    // 🔹 Live validation as user types
     public function updated($propertyName)
     {
         $this->validateOnly($propertyName);
     }
 
-    // 🔹 Submit form
     public function addNewVersion()
     {
-        $validated = $this->validate();
+        $this->validate();
 
-        try{
-            Versions::create([
-                'version_id' => $this->versionId,
-                'version' => $this->version,
-                'release_date' => $this->releaseDate,
-                'title' => $this->title,
-                'description' => $this->description,
-                'is_latest' => $this->isLatest,
-            ]);
+        try {
+            DB::transaction(function () {
+                $version = Versions::create([
+                    'version_id' => $this->versionId,
+                    'version' => $this->version,
+                    'release_date' => $this->releaseDate,
+                    'title' => $this->title,
+                    'description' => $this->description,
+                    'is_latest' => (bool) $this->isLatest,
+                ]);
 
-            if($this->isLatest){
-                Versions::where('is_latest', 1)
-                ->where('version_id', '!=', $this->versionId)
-                ->update(['is_latest' => 0]);
-            }
+                $this->normalizeLatestVersion($version->id, (bool) $this->isLatest);
+            });
 
-            session()->flash('message', '✅ New Version added successfully!');
+            session()->flash('message', 'Version added successfully.');
 
-            // ✅ Close modal
             $this->showModelNewVersion = false;
+            $this->resetNewVersionForm();
 
-            // ✅ Reset form fields (but keep modal control variable)
-            $this->reset(['versionId', 'version', 'releaseDate', 'title', 'description', 'isLatest']);
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            DB::rollBack();
-            session()->flash('error', 'Validation error: Please check your input data.');
-
-        } catch (\Illuminate\Database\QueryException $e) {
-            DB::rollBack();
-            session()->flash('error', 'Database error: Unable to save version data.'. $e->getMessage());
-
+            return $this->redirectRoute('main-tables.versions', navigate: false);
         } catch (\Throwable $e) {
-            DB::rollBack();
             Log::error('Version creation error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
+
             session()->flash('error', 'System error: ' . $e->getMessage());
         }
-
     }
 
     public function deleteVersion($id)
     {
         $version = Versions::find($id);
 
-        if ($version) {
-            $version->delete();
-            session()->flash('message', '✅ Version deleted successfully!');
-        } else {
-            session()->flash('message', 'Title not found!');
+        if (! $version) {
+            session()->flash('error', 'Version not found.');
+
+            return null;
         }
+
+        try {
+            DB::transaction(function () use ($version) {
+                $wasLatest = (bool) $version->is_latest;
+
+                $version->delete();
+
+                if (! $wasLatest) {
+                    return;
+                }
+
+                $fallback = $this->latestFallbackCandidate();
+
+                if (! $fallback) {
+                    return;
+                }
+
+                Versions::query()->update(['is_latest' => 0]);
+                $fallback->update(['is_latest' => 1]);
+            });
+
+            session()->flash('message', 'Version deleted successfully.');
+
+            return $this->redirectRoute('main-tables.versions', navigate: false);
+        } catch (QueryException $e) {
+            session()->flash('error', 'This version cannot be deleted while related change logs still exist.');
+        } catch (\Throwable $e) {
+            Log::error('Version delete error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            session()->flash('error', 'System error: ' . $e->getMessage());
+        }
+
+        return null;
     }
 
     public function toggleStatus($id)
     {
-        DB::transaction(function () use ($id) {
-
         $version = Versions::find($id);
 
         if (! $version) {
-            return;
+            session()->flash('error', 'Version not found.');
+
+            return null;
         }
 
-        // If activating → deactivate all others
-        if ($version->is_latest == 0) {
-            Versions::where('is_latest', 1)
-                ->where('id', '!=', $id)
-                ->update(['is_latest' => 0]);
+        if ($version->is_latest) {
+            session()->flash('error', 'A latest version must always remain active. Mark another version as latest instead.');
 
-            $version->is_latest = 1;
-        } 
-        // If deactivating
-        else {
-            $version->is_latest = 0;
+            return null;
         }
 
-        $version->save();
+        DB::transaction(function () use ($version) {
+            Versions::query()->update(['is_latest' => 0]);
+            $version->update(['is_latest' => 1]);
+        });
 
-        // Front-end notification
-        $this->dispatch('status-updated', [
-            'message' => $version->is_latest
-                ? 'Latest version activated successfully!'
-                : 'Latest version deactivated successfully!',
-        ]);
-    });
+        session()->flash('message', 'Latest version updated successfully.');
+
+        return $this->redirectRoute('main-tables.versions', navigate: false);
     }
-
-    public $showModelEditVersion = false;
-    public $editVersionId, $updateVersionId, $updateVersion, $updateReleaseDate, $updateTitle, $updateDescription, $updateIsLatest;
-
 
     public function editVersion($id)
     {
@@ -174,7 +182,7 @@ class MainTablesVersions extends Component
         $this->updateDescription = $version->description;
         $this->updateIsLatest = $version->is_latest;
 
-        $this->showModelEditVersion = true; // ensure modal is open
+        $this->showModelEditVersion = true;
     }
 
     public function updateVersionList()
@@ -183,7 +191,7 @@ class MainTablesVersions extends Component
             'updateVersionId' => [
                 'required',
                 'string',
-                'regex:/^[VER]{3}\d{3}$/',
+                'regex:/^VER\d{3,4}$/',
                 Rule::unique('versions', 'version_id')->ignore($this->editVersionId),
             ],
             'updateVersion' => [
@@ -198,44 +206,97 @@ class MainTablesVersions extends Component
             'updateIsLatest' => 'required|boolean',
         ]);
 
-        try{
+        try {
+            DB::transaction(function () {
+                Versions::where('id', $this->editVersionId)->update([
+                    'version_id' => $this->updateVersionId,
+                    'version' => $this->updateVersion,
+                    'release_date' => $this->updateReleaseDate,
+                    'title' => $this->updateTitle,
+                    'description' => $this->updateDescription,
+                    'is_latest' => (bool) $this->updateIsLatest,
+                ]);
 
-            Versions::where('id', $this->editVersionId)->update([
-                'version_id' => $this->updateVersionId,
-                'version' => $this->updateVersion,
-                'release_date' => $this->updateReleaseDate,
-                'title' => $this->updateTitle,
-                'description' => $this->updateDescription,
-                'is_latest' => $this->updateIsLatest,
-            ]);
-
+                $this->normalizeLatestVersion($this->editVersionId, (bool) $this->updateIsLatest);
+            });
 
             $this->showModelEditVersion = false;
 
-            session()->flash('message', '✅ Version updated successfully!');
+            session()->flash('message', 'Version updated successfully.');
 
-            $this->reset(['updateVersionId', 'updateVersion', 'updateReleaseDate', 'updateTitle', 'updateDescription', 'updateIsLatest', 'editVersionId']);
+            $this->resetEditVersionForm();
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            DB::rollBack();
-            session()->flash('error', 'Validation error: Please check your input data.');
-
-        } catch (\Illuminate\Database\QueryException $e) {
-            DB::rollBack();
-            session()->flash('error', 'Database error: Unable to update title data.'. $e->getMessage());
-
+            return $this->redirectRoute('main-tables.versions', navigate: false);
         } catch (\Throwable $e) {
-            DB::rollBack();
-            Log::error('Title update error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            Log::error('Version update error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
+
             session()->flash('error', 'System error: ' . $e->getMessage());
         }
+
+        return null;
     }
 
     public function render()
     {
-        $versions = Versions::orderBy('version_id')->paginate(50);
+        $versions = Versions::query()
+            ->orderByDesc('is_latest')
+            ->orderByDesc('release_date')
+            ->orderByDesc('id')
+            ->paginate(50);
+
         return view('livewire.main-tables.main-tables-versions', compact('versions'));
+    }
+
+    protected function normalizeLatestVersion(int $versionId, bool $requestedLatest): void
+    {
+        if ($requestedLatest) {
+            Versions::where('id', '!=', $versionId)->update(['is_latest' => 0]);
+            Versions::where('id', $versionId)->update(['is_latest' => 1]);
+
+            return;
+        }
+
+        $otherLatestExists = Versions::where('id', '!=', $versionId)
+            ->where('is_latest', 1)
+            ->exists();
+
+        if ($otherLatestExists) {
+            Versions::where('id', $versionId)->update(['is_latest' => 0]);
+
+            return;
+        }
+
+        Versions::where('id', $versionId)->update(['is_latest' => 1]);
+    }
+
+    protected function latestFallbackCandidate(): ?Versions
+    {
+        return Versions::query()
+            ->orderByDesc('release_date')
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    protected function resetNewVersionForm(): void
+    {
+        $this->reset(['versionId', 'version', 'releaseDate', 'title', 'description', 'isLatest']);
+        $this->isLatest = false;
+    }
+
+    protected function resetEditVersionForm(): void
+    {
+        $this->reset([
+            'editVersionId',
+            'updateVersionId',
+            'updateVersion',
+            'updateReleaseDate',
+            'updateTitle',
+            'updateDescription',
+            'updateIsLatest',
+        ]);
+
+        $this->updateIsLatest = false;
     }
 }

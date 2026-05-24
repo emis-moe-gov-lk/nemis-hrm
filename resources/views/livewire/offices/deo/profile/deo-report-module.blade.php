@@ -1,15 +1,13 @@
 <section class="w-full">
-    {{-- Page Header --}}
-    <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">{{ __('Divisional Education Office') }}</flux:heading>
-        <flux:subheading size="lg" class="mb-6">
-            {{ __('Statistics about Divisional Education Office structure and staff distribution.') }}
-        </flux:subheading>
-        <flux:separator variant="subtle" />
-    </div>
-
     <x-offices.deo.deo-layout :officeId="$officeId">
-
+        {{-- Page Header --}}
+        <div class="relative mb-6 w-full">
+            <flux:heading size="xl" level="1">{{ __('Divisional Education Office') }}</flux:heading>
+            <flux:subheading size="lg" class="mb-6">
+                {{ __('Statistics about Divisional Education Office structure and staff distribution.') }}
+            </flux:subheading>
+            <flux:separator variant="subtle" />
+        </div>
         <h2 class="mb-4 text-xl font-semibold text-slate-900 dark:text-white">
             Download Reports
         </h2>

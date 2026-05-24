@@ -17,16 +17,28 @@ class EmployerCurrentAppointment extends Model
     protected $table = 'employer_current_appointments';
     protected $primaryKey = 'id';
 
+        /**
+         * Class EmployerCurrentAppointment
+         *
+         * @property string $appointment_id
+         * @property string $employee_id
+         * @property string|null $workplace_id
+         * @property-read \App\Models\People|null $employee
+         * @property-read \App\Models\EmployerAppointment|null $appointment
+         * @property-read \App\Models\Workplaces|null $workplace
+         * @property-read \App\Models\Service|null $service
+         */
+
     protected $fillable = [
         'appointment_id',
         'employee_id',
         'appoint_date',
         'appointment_letter_no',
-        'service_id',
         'rank_id',
         'office_level_id',
         'position_id',
         'workplace_id',
+        'is_released_to_pool',
         'created_by',
         'updated_by',
     ];
@@ -44,11 +56,6 @@ class EmployerCurrentAppointment extends Model
     public function employee()
     {
         return $this->belongsTo(People::class, 'employee_id', 'people_id');
-    }
-
-    public function service()
-    {
-        return $this->belongsTo(Service::class, 'service_id', 'service_id');
     }
 
     public function rank()
@@ -70,6 +77,18 @@ class EmployerCurrentAppointment extends Model
     public function appointment()
     {
         return $this->belongsTo(EmployerAppointment::class, 'appointment_id', 'appointment_id');
+    }
+
+    public function service()
+    {
+        return $this->hasOneThrough(
+            Service::class,
+            EmployerAppointment::class,
+            'appointment_id', // Foreign key on employer_appointments
+            'service_id',     // Foreign key on services
+            'appointment_id', // Local key on employer_current_appointments
+            'service_id'      // Local key on employer_appointments
+        );
     }
 
     // Appointment history
@@ -126,6 +145,16 @@ class EmployerCurrentAppointment extends Model
         return $result;
     }
 
+    public function getServiceIdAttribute()
+    {
+        // Try to get service_id from loaded service relation first to avoid N+1 queries
+        if ($this->relationLoaded('service') && $this->service) {
+            return $this->service->service_id;
+        }
+
+        return $this->appointment?->service_id;
+    }
+
     // Institution
     public function institution()
     {
@@ -139,32 +168,16 @@ class EmployerCurrentAppointment extends Model
     public static function serviceByGenderWithTotalCounts()
     {
         return self::query()
-            ->join(
-                'people',
-                'people.people_id',
-                '=',
-                'employer_current_appointments.employee_id'
-            )
+            ->join('employer_appointments', 'employer_appointments.appointment_id', '=', 'employer_current_appointments.appointment_id')
+            ->join('people', 'people.people_id', '=', 'employer_current_appointments.employee_id')
             ->select(
-                'employer_current_appointments.service_id',
-
+                'employer_appointments.service_id',
                 DB::raw('COUNT(*) as total'),
-
-                DB::raw("SUM(CASE 
-                WHEN people.gender_id = 'G01' THEN 1 
-                ELSE 0 END) as male"),
-
-                DB::raw("SUM(CASE 
-                WHEN people.gender_id = 'G02' THEN 1 
-                ELSE 0 END) as female"),
-
-                DB::raw("SUM(CASE 
-                WHEN people.gender_id IS NULL 
-                     OR people.gender_id NOT IN ('G01','G02') 
-                THEN 1 
-                ELSE 0 END) as other")
+                DB::raw("SUM(CASE WHEN people.gender_id = 'G01' THEN 1 ELSE 0 END) as male"),
+                DB::raw("SUM(CASE WHEN people.gender_id = 'G02' THEN 1 ELSE 0 END) as female"),
+                DB::raw("SUM(CASE WHEN people.gender_id IS NULL OR people.gender_id NOT IN ('G01','G02') THEN 1 ELSE 0 END) as other")
             )
-            ->groupBy('employer_current_appointments.service_id')
+            ->groupBy('employer_appointments.service_id')
             ->get();
     }
 

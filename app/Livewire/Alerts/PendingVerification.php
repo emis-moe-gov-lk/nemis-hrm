@@ -68,9 +68,13 @@ class PendingVerification extends Component
         |--------------------------------------------------------------------------
         */
         $peopleQuery = People::query()
-            ->whereHas('currentAppointment', function ($q) use ($allowedServices, $allowedWorkplaceIds) {
+            ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds) {
+                $q->whereIn('workplace_id', $allowedWorkplaceIds);
+            })
+            ->whereHas('appointment', function ($q) use ($allowedServices) {
                 $q->whereIn('service_id', $allowedServices)
-                ->whereIn('workplace_id', $allowedWorkplaceIds);
+                ->where('is_verified', 0)
+                ->where('is_confirmed', 0);
             });
 
         /*
@@ -116,7 +120,7 @@ class PendingVerification extends Component
         // If user has no workplace → show empty result
         if (! $workplace) {
             $employees = People::where('id', 0)->paginate(10);
-            return view('livewire.pending.verification', compact('employees'));
+            return view('livewire.alerts.pending-verification', compact('employees'));
         }
 
         // Get allowed workplaces (hierarchy)
@@ -151,7 +155,7 @@ class PendingVerification extends Component
         // If user has no permission → show empty
         if (empty($allowedServices)) {
             $employees = People::where('id', 0)->paginate(10);
-            return view('livewire.pending.verification', compact('employees'));
+            return view('livewire.alerts.pending-verification', compact('employees'));
         }
 
         /*
@@ -163,7 +167,7 @@ class PendingVerification extends Component
                 'currentAppointment.workplace',
                 'currentAppointment.position',
                 'currentAppointment.rank',
-                'currentAppointment.service',
+                'appointment.service',
                 'currentAppointment.workplace.ministry',
                 'currentAppointment.workplace.provincialMinistry',
                 'currentAppointment.workplace.provincial',
@@ -171,12 +175,12 @@ class PendingVerification extends Component
                 'currentAppointment.workplace.divisional',
                 'currentAppointment.workplace.institution',
             ])
-            ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds, $allowedServices) {
-                $q->whereIn('service_id', $allowedServices)
-                ->whereIn('workplace_id', $allowedWorkplaceIds);
+            ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds) {
+                $q->whereIn('workplace_id', $allowedWorkplaceIds);
             })
-            ->whereHas('appointment', function ($q) {
-                $q->where('is_verified', 0)
+            ->whereHas('appointment', function ($q) use ($allowedServices) {
+                $q->whereIn('service_id', $allowedServices)
+                ->where('is_verified', 0)
                 ->where('is_confirmed', 0);
             })
             ->paginate(10);
@@ -184,3 +188,4 @@ class PendingVerification extends Component
         return view('livewire.alerts.pending-verification', compact('employees'));
     }
 }
+

@@ -1,123 +1,128 @@
 <section class="w-full">
-    <div class="relative mb-8 w-full">
-        <flux:heading size="xl" level="1" class="text-gray-900 dark:text-white font-bold">
-            {{ __('Staff') }}
+    {{-- 1. Header Section --}}
+    <header class="mb-10">
+        <flux:heading size="xl" level="1" class="text-3xl! font-black tracking-tight text-slate-900 dark:text-white leading-none mb-3">
+            {{ __('Staff Directory') }}
         </flux:heading>
-        <flux:subheading size="lg" class="mb-6 text-gray-600 dark:text-gray-300">
-            {{ __('View the list of staff members and their appointment details.') }}
+        <flux:subheading size="lg" class="text-slate-500 dark:text-slate-500 font-medium max-w-2xl">
+            {{ __('Manage and view the list of staff members, their roles, and professional history within this institution.') }}
         </flux:subheading>
-        <flux:separator variant="subtle" />
-    </div>
+    </header>
 
     <x-institutions.institution-layout :institutionId="$id">
-        <div class="bg-white dark:bg-slate-900">
-            <!-- Header -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-                    Staff List
-                </h2>
-
-                <!-- Optional: Add filters or actions here -->
-                <div class="flex items-center space-x-3">
-                    <span class="text-sm text-gray-500 dark:text-gray-400 mx-4">
-                        Total: {{ $staffList->total() }} staff members
-                    </span>
-                </div>
-            </div>
-
-            <!-- Service Tabs -->
+        <div class="mt-8 space-y-8">
+            {{-- Service Tabs / Filters --}}
             @if(isset($availableServices) && $availableServices->count() > 0)
-            <div class="mb-6 border-b border-gray-200 dark:border-slate-700 overflow-x-auto scrollbar-hide">
-                <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                    <button wire:click="$set('selectedService', null)" 
-                        class="{{ empty($selectedService) ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400 border-b-2' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-slate-400 dark:hover:text-slate-300 border-b-2' }} whitespace-nowrap pb-4 px-1 font-medium text-sm transition-colors cursor-pointer">
-                        All Staff
-                    </button>
-                    @foreach($availableServices as $srv)
-                    <button wire:click="$set('selectedService', '{{ $srv->service_id }}')" 
-                        class="{{ $selectedService == $srv->service_id ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400 border-b-2' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-slate-400 dark:hover:text-slate-300 border-b-2' }} whitespace-nowrap pb-4 px-1 font-medium text-sm transition-colors cursor-pointer">
-                        {{ $srv->service->service_name ?? 'Unknown Service' }}
-                    </button>
-                    @endforeach
-                </nav>
+            <div class="p-2 bg-slate-100 dark:bg-slate-800/50 rounded-2xl w-fit flex flex-wrap gap-1">
+                <button wire:click="$set('selectedService', null)"
+                    class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all {{ empty($selectedService) ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300' }}">
+                    {{ __('All Staff') }}
+                </button>
+                @foreach($availableServices as $srv)
+                <button wire:click="$set('selectedService', '{{ $srv->service_id }}')"
+                    class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all {{ $selectedService == $srv->service_id ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300' }}">
+                    {{ $srv->service->service_name ?? 'Unknown' }}
+                </button>
+                @endforeach
             </div>
             @endif
 
-            <!-- Table Container -->
-            <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-                    <thead class="bg-linear-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-900">
+            {{-- Table Container --}}
+            <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-4xl shadow-sm overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                         <tr>
-                            @foreach (['#', 'Name & ID', 'Contact Number', 'Position', 'Service & Rank', 'Service Duration'] as $head)
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider border-r border-gray-200 dark:border-slate-600 last:border-r-0">
-                                <div class="flex items-center space-x-1">
-                                    <span>{{ $head }}</span>
-                                    <!-- Optional: Add sort icons -->
-                                </div>
-                            </th>
-                            @endforeach
+                            <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 w-16 text-center">#</th>
+                            <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">Identity</th>
+                            <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">Position</th>
+                            <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">Service & Rank</th>
+                            <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-center">Experience</th>
+                            <th class="px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 text-right">Actions</th>
                         </tr>
                     </thead>
 
-                    <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
+                    <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
                         @foreach ($staffList as $staff)
                         @php
                         $start = \Carbon\Carbon::parse($staff->appoint_date);
                         $duration = $start->diff(now());
                         @endphp
-                        <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors duration-200 group">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white border-r border-gray-200 dark:border-slate-600 last:border-r-0">
-                                <span class="inline-flex items-center justify-center w-6 h-6 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full text-xs font-medium">
+                        <tr class="hover:bg-indigo-50/30 dark:hover:bg-indigo-500/5 transition-all group">
+                            <td class="px-6 py-5 text-center">
+                                <span class="inline-flex items-center justify-center w-7 h-7 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 rounded-lg text-[10px] font-black">
                                     {{ $loop->iteration + ($staffList->currentPage() - 1) * $staffList->perPage() }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-slate-300 border-r border-gray-200 dark:border-slate-600 last:border-r-0">
-                                <p>
-                                    <span class="font-semibold text-gray-900 dark:text-white">{{$staff->employee->title->title_name}} {{ $staff->employee->name_with_initials ?? '-' }}</span><br />
-                                    <span class="text-xs text-gray-500 dark:text-white">
-                                        NIC: {{ $staff->employee->nic }}
-                                    </span>
-                                </p>
+                            <td class="px-6 py-5">
+                                <div class="flex items-center gap-3">
+                                    <div>
+                                        <div class="text-sm font-bold text-slate-900 dark:text-white leading-tight group-hover:text-indigo-600 transition-colors">
+                                            {{$staff->employee->title->title_name}} {{ $staff->employee->name_with_initials ?? '-' }}
+                                        </div>
+                                        <div class="text-[10px] font-mono text-slate-500 dark:text-slate-500 mt-1 uppercase tracking-widest">
+                                            {{ $staff->employee->nic }}
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-slate-300 border-r border-gray-200 dark:border-slate-600 last:border-r-0">
-                                {{ $staff->employee->phone ?? '-' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-slate-300 border-r border-gray-200 dark:border-slate-600 last:border-r-0">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-green-800 dark:text-green-300">
+                            <td class="px-6 py-5">
+                                <span class="inline-block whitespace-nowrap px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20 text-[10px] font-black uppercase tracking-widest">
                                     {{ $staff->position->position_name ?? '-' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-slate-300 border-r border-gray-200 dark:border-slate-600 last:border-r-0">
-                                {{ $staff->service->service_name ?? '-' }} ({{ $staff->rank->rank_name ?? '-' }})
+                            <td class="px-6 py-5">
+                                <div class="text-sm font-bold text-slate-700 dark:text-slate-300">{{ $staff->service->service_name ?? '-' }}</div>
+                                <div class="text-[10px] font-black text-indigo-400 dark:text-indigo-500 uppercase tracking-tight mt-0.5">{{ $staff->rank->rank_name ?? '-' }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-slate-300 border-r border-gray-200 dark:border-slate-600 last:border-r-0">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    {{ $duration->y }}y {{ $duration->m }}m
-                                </span>
+                            <td class="px-6 py-5 text-center">
+                                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-inner">
+                                    <flux:icon name="clock" variant="micro" class="text-slate-300" />
+                                    <span class="text-xs font-black text-slate-600 dark:text-slate-500 tracking-tighter">
+                                        {{ $duration->y }}Y {{ $duration->m }}M
+                                    </span>
+                                </div>
                             </td>
-
+                            <td class="px-6 py-5 text-right">
+                                @php
+                                $serviceId = $staff->appointment?->service_id;
+                                $routeName = match($serviceId) {
+                                'SER001' => 'teacher.profile.index',
+                                'SER002' => 'sltes.profile.index',
+                                'SER003' => 'sltas.profile.index',
+                                'SER004' => 'principal.profile.index',
+                                'SER005' => 'sleas.profile.index',
+                                'SER006' => 'slas.profile.index',
+                                'SER007' => 'dos.profile.index',
+                                'SER008' => 'mso.profile.index',
+                                default => 'teacher.profile.index',
+                                };
+                                @endphp
+                                <flux:button href="{{ route($routeName, $staff->employee->id) }}" icon="user" size="sm" variant="subtle" class="rounded-lg!" />
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <div class="mt-6">
+            {{-- Pagination --}}
+            <div class="mt-8">
                 {{ $staffList->links() }}
             </div>
 
-            <!-- Empty State -->
+            {{-- Empty State --}}
             @if($staffList->count() === 0)
-            <div class="text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                </svg>
-                <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">No staff members found</h3>
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No staff members are currently assigned to this institution.</p>
+            <div class="py-24 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
+                <div class="relative mb-6">
+                    <div class="absolute inset-0 bg-indigo-100 dark:bg-indigo-900/20 rounded-full scale-150 blur-2xl opacity-50"></div>
+                    <div class="relative p-6 bg-linear-to-b from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-full shadow-inner">
+                        <flux:icon name="user-group" variant="solid" class="w-16 h-16 text-slate-300 dark:text-slate-600" />
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 uppercase tracking-tight">{{ __('No staff members found') }}</h3>
+                <p class="mt-2 text-sm text-slate-500 dark:text-slate-500 max-w-xs text-center font-medium">
+                    {{ __('No staff members are currently assigned to this institution under the selected criteria.') }}
+                </p>
             </div>
             @endif
         </div>

@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class OfficeLevel
+ *
+ * @property string $office_level_id
+ */
 class OfficeLevel extends Model
 {
 

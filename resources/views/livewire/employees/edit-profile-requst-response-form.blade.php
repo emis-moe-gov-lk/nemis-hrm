@@ -1,14 +1,14 @@
 <div>
     <div class="space-y-6">
         {{-- Header --}}
-        <div>
-            <flux:heading size="lg">{{ __('Review Profile Update') }}</flux:heading>
-            <flux:text class="mt-2">{{ __('Review and respond to the user update request below.') }}</flux:text>
+        <div class="pb-4 border-b border-slate-200 dark:border-zinc-700">
+            <h3 class="text-sm font-black tracking-widest text-slate-900 dark:text-white uppercase">Review Profile Update</h3>
+            <p class="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mt-0.5">Review and respond to the user update request below</p>
         </div>
 
         {{-- Request Summary Card --}}
         <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-white dark:bg-gray-800">
+            <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-2 bg-white dark:bg-gray-800">
                 <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Reference</span>
                 <flux:badge size="sm" variant="pill" color="indigo" inset="top bottom">
                     {{ $complaint?->complaint_request_ref ?? 'N/A' }}
@@ -64,14 +64,11 @@
             {{-- Optional: Add a custom comment area if the dropdown isn't enough --}}
             {{-- <flux:textarea label="Additional Comments" wire:model="custom_comment" /> --}}
 
-            <div class="flex items-center pt-4 border-t border-gray-100 dark:border-gray-800">
-                <flux:spacer />
-                <div class="flex gap-3">
-                    <flux:button variant="ghost" x-on:click="$dispatch('close')">Cancel</flux:button>
-                    <flux:button type="submit" variant="primary" icon="check" wire:loading.attr="disabled">
-                        {{ __('Confirm Action') }}
-                    </flux:button>
-                </div>
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <flux:button variant="ghost" x-on:click="$dispatch('close')" class="w-full sm:w-auto font-bold rounded-xl">Cancel</flux:button>
+                <flux:button type="submit" variant="primary" icon="check" wire:loading.attr="disabled" class="w-full sm:w-auto font-black rounded-xl">
+                    {{ __('Confirm Action') }}
+                </flux:button>
             </div>
         </form>
     </div>    

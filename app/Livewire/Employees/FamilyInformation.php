@@ -18,37 +18,75 @@ use App\Rules\UniqueHashedNic;
 use App\Rules\UniquePhoneAcrossTables;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\NicHelper;
+use App\Http\Controllers\PeopleController;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class FamilyInformation extends Component
 {
-    public $peopleId;
-    public $canCreate;
-    public $canDelete;
-    public $employee;
+    public string $peopleId;
+    public bool $canCreate = false;
+    public bool $canDelete = false;
+    public ?People $employee = null;
 
-    public $isCheckNIC = false;
-    public $isPeopleFound = false;
-    public $peopleData = null;
+    public bool $isCheckNIC = false;
+    public bool $isPeopleFound = false;
+    public ?People $peopleData = null;
 
-    public $showModalSpouseReg = false;
-    public $showModalChildReg = false;
+    public bool $showModalSpouseReg = false;
+    public bool $showModalChildReg = false;
+    public bool $showModalDivorce = false;
 
     // spouse fields
-    public $nic, $title, $fullName, $gender, $birthday, $religion;
-    public $ethnicity, $email, $contact, $marriedDate, $marriedCfNo;
+    public ?string $nic = null;
+    public ?string $title = null;
+    public ?string $fullName = null;
+    public ?string $gender = null;
+    public ?string $birthday = null;
+    public ?string $religion = null;
+    public ?string $ethnicity = null;
+    public ?string $email = null;
+    public ?string $contact = null;
+    public ?string $marriedDate = null;
+    public ?string $marriedCfNo = null;
 
     // child fields
-    public $family_id, $childName, $childDob, $childGender, $birthCertificateNo, $childHealthCondition;
+    public ?string $family_id = null;
+    public ?string $childName = null;
+    public ?string $childDob = null;
+    public ?string $childGender = null;
+    public ?string $birthCertificateNo = null;
+    public bool $childHealthCondition = true;
+
+    // divorce fields
+    public ?string $divorceFamilyId = null;
+    public ?string $divorceDate = null;
+
+    // delete state
+    public ?string $spouseIdToDelete = null;
+    public ?string $childIdToDelete = null;
 
     // dropdowns
-    public $titleOptions = [], $religionOptions = [], $genderOptions = [];
-    public $ethnicityOptions = [], $civilStatusOptions = [];
-    public $healthConditionOptions = [];
+    public array $titleOptions = [];
+    public array $religionOptions = [];
+    public array $genderOptions = [];
+    public array $ethnicityOptions = [];
+    public array $civilStatusOptions = [];
+    public array $healthConditionOptions = [];
 
-    protected function rules()
+    protected function rules(): array
     {
         return [
-            'nic' => ['required', 'string', 'regex:/^(\d{9}[vVxX]|\d{12})$/'],
+            'nic' => [
+                'required',
+                'string',
+                'regex:/^(\d{9}[vVxX]|\d{12})$/',
+                function ($attribute, $value, $fail) {
+                    if (!NicHelper::isValid($value)) {
+                        $fail('The provided NIC is not a valid format.');
+                    }
+                }
+            ],
             'title' => 'required|string',
             'fullName' => 'required|string|max:255',
             'gender' => 'required|string',
@@ -68,56 +106,49 @@ class FamilyInformation extends Component
         ];
     }
 
-    public function updated($property)
+    public function updated(string $property): void
     {
         $this->validateOnly($property);
     }
 
-    public function mount($peopleId)
+    public function mount(string $peopleId): void
     {
         $this->employee = People::where('people_id', $peopleId)->firstOrFail();
-        //$this->canCreate = $canCreate;
-        //$this->canDelete = $canDelete;
-
-        $this->titleOptions = Title::all();
-        $this->genderOptions = GenderList::all();
-        $this->religionOptions = Religion::all();
-        $this->ethnicityOptions = Ethnicity::all();
-        $this->civilStatusOptions = CivilStatus::all();
+        $this->titleOptions = Title::all()->all();
+        $this->genderOptions = GenderList::all()->all();
+        $this->religionOptions = Religion::all()->all();
+        $this->ethnicityOptions = Ethnicity::all()->all();
+        $this->civilStatusOptions = CivilStatus::all()->all();
 
         $this->healthConditionOptions = [true => 'Yes', false => 'No'];
         $this->childHealthCondition = true;
     }
 
-    public function updatedNic()
+    public function updatedNic(): void
     {
         $this->resetNICState();
     }
 
-    private function resetNICState()
+    private function resetNICState(): void
     {
         $this->isCheckNIC = false;
         $this->isPeopleFound = false;
         $this->peopleData = null;
     }
 
-    public function checkNIC()
+    public function checkNIC(): void
     {
         $this->resetNICState();
-
         $this->validateOnly('nic');
 
         $nic = NicHelper::normalize($this->nic);
 
-        // prevent own NIC
         if (strtoupper($this->employee->nic) === $nic) {
             $this->addError('nic', 'You cannot enter your own NIC.');
             return;
         }
 
         $this->isCheckNIC = true;
-
-        // search existing People
         $found = People::where('nic_hash', NicHelper::hash($nic))->first();
 
         if ($found) {
@@ -126,7 +157,6 @@ class FamilyInformation extends Component
         }
     }
 
-    /** ------------------ SPOUSE REGISTRATION ------------------ **/
     public function spouseReg()
     {
         if (!$this->isCheckNIC) {
@@ -134,113 +164,118 @@ class FamilyInformation extends Component
             return;
         }
 
-        // CASE 1: existing person found by NIC
-        if ($this->peopleData) {
-            // check existing marriage
-            if (
-                Family::where('member_a_id', $this->peopleData->people_id)
-                ->orWhere('member_b_id', $this->peopleData->people_id)
-                ->exists()
-            ) {
-                $this->addError('nic', 'This person is already registered in a family.');
-                return;
-            }
-
-
-            Family::create([
-                'member_a_id' => $this->employee->people_id,
-                'member_b_id' => $this->peopleData->people_id,
-                'married_date' => $this->marriedDate,
-                'married_cf_no' => $this->marriedCfNo,
-            ]);
-
-            session()->flash('success', 'Spouse linked successfully!');
-            $this->showModalSpouseReg = false;
-            $this->resetSpouseForm();
-            return;
-        }
-
-        // CASE 2: new person (not found by NIC)
-        $validated = $this->validate(
-            [
-                'nic' => ['required', 'string', 'regex:/^(\d{9}[vVxX]|\d{12})$/', new UniqueHashedNic()],
-                'title' => 'required|string',
-                'fullName' => 'required|string|max:255',
-                'gender' => 'required|string',
-                'birthday' => 'required|date',
-                'religion' => 'required|string',
-                'ethnicity' => 'required|string',
-                'email' => 'required|email|max:255',
-                'contact' => 'required|string|max:15',
-                'marriedDate' => 'required|date',
-                'marriedCfNo' => 'required|string|max:20',
-            ]
-        );
-
+        $peopleController = new PeopleController();
         DB::beginTransaction();
         try {
-            $initials = People::generateInitials($this->fullName);
+            $spouseId = null;
 
-            $nic = NicHelper::normalize($this->nic);
+            if ($this->peopleData) {
+                $this->validate([
+                    'marriedDate' => 'required|date',
+                    'marriedCfNo' => 'required|string|max:50',
+                ]);
+                $spouseId = $this->peopleData->people_id;
+            } else {
+                $peopleRequest = new Request([
+                    'nic' => $this->nic,
+                    'title_id' => $this->title,
+                    'full_name' => $this->fullName,
+                    'gender_id' => $this->gender,
+                    'date_of_birth' => $this->birthday,
+                    'religion_id' => $this->religion,
+                    'ethnicity_id' => $this->ethnicity,
+                    'civil_status_id' => 'C02',
+                    'email' => $this->email,
+                    'phone' => $this->contact,
+                    'address_line1' => $this->employee->address_line1,
+                    'address_line2' => $this->employee->address_line2,
+                    'address_line3' => $this->employee->address_line3,
+                    'postal_code' => $this->employee->postal_code,
+                ]);
 
-            $spouse = People::create([
-                'nic' => $nic,
-                'nic_hash' => NicHelper::hash($nic),
-                'title_id' => $this->title,
-                'full_name' => ucwords(strtolower($this->fullName)),
-                'name_with_initials' => $initials,
-                'gender_id' => $this->gender,
-                'date_of_birth' => $this->birthday,
-                'religion_id' => $this->religion,
-                'ethnicity_id' => $this->ethnicity,
-                'civil_status_id' => 'C02',
-                'email' => strtolower($this->email),
-                'phone' => $this->contact,
-                'address_line1' => $this->employee->address_line1,
-                'address_line2' => $this->employee->address_line2,
-                'address_line3' => $this->employee->address_line3,
-                'postal_code' => $this->employee->postal_code,
-                'profile_picture' => 'default.png',
-            ]);
+                $response = $peopleController->createPeople($peopleRequest);
+                $responseData = json_decode($response->getContent(), true);
 
-            Family::create([
+                if ($responseData['status'] !== 'success') {
+                    if ($responseData['status'] === 'validation_error') {
+                        foreach ($responseData['errors'] as $field => $messages) {
+                            $this->addError($field, $messages[0]);
+                        }
+                        return;
+                    }
+                    throw new Exception($responseData['message'] ?? 'Failed to register spouse');
+                }
+                $spouseId = $responseData['data']['people_id'];
+            }
+
+            $familyRequest = new Request([
                 'member_a_id' => $this->employee->people_id,
-                'member_b_id' => $spouse->people_id,
+                'member_b_id' => $spouseId,
                 'married_date' => $this->marriedDate,
                 'married_cf_no' => $this->marriedCfNo,
             ]);
 
+            $familyResponse = $peopleController->familyCreate($familyRequest);
+            $familyResponseData = json_decode($familyResponse->getContent(), true);
+
+            if ($familyResponseData['status'] !== 'success') {
+                if ($familyResponseData['status'] === 'error') {
+                    $this->addError('nic', $familyResponseData['message']);
+                    return;
+                }
+                throw new Exception($familyResponseData['message'] ?? 'Failed to link family');
+            }
+
             DB::commit();
-            session()->flash('success', 'New spouse created successfully!');
+            session()->flash('success', 'Spouse successfully registered and linked!');
+            $this->resetSpouseForm();
             $this->showModalSpouseReg = false;
             return $this->redirect(url()->previous(), navigate: true);
-            $this->resetSpouseForm();
+
         } catch (Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Error: ' . $e->getMessage());
         }
     }
 
-    private function resetSpouseForm()
+    private function resetSpouseForm(): void
     {
         $this->reset([
-            'nic',
-            'title',
-            'fullName',
-            'gender',
-            'birthday',
-            'religion',
-            'ethnicity',
-            'email',
-            'contact',
-            'marriedDate',
-            'marriedCfNo'
+            'nic', 'title', 'fullName', 'gender', 'birthday', 'religion',
+            'ethnicity', 'email', 'contact', 'marriedDate', 'marriedCfNo'
         ]);
         $this->resetNICState();
     }
 
-    /** ------------------ CHILD REGISTRATION ------------------ **/
-    public function openChildModal($family_id)
+    public function openDivorceModal(string $family_id): void
+    {
+        $this->divorceFamilyId = $family_id;
+        $this->divorceDate = now()->format('Y-m-d');
+        $this->showModalDivorce = true;
+    }
+
+    public function recordDivorce()
+    {
+        $this->validate([
+            'divorceDate' => 'required|date|after_or_equal:marriedDate',
+        ]);
+
+        try {
+            $family = Family::where('family_id', $this->divorceFamilyId)->firstOrFail();
+            $family->update([
+                'divorce_date' => $this->divorceDate,
+                'active_status' => 0,
+            ]);
+
+            session()->flash('success', 'Divorce recorded successfully.');
+            $this->showModalDivorce = false;
+            return $this->redirect(url()->previous(), navigate: true);
+        } catch (Exception $e) {
+            session()->flash('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
+    public function openChildModal(string $family_id): void
     {
         $this->family_id = $family_id;
         $this->showModalChildReg = true;
@@ -248,44 +283,51 @@ class FamilyInformation extends Component
 
     public function childReg()
     {
-        $validated = $this->validate([
-            'childName' => 'required|string|max:255',
-            'childDob' => 'required|date',
-            'childGender' => 'required|string',
-            'birthCertificateNo' => 'required|string|max:10',
-            'childHealthCondition' => 'required|boolean',
+        $request = new Request([
+            'family_id' => $this->family_id,
+            'child_name' => $this->childName,
+            'date_of_birth' => $this->childDob,
+            'gender_id' => $this->childGender,
+            'birth_fc_no' => $this->birthCertificateNo,
+            'health_condition' => $this->childHealthCondition,
         ]);
 
-        DB::beginTransaction();
-        try {
-            FamilyMember::create([
-                'family_id' => $this->family_id,
-                'child_name' => $this->childName,
-                'date_of_birth' => $this->childDob,
-                'gender_id' => $this->childGender,
-                'birth_fc_no' => $this->birthCertificateNo,
-                'health_condition' => $this->childHealthCondition,
-            ]);
+        $controller = new PeopleController();
+        $response = $controller->childReg($request);
+        $result = $response->getData();
 
-            DB::commit();
-            session()->flash('success', 'Child added successfully!');
+        if ($result->status === 'success') {
+            session()->flash('success', $result->message ?? 'Child registered successfully.');
             $this->resetChildForm();
             $this->showModalChildReg = false;
             return $this->redirect(url()->previous(), navigate: true);
-        } catch (Exception $e) {
-            DB::rollBack();
-            session()->flash('error', 'Error: ' . $e->getMessage());
+        } else {
+            if ($result->status === 'validation_error') {
+                foreach ($result->errors as $field => $messages) {
+                    $map = [
+                        'child_name' => 'childName',
+                        'date_of_birth' => 'childDob',
+                        'gender_id' => 'childGender',
+                        'birth_fc_no' => 'birthCertificateNo',
+                        'health_condition' => 'childHealthCondition'
+                    ];
+                    $wireField = $map[$field] ?? $field;
+                    foreach ($messages as $message) {
+                        $this->addError($wireField, $message);
+                    }
+                }
+            } else {
+                session()->flash('error', $result->message);
+            }
         }
     }
 
-    private function resetChildForm()
+    private function resetChildForm(): void
     {
         $this->reset(['childName', 'childDob', 'childGender', 'birthCertificateNo', 'childHealthCondition']);
     }
 
-
-
-    public function render()
+    public function render(): View
     {
         $familyList = Family::where('member_a_id', $this->employee->people_id)
             ->orWhere('member_b_id', $this->employee->people_id)
@@ -297,19 +339,98 @@ class FamilyInformation extends Component
         return view('livewire.employees.family-information', compact('familyList', 'familyMemberList'));
     }
 
-    /** ------------------ DELETE ------------------ **/
-    public function deleteSpouse($rowId)
+    public function confirmDeleteSpouse(string $rowId): void
     {
-        //dd($rowId);
-        Family::where('family_id', $rowId)->delete();
-        session()->flash('success', 'Spouse deleted successfully!');
-        return $this->redirect(url()->previous(), navigate: true);
+        $this->spouseIdToDelete = $rowId;
+        $this->dispatch('modal-show', name: 'delete-spouse-confirmation');
     }
 
-    public function deleteChild($rowId)
+    public function deleteSpouse(): void
     {
-        FamilyMember::where('id', $rowId)->delete();
-        session()->flash('success', 'Child deleted successfully!');
-        return $this->redirect(url()->previous(), navigate: true);
+        if (!$this->spouseIdToDelete) return;
+
+        $request = new Request([
+            'family_id' => $this->spouseIdToDelete,
+        ]);
+
+        $controller = new PeopleController();
+        $response = $controller->deleteFamily($request);
+        $result = $response->getData();
+
+        $this->spouseIdToDelete = null;
+        $this->dispatch('modal-close', name: 'delete-spouse-confirmation');
+
+        if ($result->status === 'success') {
+            session()->flash('success', $result->message ?? 'Family deleted successfully.');
+            $this->redirect(url()->previous(), navigate: true);
+        } else {
+            session()->flash('error', $result->message ?? 'An error occurred while deleting the family.');
+        }
+    }
+
+    public function confirmDeleteChild(string $rowId): void
+    {
+        $this->childIdToDelete = $rowId;
+        $this->dispatch('modal-show', name: 'delete-child-confirmation');
+    }
+
+    public function deleteChild(): void
+    {
+        if (!$this->childIdToDelete) return;
+
+        $child = FamilyMember::find($this->childIdToDelete);
+        if (!$child) {
+            session()->flash('error', 'Child record not found.');
+            return;
+        }
+
+        $request = new Request([
+            'family_id' => $child->family_id,
+            'id' => $this->childIdToDelete,
+        ]);
+
+        $controller = new PeopleController();
+        $response = $controller->removeChild($request);
+        $result = $response->getData();
+
+        $this->childIdToDelete = null;
+        $this->dispatch('modal-close', name: 'delete-child-confirmation');
+
+        if ($result->status === 'success') {
+            session()->flash('success', $result->message ?? 'Child removed successfully.');
+            $this->redirect(url()->previous(), navigate: true);
+        } else {
+            session()->flash('error', $result->message ?? 'An error occurred during child removal.');
+        }
+    }
+
+    public function terminateRelationship(string $family_id)
+    {
+        $request = new Request(['family_id' => $family_id]);
+        $controller = new PeopleController();
+        $response = $controller->terminateFamily($request);
+        $result = $response->getData();
+
+        if ($result->status === 'success') {
+            session()->flash('success', $result->message ?? 'Relationship terminated successfully.');
+            return $this->redirect(url()->previous(), navigate: true);
+        } else {
+            session()->flash('error', $result->message ?? 'An error occurred.');
+        }
+    }
+
+    public function reactivateRelationship(string $family_id)
+    {
+        $request = new Request(['family_id' => $family_id]);
+        $controller = new PeopleController();
+        $response = $controller->reactivateFamily($request);
+        $result = $response->getData();
+
+        if ($result->status === 'success') {
+            session()->flash('success', $result->message ?? 'Relationship reactivated successfully.');
+            return $this->redirect(url()->previous(), navigate: true);
+        } else {
+            session()->flash('error', $result->message ?? 'An error occurred.');
+        }
     }
 }

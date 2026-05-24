@@ -5,6 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class EducationAdministratorServiceSubject
+ *
+ * @property string $id
+ */
 class EducationAdministratorServiceSubject extends Model
 {
     use HasFactory;

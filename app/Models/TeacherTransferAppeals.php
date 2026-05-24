@@ -102,7 +102,7 @@ class TeacherTransferAppeals extends Model
     public function policy()
     {
         return $this->belongsTo(
-            TransferPolicy::class,
+            TeacherTransferPolicy::class,
             'policy_id',
             'policy_id'
         );
@@ -111,7 +111,7 @@ class TeacherTransferAppeals extends Model
     public function board()
     {
         return $this->belongsTo(
-            TransferBoard::class,
+            TeacherTransferBoard::class,
             'appeal_board_id',
             'board_id'
         );

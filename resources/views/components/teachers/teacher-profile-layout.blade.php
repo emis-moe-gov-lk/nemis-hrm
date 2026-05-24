@@ -1,8 +1,8 @@
-<div class="max-w-7xl mx-left pb-10 px-0 md:px-4">
+<div class="max-w-7xl mx-auto pb-10 px-0 md:px-4">
     {{-- 1. Profile Header Section --}}
-    <div class="bg-white dark:bg-gray-900 rounded-2xl border-x border-b border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+    <div class="bg-white dark:bg-gray-900 rounded-4xl border-x border-b border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
         {{-- Cover Photo --}}
-        <div class="h-32 md:h-52 bg-gradient-to-r from-blue-600 to-indigo-600 relative">
+        <div class="h-32 md:h-52 bg-linear-to-r from-blue-600 to-indigo-600 relative">
             <div class="absolute inset-0 opacity-100 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
         </div>
 
@@ -12,9 +12,9 @@
                 {{-- Profile Image --}}
                 <div class="relative">
                     @if ($teacher->gender_id == 'G02')
-                        <img src="{{ asset('images/profile_f.png') }}" alt="Profile" class="w-28 h-28 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-900 shadow-lg object-cover bg-white" />
+                    <img src="{{ asset('images/profile_f.png') }}" alt="Profile" class="w-28 h-28 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-900 shadow-lg object-cover bg-white" />
                     @else
-                        <img src="{{ asset('images/profile_m.png') }}" alt="Profile" class="w-28 h-28 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-900 shadow-lg object-cover bg-white" />
+                    <img src="{{ asset('images/profile_m.png') }}" alt="Profile" class="w-28 h-28 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-900 shadow-lg object-cover bg-white" />
                     @endif
                     <span class="absolute bottom-2 right-2 md:bottom-3 md:right-3 block h-4 w-4 md:h-5 md:w-5 rounded-full border-2 border-white dark:border-gray-900 {{ $teacher->appointment->is_confirmed ? 'bg-green-500' : 'bg-red-500' }}"></span>
                 </div>
@@ -23,19 +23,19 @@
                     <h1 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tighter">
                         {{ $teacher->title->title_name }} {{ $teacher->name_with_initials }}
                     </h1>
-                    
+
                     <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 mt-1">
                         <p class="text-indigo-600 dark:text-indigo-400 font-bold text-xs md:text-sm uppercase tracking-widest">
-                            {{ $teacher->currentAppointment->service->service_name }}
+                            {{ $teacher->appointment?->service?->service_name ?? 'N/A' }}
                         </p>
 
                         <span class="hidden md:block w-1 h-1 bg-slate-300 rounded-full"></span>
 
-                        <p class="text-slate-500 dark:text-slate-400 font-medium text-sm md:text-base flex items-center justify-center md:justify-start gap-1.5">
+                        <p class="text-slate-500 dark:text-slate-500 font-medium text-sm md:text-base flex items-center justify-center md:justify-start gap-1.5">
                             <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-7h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                             </svg>
-                            {{ $teacher->currentAppointment->workplace->office()->name ?? 'No Workplace Assigned' }}
+                            {{ $teacher->currentAppointment?->workplace?->office_name ?? 'No Workplace Assigned' ?? 'No Workplace Assigned' }}
                         </p>
                     </div>
                 </div>
@@ -52,7 +52,7 @@
                         </button>
                     </flux:modal.trigger>
                     @endcan
-                    
+
                     @can('teacher.profile.pdf.view')
                     <a href="{{ route('teacher.profile.pdf', $teacher->id) }}" download class="flex-1 md:flex-none">
                         <button class="w-full inline-flex justify-center items-center px-4 py-2 bg-blue-600 border border-transparent rounded-lg text-xs md:text-sm font-medium text-white hover:bg-blue-700 transition shadow-sm">
@@ -72,8 +72,8 @@
             <div class="w-full mt-2">
                 <nav class="flex justify-between md:justify-start gap-1 md:gap-5 p-1 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
                     {{-- General --}}
-                    <a href="{{ route('teacher.profile.index', $teacherid) }}" wire:navigate 
-                    class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
+                    <a href="{{ route('teacher.profile.index', $teacherid) }}" wire:navigate
+                        class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
                     {{ request()->routeIs('teacher.profile.index') 
                             ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
                             : 'text-gray-500 hover:bg-gray-200/60 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-white' }}">
@@ -83,8 +83,8 @@
 
                     {{-- Qualification --}}
                     @can('teacher.profile.qualification.view')
-                    <a href="{{ route('teacher.profile.qualification', $teacherid) }}" wire:navigate 
-                    class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
+                    <a href="{{ route('teacher.profile.qualification', $teacherid) }}" wire:navigate
+                        class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
                     {{ request()->routeIs('teacher.profile.qualification') 
                             ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
                             : 'text-gray-500 hover:bg-gray-200/60 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-white' }}">
@@ -95,8 +95,8 @@
 
                     {{-- Employment --}}
                     @can('teacher.profile.employment.view')
-                    <a href="{{ route('teacher.profile.employment', $teacherid) }}" wire:navigate 
-                    class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
+                    <a href="{{ route('teacher.profile.employment', $teacherid) }}" wire:navigate
+                        class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
                     {{ request()->routeIs('teacher.profile.employment') 
                             ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
                             : 'text-gray-500 hover:bg-gray-200/60 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-white' }}">
@@ -107,8 +107,8 @@
 
                     {{-- W&OP --}}
                     @can('teacher.profile.pension-and-payment.view')
-                    <a href="{{ route('teacher.profile.pension-and-payment', $teacherid) }}" wire:navigate 
-                    class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
+                    <a href="{{ route('teacher.profile.pension-and-payment', $teacherid) }}" wire:navigate
+                        class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
                     {{ request()->routeIs('teacher.profile.pension-and-payment') 
                             ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
                             : 'text-gray-500 hover:bg-gray-200/60 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-white' }}">
@@ -119,8 +119,8 @@
 
                     {{-- Family --}}
                     @can('teacher.profile.family.view')
-                    <a href="{{ route('teacher.profile.family', $teacherid) }}" wire:navigate 
-                    class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
+                    <a href="{{ route('teacher.profile.family', $teacherid) }}" wire:navigate
+                        class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
                     {{ request()->routeIs('teacher.profile.family') 
                             ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
                             : 'text-gray-500 hover:bg-gray-200/60 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-white' }}">
@@ -131,8 +131,8 @@
 
                     {{-- Edit Request --}}
                     @can('teacher.profile.edit-request.view')
-                    <a href="{{ route('teacher.profile.edit-request', $teacherid) }}" wire:navigate 
-                    class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
+                    <a href="{{ route('teacher.profile.edit-request', $teacherid) }}" wire:navigate
+                        class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
                     {{ request()->routeIs('teacher.profile.edit-request') 
                             ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
                             : 'text-gray-500 hover:bg-gray-200/60 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-white' }}">
@@ -147,7 +147,7 @@
 
     {{-- 3. Main Grid --}}
     <div class="mt-4 md:mt-6 flex flex-col lg:flex-row gap-6 md:px-0">
-        
+
         {{-- INTRO SECTION: Top on Mobile (2 columns), Right on Desktop --}}
         <div class="order-1 lg:order-2 w-full lg:w-[320px] space-y-4">
             <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
@@ -175,59 +175,59 @@
 
         {{-- CONTENT AREA --}}
         <div class="order-2 lg:order-1 flex-1 min-w-0">
-            
+
             {{-- RESTORED: Verify and Confirm Alerts (Original Logic) --}}
             @if (!$teacher->appointment?->is_confirmed && !$teacher->appointment?->is_verified)
-                @can('teacher.profile.verify')
-                <div class="mb-6">
-                    <x-alert type="warning" :dismissible="false">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div class="flex flex-col gap-1">
-                                <span class="font-semibold">Profile Not Verified</span>
-                                <span>This profile has not been verified yet. Please review the details.</span>
-                            </div>
-                            <flux:modal.trigger name="verify-profile">
-                                <button class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium whitespace-nowrap shadow-sm">Verify</button>
-                            </flux:modal.trigger>
+            @can('teacher.profile.verify')
+            <div class="mb-6">
+                <x-alert type="warning" :dismissible="false">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-semibold">Profile Not Verified</span>
+                            <span>This profile has not been verified yet. Please review the details.</span>
                         </div>
-                    </x-alert>
-                </div>
-                @endcan
+                        <flux:modal.trigger name="verify-profile">
+                            <button class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium whitespace-nowrap shadow-sm">Verify</button>
+                        </flux:modal.trigger>
+                    </div>
+                </x-alert>
+            </div>
+            @endcan
             @elseif(!$teacher->appointment?->is_confirmed && $teacher->appointment?->is_verified)
-                @can('teacher.profile.confirm')
-                <div class="mb-6">
-                    <x-alert type="warning" :dismissible="false">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div class="flex flex-col gap-1">
-                                <span class="font-semibold">Profile Not Confirmed</span>
-                                <span>This profile has not been confirmed yet. Please review the details.</span>
-                            </div>
-                            <flux:modal.trigger name="confirm-profile">
-                                <button class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium whitespace-nowrap shadow-sm">Confirm</button>
-                            </flux:modal.trigger>
+            @can('teacher.profile.confirm')
+            <div class="mb-6">
+                <x-alert type="warning" :dismissible="false">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-semibold">Profile Not Confirmed</span>
+                            <span>This profile has not been confirmed yet. Please review the details.</span>
                         </div>
-                    </x-alert>
-                </div>
-                @endcan
+                        <flux:modal.trigger name="confirm-profile">
+                            <button class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium whitespace-nowrap shadow-sm">Confirm</button>
+                        </flux:modal.trigger>
+                    </div>
+                </x-alert>
+            </div>
+            @endcan
             @endif
 
             {{-- Pending Edit Request Alert --}}
             @if ($teacher->profileEditRequests->where('status', 1)->isNotEmpty())
-                @can('teacher.profile.edit-request.response')
-                <div class="mb-6">
-                    <x-alert type="info" :dismissible="false">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div class="flex flex-col gap-1">
-                                <span class="font-semibold">Profile Edit Request Pending</span>
-                                <span>You have a pending profile edit request. Please wait for approval.</span>
-                            </div>
-                            <flux:modal.trigger name="edit-profile-request-response">
-                                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap shadow-sm">Response</button>
-                            </flux:modal.trigger>
+            @can('teacher.profile.edit-request.response')
+            <div class="mb-6">
+                <x-alert type="info" :dismissible="false">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-semibold">Profile Edit Request Pending</span>
+                            <span>You have a pending profile edit request. Please wait for approval.</span>
                         </div>
-                    </x-alert>
-                </div>
-                @endcan
+                        <flux:modal.trigger name="edit-profile-request-response">
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap shadow-sm">Response</button>
+                        </flux:modal.trigger>
+                    </div>
+                </x-alert>
+            </div>
+            @endcan
             @endif
 
             {{-- Original Session Messages --}}

@@ -5,6 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class InstitutionGender
+ *
+ * @property string $id
+ * @property string $gender
+ */
 class InstitutionGender extends Model
 {
     use HasFactory;

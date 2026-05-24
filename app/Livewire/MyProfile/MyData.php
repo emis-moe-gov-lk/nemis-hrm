@@ -13,8 +13,12 @@ class MyData extends Component
 
     public function mount()
     {
-        $this->serviceId = EmployerCurrentAppointment::where('employee_id', $this->peopleId)
-            ->value('service_id');
+        $currentAppointment = EmployerCurrentAppointment::query()
+            ->with('appointment:appointment_id,service_id')
+            ->where('employee_id', $this->peopleId)
+            ->first();
+
+        $this->serviceId = $currentAppointment?->appointment?->service_id;
     }
 
     public function render()

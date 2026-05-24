@@ -1,32 +1,30 @@
-<div class="max-w-7xl mx-left px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-    {{-- Header Section --}}
-    <header class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-            <flux:heading size="xl" level="1" class="!font-black tracking-tight text-slate-900 dark:text-white">
-                {{ __('Divisional Education Offices') }}
-            </flux:heading>
-            <flux:subheading size="lg" class="mt-1">
-                {{ __('Manage Divisional profiles and localized administrative units') }}
-            </flux:subheading>
-        </div>
-
-        <div class="flex items-center gap-3">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <x-page-header
+        title="Divisional Education Offices"
+        subtitle="Manage Divisional profiles and localized administrative units"
+        icon="building-office-2"
+        :breadcrumbs="[
+            'Administrative Hierarchy' => route('offices.index'),
+            'Divisional Education' => route('offices.deo.list')
+        ]"
+    >
+        <x-slot:actions>
              @can('office.deo.create')
                 <a href="{{ route('offices.deo.create') }}" wire:navigate>
-                    <flux:button variant="primary" icon="plus" class="shadow-sm">
+                    <flux:button variant="primary" icon="plus" class="h-11 bg-indigo-600! hover:bg-indigo-700! text-white! shadow-lg shadow-indigo-200/50 dark:shadow-none border-none">
                         Create Divisional Office
                     </flux:button>
                 </a>
             @endcan
-        </div>
-    </header>
+        </x-slot:actions>
+    </x-page-header>
 
     <flux:separator variant="subtle" />
 
     {{-- Horizontal Cards Stack --}}
     <div class="space-y-4">
         @forelse ($divisionalEducationOffices as $data)
-            <div class="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-2 pr-6 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-500/30">
+            <div class="group bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-3xl p-2 pr-6 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-500/30">
                 <div class="flex flex-col lg:flex-row lg:items-center gap-6">
                     
                     {{-- Office Identity Section with Status --}}
@@ -34,7 +32,7 @@
                         <div class="flex items-center gap-5 p-3 lg:w-80 bg-slate-50 dark:bg-slate-800/50 rounded-2xl transition-all">
                             <div class="relative shrink-0">
                                 <div class="h-16 w-16 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-800 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
-                                    <flux:icon.building-office class="size-8 text-slate-500 dark:text-slate-400" />
+                                    <flux:icon.building-office class="size-8 text-slate-500 dark:text-slate-500" />
                                 </div>
                                 
                                 {{-- Status Indicator Dot --}}
@@ -50,7 +48,7 @@
                                     <span class="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.15em]">
                                         ID: {{ $data->workplace_id }}
                                     </span>
-                                    <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded {{ $data->active_status ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400' }}">
+                                    <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded {{ $data->active_status ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-500' }}">
                                         {{ $data->active_status ? 'Active' : 'Inactive' }}
                                     </span>
                                 </div>
@@ -65,7 +63,7 @@
                     <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-8 px-4 lg:px-0">
                         {{-- Address --}}
                         <div class="space-y-1.5">
-                            <div class="flex items-center gap-2 text-slate-400">
+                            <div class="flex items-center gap-2 text-slate-500">
                                 <flux:icon.map-pin variant="micro" class="size-3.5" />
                                 <span class="text-[10px] font-bold uppercase tracking-wider">Address</span>
                             </div>
@@ -76,7 +74,7 @@
 
                         {{-- Zonal Affiliation --}}
                         <div class="space-y-1.5">
-                            <div class="flex items-center gap-2 text-slate-400">
+                            <div class="flex items-center gap-2 text-slate-500">
                                 <flux:icon.rectangle-group variant="micro" class="size-3.5" />
                                 <span class="text-[10px] font-bold uppercase tracking-wider">Zonal Affiliation</span>
                             </div>
@@ -87,7 +85,7 @@
 
                         {{-- Contact Detail --}}
                         <div class="space-y-1.5">
-                            <div class="flex items-center gap-2 text-slate-400">
+                            <div class="flex items-center gap-2 text-slate-500">
                                 <flux:icon.phone variant="micro" class="size-3.5" />
                                 <span class="text-[10px] font-bold uppercase tracking-wider">Contact</span>
                             </div>
@@ -120,7 +118,7 @@
                 </div>
             </div>
         @empty
-            <div class="flex flex-col items-center justify-center py-24 bg-slate-50 dark:bg-slate-800/50 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+            <div class="flex flex-col items-center justify-center py-24 bg-slate-50 dark:bg-slate-800/50 rounded-[2.5rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                 <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm mb-4">
                     <flux:icon.magnifying-glass class="size-8 text-slate-300" />
                 </div>

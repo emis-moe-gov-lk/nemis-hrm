@@ -12,8 +12,6 @@ class ZeoPrincipalsList extends Component
 {
     use WithPagination;
 
-    protected $paginationTheme = 'tailwind';
-
     public $officeId;
     public $institutionIds = [];
 
@@ -34,19 +32,27 @@ class ZeoPrincipalsList extends Component
 
     public function render()
     {
-        $principalsList = EmployerCurrentAppointment::with([
+        $query = EmployerCurrentAppointment::with([
             'employee.title',
             'service',
             'rank',
             'position',
+            'workplace'
         ])
-            ->whereIn('workplace_id', $this->institutionIds)
-            ->where('position_id', 'POS002')
-            ->orderBy('appoint_date', 'asc')
+        ->select('employer_current_appointments.*')
+        ->leftJoin('employer_appointments', 'employer_appointments.appointment_id', '=', 'employer_current_appointments.appointment_id')
+        ->leftJoin('services', 'services.service_id', '=', 'employer_appointments.service_id')
+        ->whereIn('employer_current_appointments.workplace_id', $this->institutionIds)
+        ->where('employer_current_appointments.position_id', 'POS002');
+
+        $principalsList = $query
+            ->orderByRaw('COALESCE(services.rank, 9999) ASC')
+            ->orderBy('employer_current_appointments.appoint_date', 'asc')
             ->paginate(50);
 
         return view('livewire.offices.zeo.profile.zeo-principals-list', [
             'principalsList' => $principalsList,
+            'officeId' => $this->officeId,
         ]);
     }
 }

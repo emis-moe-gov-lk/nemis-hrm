@@ -8,6 +8,25 @@ use App\Traits\Blameable;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
+/**
+ * Class Teacher
+ *
+ * @property int $id
+ * @property string $employee_id
+ * @property int|null $appointment_id
+ * @property-read \App\Models\EmployerAppointment|null $appointment
+ * @property-read \App\Models\EmployerCurrentAppointment|null $currentAppointment
+ * @property-read \App\Models\People|null $employee
+ * @property-read \App\Models\TeacherCategory|null $teacherCategory
+ * @property-read \App\Models\TeacherType|null $teacherType
+ * @property-read \App\Models\MediumOfInstruction|null $medium
+ * @property-read \App\Models\ApointedSubject|null $appointmentSubject
+ * @property-read \App\Models\SubjectList|null $mainSubject
+ * @property-read \App\Models\SubjectList|null $secondarySubject
+ * @property-read \App\Models\SubjectList|null $currentTeachingSubject
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EmployerAppointmentHistory[] $appointmentHistory
+ * @property-read \App\Models\EmployerAttachmentAppointment|null $attachmentAppointment
+ */
 class Teacher extends Model
 {
     use HasFactory, LogsActivity, Blameable;

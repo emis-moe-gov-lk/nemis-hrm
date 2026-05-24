@@ -10,7 +10,7 @@
                         {{ __('GN Divisions') }}
                     </flux:heading>
                     <flux:subheading size="lg" class="flex items-center gap-2">
-                        <flux:icon.map-pin variant="micro" class="text-slate-400" />
+                        <flux:icon.map-pin variant="micro" class="text-slate-500" />
                         {{ __('Manage Grama Niladhari jurisdictions and regional mapping') }}
                     </flux:subheading>
                 </div>
@@ -21,7 +21,7 @@
                         placeholder="Search GN Division..." 
                         icon="magnifying-glass"
                         kbd="⌘K"
-                        class="w-full sm:w-64 !rounded-2xl shadow-sm border-slate-200 dark:border-slate-800" 
+                        class="w-full sm:w-64 !rounded-2xl shadow-sm border-slate-300 dark:border-slate-700" 
                     />
 
                     <flux:modal.trigger name="add-new-gn-division">
@@ -45,11 +45,11 @@
             {{-- CARD GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 @forelse ($gnDivisionList as $key => $data)
-                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-5 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500/30 transition-all duration-500">
+                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-5 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500/30 transition-all duration-500">
                         
                         {{-- Card Header: Code & Status --}}
                         <div class="flex justify-between items-start mb-4">
-                            <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full border border-slate-200 dark:border-slate-700">
+                            <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 rounded-full border border-slate-300 dark:border-slate-700">
                                 {{ $data->gn_division_code }}
                             </span>
                             
@@ -73,19 +73,19 @@
                             <h3 class="text-lg font-black text-slate-900 dark:text-white leading-tight uppercase tracking-tight group-hover:text-indigo-600 transition-colors">
                                 {{ $data->gn_division_name }}
                             </h3>
-                            <p class="text-[11px] font-medium text-slate-400 mt-1 uppercase tracking-widest">
+                            <p class="text-[11px] font-medium text-slate-500 mt-1 uppercase tracking-widest">
                                 ID: {{ $data->gn_division_id }}
                             </p>
                         </div>
 
                         {{-- Card Footer: Parent Office Mapping --}}
-                        <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-700">
                             <div class="flex items-center gap-3">
                                 <div class="flex shrink-0 w-10 h-10 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
                                     <flux:icon.map-pin variant="micro" />
                                 </div>
                                 <div class="overflow-hidden">
-                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">DS Office</p>
+                                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-tighter leading-none mb-1">DS Office</p>
                                     <p class="text-sm font-bold text-slate-700 dark:text-slate-300 truncate uppercase tracking-tight">
                                         {{ $data->divisionalSecretariatOffice->dso_name }}
                                     </p>
@@ -95,7 +95,7 @@
 
                         {{-- Hover Action Bar --}}
                         <div class="absolute inset-x-0 -bottom-2 flex justify-center opacity-0 group-hover:opacity-100 group-hover:bottom-4 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto">
-                            <div class="flex items-center gap-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 p-1.5 rounded-2xl shadow-xl">
+                            <div class="flex items-center gap-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-300 dark:border-slate-700 p-1.5 rounded-2xl shadow-xl">
                                 <flux:modal.trigger wire:click="editGNDivision({{ $data->id }})" name="edit-gn-division">
                                     <flux:button size="sm" variant="ghost" icon="pencil-square" class="!rounded-xl hover:!bg-indigo-50 hover:!text-indigo-600 transition-colors" />
                                 </flux:modal.trigger>
@@ -114,9 +114,9 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-24 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-24 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <flux:icon.magnifying-glass size="xl" class="text-slate-300 mb-4" />
-                        <p class="text-slate-400 font-black uppercase tracking-widest text-sm italic">{{ __('No GN Divisions Found') }}</p>
+                        <p class="text-slate-500 font-black uppercase tracking-widest text-sm italic">{{ __('No GN Divisions Found') }}</p>
                     </div>
                 @endforelse
             </div>

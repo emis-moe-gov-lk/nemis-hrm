@@ -1,89 +1,60 @@
-<div class="space-y-6">
-    {{-- Section Header --}}
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 px-1">
-        <div class="flex items-center gap-3">
-            <div class="p-2.5 bg-amber-100 dark:bg-amber-900/30 rounded-xl">
-                <flux:icon.banknotes class="size-5 text-amber-600 dark:text-amber-400" />
-            </div>
+<div class="space-y-8">
+    <section>
+        {{-- Section Header --}}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
-                <h2 class="text-lg sm:text-xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-tight">W&OP & Payment Details</h2>
-                <p class="text-xs sm:text-sm text-gray-500">Pension contributions & payroll identification</p>
+                <h2 class="text-base font-black tracking-widest text-slate-700 dark:text-zinc-200 uppercase">W&OP & Payment Details</h2>
+                <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-[0.2em] mt-0.5">Pension contributions & payroll identification</p>
             </div>
-        </div>
-
-        <div class="flex items-center justify-between sm:justify-end gap-2 border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-100 dark:border-gray-800">
             @if ($canEdit)
                 <flux:modal.trigger name="edit-profile-pension-payment">
-                    <flux:button variant="ghost" icon="pencil-square" size="sm" class="rounded-full">Edit Details</flux:button>
+                    <flux:button variant="ghost" size="sm" class="rounded-xl border border-slate-300 dark:border-zinc-700 font-bold text-xs px-5 text-slate-600 dark:text-zinc-300 hover:border-amber-400 hover:text-amber-600 transition-all w-fit">
+                        Edit Details
+                    </flux:button>
                 </flux:modal.trigger>
             @endif
         </div>
-    </div>
 
-    {{-- Data Cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        {{-- W&OP Number Card --}}
-        <div class="group relative p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all hover:shadow-sm">
-            <div class="flex items-center gap-4">
-                <div class="p-2 bg-gray-50 dark:bg-gray-900 rounded-lg group-hover:bg-amber-50 dark:group-hover:bg-amber-900/20 transition-colors">
-                    <flux:icon.document-text class="size-5 text-gray-400 group-hover:text-amber-500" />
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">W&OP Number</p>
-                    <p class="text-base font-mono font-bold text-gray-900 dark:text-white">
-                        {{ $employee->appointment->w_op_no ?? 'NOT ASSIGNED' }}
-                    </p>
-                </div>
-            </div>
-        </div>
+        {{-- Data Table --}}
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-700 overflow-hidden">
 
-        {{-- Pay Sheet Number Card --}}
-        <div class="group relative p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all hover:shadow-sm">
-            <div class="flex items-center gap-4">
-                <div class="p-2 bg-gray-50 dark:bg-gray-900 rounded-lg group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
-                    <flux:icon.credit-card class="size-5 text-gray-400 group-hover:text-blue-500" />
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pay Sheet Number</p>
-                    <p class="text-base font-mono font-bold text-gray-900 dark:text-white">
-                        {{ $employee->appointment->pay_sheet_no ?? 'NOT ASSIGNED' }}
-                    </p>
-                </div>
+            {{-- W&OP Number --}}
+            <div class="flex flex-col sm:flex-row sm:items-center border-b border-dashed border-slate-300 dark:border-zinc-700 px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors gap-1 sm:gap-0">
+                <span class="w-full sm:w-48 sm:shrink-0 text-[11px] font-black text-slate-500 dark:text-zinc-400 uppercase tracking-widest">W&OP Number</span>
+                <span class="text-sm font-mono font-semibold text-slate-800 dark:text-zinc-100">
+                    {{ $employee->appointment->w_op_no ?? '—' }}
+                </span>
             </div>
+
+            {{-- Pay Sheet Number --}}
+            <div class="flex flex-col sm:flex-row sm:items-center px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors gap-1 sm:gap-0">
+                <span class="w-full sm:w-48 sm:shrink-0 text-[11px] font-black text-slate-500 dark:text-zinc-400 uppercase tracking-widest">Pay Sheet Number</span>
+                <span class="text-sm font-mono font-semibold text-slate-800 dark:text-zinc-100">
+                    {{ $employee->appointment->pay_sheet_no ?? '—' }}
+                </span>
+            </div>
+
         </div>
-    </div>
+    </section>
 
     {{-- Edit Modal --}}
     @if ($canEdit)
     <flux:modal name="edit-profile-pension-payment" class="md:w-110">
         <div class="space-y-6">
             <div>
-                <flux:heading size="lg">Update Payment Details</flux:heading>
-                <flux:text class="mt-2">Update your Widows' & Orphans' Pension and payroll identification numbers.</flux:text>
+                <h3 class="text-sm font-black tracking-widest text-slate-900 dark:text-white uppercase">Update Payment Details</h3>
+                <p class="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mt-0.5">Widows' & Orphans' Pension and payroll numbers</p>
             </div>
 
             <form wire:submit.prevent="updatePensionPayment" class="space-y-4">
-                <flux:field>
-                    <flux:input 
-                        wire:model.live="wopNo" 
-                        label="W&OP No" 
-                        placeholder="E.g. 1234567-X" 
-                        icon="document-text"
-                    />
-                </flux:field>
+                <flux:input wire:model.live="wopNo" label="W&OP No" placeholder="E.g. 1234567-X" icon="document-text" />
+                <flux:input wire:model.live="paySheetNo" label="Pay Sheet No" placeholder="E.g. PS-8821" icon="credit-card" />
 
-                <flux:field>
-                    <flux:input 
-                        wire:model.live="paySheetNo" 
-                        label="Pay Sheet No" 
-                        placeholder="E.g. PS-8821" 
-                        icon="credit-card"
-                    />
-                </flux:field>
-
-                <div class="flex pt-2">
-                    <flux:spacer />
-                    <flux:button type="submit" variant="primary">Save Changes</flux:button>
+                <div class="flex gap-4 pt-4">
+                    <flux:modal.close>
+                        <flux:button variant="ghost" class="flex-1 font-bold rounded-xl h-12">Cancel</flux:button>
+                    </flux:modal.close>
+                    <flux:button type="submit" variant="primary" class="flex-1 font-black rounded-xl h-12 bg-indigo-600 dark:bg-white text-white dark:text-slate-900">Save Changes</flux:button>
                 </div>
             </form>
         </div>

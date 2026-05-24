@@ -1,0 +1,10 @@
+includes:
+  - vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+  bootstrapFiles:
+    - vendor/autoload.php
+  level: 7
+  paths:
+    - app
+    - tests

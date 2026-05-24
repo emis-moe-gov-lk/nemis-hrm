@@ -10,13 +10,13 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasTable('transfer_categories')) {
+        if (!Schema::hasTable('teacher_transfer_categories')) {
             return;
         }
 
         $this->ensureColumnsExist();
 
-        if (DB::table('transfer_categories')->exists()) {
+        if (DB::table('teacher_transfer_categories')->exists()) {
             $this->backfillPolicyIds();
             $this->backfillOwnerWorkplaces();
             $this->ensureResolvedCategoryLinks();
@@ -35,14 +35,14 @@ return new class extends Migration
 
     protected function ensureColumnsExist(): void
     {
-        $hasPolicyColumn = Schema::hasColumn('transfer_categories', 'policy_id');
-        $hasOwnerWorkplaceColumn = Schema::hasColumn('transfer_categories', 'transfer_owner_workplace_id');
+        $hasPolicyColumn = Schema::hasColumn('teacher_transfer_categories', 'policy_id');
+        $hasOwnerWorkplaceColumn = Schema::hasColumn('teacher_transfer_categories', 'transfer_owner_workplace_id');
 
         if ($hasPolicyColumn && $hasOwnerWorkplaceColumn) {
             return;
         }
 
-        Schema::table('transfer_categories', function (Blueprint $table) use ($hasPolicyColumn, $hasOwnerWorkplaceColumn) {
+        Schema::table('teacher_transfer_categories', function (Blueprint $table) use ($hasPolicyColumn, $hasOwnerWorkplaceColumn) {
             if (!$hasPolicyColumn) {
                 $table->string('policy_id', 20)->nullable()->after('transfer_category_id');
             }
@@ -55,7 +55,7 @@ return new class extends Migration
 
     protected function backfillPolicyIds(): void
     {
-        $policies = DB::table('transfer_policies')
+        $policies = DB::table('teacher_transfer_policies')
             ->select('policy_id', 'transfer_authority')
             ->get();
 
@@ -69,7 +69,7 @@ return new class extends Migration
 
         $policiesByAuthority = $policies->groupBy('transfer_authority');
 
-        $categories = DB::table('transfer_categories')
+        $categories = DB::table('teacher_transfer_categories')
             ->select('id', 'transfer_category_id', 'policy_id', 'transfer_owner_workplace_id')
             ->whereNull('policy_id')
             ->get();
@@ -81,7 +81,7 @@ return new class extends Migration
                 continue;
             }
 
-            DB::table('transfer_categories')
+            DB::table('teacher_transfer_categories')
                 ->where('id', $category->id)
                 ->update(['policy_id' => $resolvedPolicyId]);
         }
@@ -101,7 +101,7 @@ return new class extends Migration
                     ->pluck('policy_id')
             )
             ->merge(
-                DB::table('transfer_boards')
+                DB::table('teacher_transfer_boards')
                     ->where('transfer_category_id', $category->transfer_category_id)
                     ->whereNotNull('policy_id')
                     ->distinct()
@@ -136,10 +136,10 @@ return new class extends Migration
 
     protected function backfillOwnerWorkplaces(): void
     {
-        $policyAuthorities = DB::table('transfer_policies')
+        $policyAuthorities = DB::table('teacher_transfer_policies')
             ->pluck('transfer_authority', 'policy_id');
 
-        $categories = DB::table('transfer_categories')
+        $categories = DB::table('teacher_transfer_categories')
             ->select('id', 'policy_id', 'transfer_owner_workplace_id')
             ->whereNull('transfer_owner_workplace_id')
             ->get();
@@ -151,7 +151,7 @@ return new class extends Migration
                 continue;
             }
 
-            DB::table('transfer_categories')
+            DB::table('teacher_transfer_categories')
                 ->where('id', $category->id)
                 ->update(['transfer_owner_workplace_id' => $ownerWorkplaceId]);
         }
@@ -159,7 +159,7 @@ return new class extends Migration
 
     protected function ensureResolvedCategoryLinks(): void
     {
-        $missingPolicyCount = DB::table('transfer_categories')
+        $missingPolicyCount = DB::table('teacher_transfer_categories')
             ->whereNull('policy_id')
             ->count();
 
@@ -169,7 +169,7 @@ return new class extends Migration
             );
         }
 
-        $missingOwnerCount = DB::table('transfer_categories')
+        $missingOwnerCount = DB::table('teacher_transfer_categories')
             ->whereNull('transfer_owner_workplace_id')
             ->count();
 
@@ -182,14 +182,14 @@ return new class extends Migration
 
     protected function makeColumnsRequired(): void
     {
-        if ($this->columnAllowsNull('transfer_categories', 'policy_id')) {
-            Schema::table('transfer_categories', function (Blueprint $table) {
+        if ($this->columnAllowsNull('teacher_transfer_categories', 'policy_id')) {
+            Schema::table('teacher_transfer_categories', function (Blueprint $table) {
                 $table->string('policy_id', 20)->nullable(false)->change();
             });
         }
 
-        if ($this->columnAllowsNull('transfer_categories', 'transfer_owner_workplace_id')) {
-            Schema::table('transfer_categories', function (Blueprint $table) {
+        if ($this->columnAllowsNull('teacher_transfer_categories', 'transfer_owner_workplace_id')) {
+            Schema::table('teacher_transfer_categories', function (Blueprint $table) {
                 $table->string('transfer_owner_workplace_id', 10)->nullable(false)->change();
             });
         }
@@ -197,17 +197,17 @@ return new class extends Migration
 
     protected function ensureForeignKeysExist(): void
     {
-        if (!$this->foreignKeyExists('transfer_categories', 'tca_policy_fk')) {
-            Schema::table('transfer_categories', function (Blueprint $table) {
+        if (!$this->foreignKeyExists('teacher_transfer_categories', 'tca_policy_fk')) {
+            Schema::table('teacher_transfer_categories', function (Blueprint $table) {
                 $table->foreign('policy_id', 'tca_policy_fk')
                     ->references('policy_id')
-                    ->on('transfer_policies')
+                    ->on('teacher_transfer_policies')
                     ->onDelete('cascade');
             });
         }
 
-        if (!$this->foreignKeyExists('transfer_categories', 'tca_owner_wp_fk')) {
-            Schema::table('transfer_categories', function (Blueprint $table) {
+        if (!$this->foreignKeyExists('teacher_transfer_categories', 'tca_owner_wp_fk')) {
+            Schema::table('teacher_transfer_categories', function (Blueprint $table) {
                 $table->foreign('transfer_owner_workplace_id', 'tca_owner_wp_fk')
                     ->references('workplace_id')
                     ->on('workplaces');

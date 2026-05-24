@@ -5,6 +5,9 @@ namespace App\Livewire\Employees;
 use App\Models\{
     EmployerAppointment,
     EmployerAppointmentHistory,
+    EmployerAppointmentRankHistory,
+    EmployerAppointmentWorkplaceHistory,
+    EmployerAppointmentPositionHistory,
     Institution,
     InstitutionCategory,
     OfficeLevel,
@@ -17,51 +20,58 @@ use App\Models\{
     ZonalEducationOffice
 };
 use Carbon\Carbon;
-
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class PreviousServicesReg extends Component
 {
     // -------------------------------------------------
-    // Public properties (used in the Livewire template)
+    // Public properties (Typed)
     // -------------------------------------------------
-    public $peopleId;
-    public $canCreate;
-    public $canDelete;
-    public $people;
-    public $teacherAppointment;
+    public string $peopleId;
+    public bool $canCreate = false;
+    public bool $canDelete = false;
+    public ?People $people = null;
+    public mixed $teacherAppointment = null;
 
-    // Dropdown options (collections for select boxes)
-    public $servicesOptions = [];
-    public $ranksOptions = [];
-    public $positionOption = [];
-    public $officeLevelOption = [];
-    public $zonalEducationOfficeOption = [];
-    public $institutionCategoryOption = [];
-    public $workingPlaceOption = [];
-
-    public $subjectOption = [], $currentInstitutionOption = [];
+    // Dropdown options (Typed)
+    public Collection|array $servicesOptions = [];
+    public Collection|array $ranksOptions = [];
+    public Collection|array $positionOption = [];
+    public Collection|array $officeLevelOption = [];
+    public Collection|array $zonalEducationOfficeOption = [];
+    public Collection|array $institutionCategoryOption = [];
+    public Collection|array $workingPlaceOption = [];
+    public Collection|array $subjectOption = [];
+    public Collection|array $currentInstitutionOption = [];
 
     // Selected dropdown values / input fields
-    public $recordType;
-    public $service;
-    public $rank;
-    public $position;
-    public $officeLevel;
-    public $institutionCategory;
-    public $zonalEducationOffice;
-    public $workingPlace;
-    public $firstAppointmentDate;
-    public $appointmentLetterNo;
+    public ?string $recordType = null;
+    public ?string $service = null;
+    public ?string $rank = null;
+    public ?string $position = null;
+    public ?string $officeLevel = null;
+    public ?string $institutionCategory = null;
+    public ?string $zonalEducationOffice = null;
+    public ?string $workingPlace = null;
+    public ?string $firstAppointmentDate = null;
+    public ?string $appointmentLetterNo = null;
 
+    // Rank History Form Fields
+    public ?string $selectedAppointmentId = null;
+    public ?string $historyRankId = null;
+    public ?string $historyStartDate = null;
+    public ?string $historyEndDate = null;
+    public ?string $historyRemarks = null;
+    public bool $historyIsActive = false;
+    public bool $showRankModal = false;
 
-    // -------------------------
-    // Validation Rules
-    // -------------------------
+    // Delete state
+    public ?int $serviceIdToDelete = null;
+    public ?int $rankIdToDelete = null;
 
-
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'recordType' => ['required', Rule::in(['0', '1', '2', '3'])],
@@ -77,51 +87,33 @@ class PreviousServicesReg extends Component
         ];
     }
 
-    // -------------------------
-    // Live Validation on Field Update
-    // -------------------------
-    public function updated($propertyName)
+    public function updated(string $propertyName): void
     {
         $this->validateOnly($propertyName);
     }
 
-    public function mount($peopleId)
+    public function mount(string $peopleId): void
     {
         $this->peopleId = $peopleId;
-        // $this->canCreate = $canCreate;
-        // $this->canDelete = $canDelete;
-        // Load teacher details and current appointment
         $this->people = People::with('currentAppointment')->where('people_id', $this->peopleId)->first();
         if ($this->people) {
-
-            // Load available service records for this employee
             $this->servicesOptions = Service::govService()->get();
         }
 
-        // Load dropdown data
         $this->officeLevelOption = OfficeLevel::all();
         $this->zonalEducationOfficeOption = ZonalEducationOffice::all();
         $this->institutionCategoryOption = InstitutionCategory::all();
     }
 
-    /**
-     * When 'service' dropdown changes,
-     * dynamically update ranks and positions.
-     */
-    public function updatedService($value)
+    public function updatedService(string $value): void
     {
         $this->ranksOptions = ServiceRank::where('service_id', $value)->get();
         $this->positionOption = Position::where('service_id', $value)->get();
     }
 
-    /**
-     * When 'officeLevel' changes,
-     * update workplaces accordingly.
-     */
-    public function updatedOfficeLevel($value)
+    public function updatedOfficeLevel(string $value): void
     {
         if ($value === 'OLID006') {
-            // Special case for institutions
             $this->workingPlaceOption = collect();
             $this->workingPlace = '';
         } else {
@@ -130,11 +122,7 @@ class PreviousServicesReg extends Component
         }
     }
 
-    /**
-     * When 'zonalEducationOffice' changes,
-     * filter institutions by ZEO + category.
-     */
-    public function updatedZonalEducationOffice($value)
+    public function updatedZonalEducationOffice(?string $value): void
     {
         if ($value && $this->institutionCategory) {
             $this->workingPlaceOption = Workplaces::where('office_level_id', 'OLID006')
@@ -147,7 +135,7 @@ class PreviousServicesReg extends Component
                 }])
                 ->get()
                 ->sortBy('institution.name')
-                ->values(); // reset array keys
+                ->values();
         } else {
             $this->workingPlaceOption = collect();
         }
@@ -155,27 +143,20 @@ class PreviousServicesReg extends Component
         $this->workingPlace = '';
     }
 
-
-    /**
-     * When 'institutionCategory' changes,
-     * filter institutions by category + ZEO.
-     */
-    public function updatedInstitutionCategory($value)
+    public function updatedInstitutionCategory(?string $value): void
     {
         if ($value && $this->zonalEducationOffice) {
-
             $this->workingPlaceOption = Workplaces::where('office_level_id', 'OLID006')
                 ->whereHas('institution', function ($query) use ($value) {
                     $query->where('institution_category_id', $value)
                         ->where('zeo_wp_id', $this->zonalEducationOffice);
                 })
                 ->with(['institution' => function ($q) {
-                    $q->orderBy('name', 'asc'); // preload institution sorted
+                    $q->orderBy('name', 'asc');
                 }])
                 ->get()
-                ->sortBy('institution.name') // sort final collection
-                ->values(); // reset array keys
-
+                ->sortBy('institution.name')
+                ->values();
         } else {
             $this->workingPlaceOption = collect();
         }
@@ -189,19 +170,15 @@ class PreviousServicesReg extends Component
 
         if ($this->people && $this->people->currentAppointment) {
             $employeeServiceList = EmployerAppointment::where('employee_id', $this->people->currentAppointment->employee_id)
-                ->with(['position', 'service', 'rank', 'workplace']) // eager load relations
-                ->orderBy('first_appointment_date', 'desc') // use 'desc or asc' for newest first
+                ->with(['position', 'service', 'rank', 'workplace', 'rankHistory.rank'])
+                ->orderBy('active_status', 'desc')
+                ->orderBy('first_appointment_date', 'desc')
                 ->get();
-        } else {
-            $employeeServiceList = collect(); // return an empty collection if no employee
         }
 
         return view('livewire.employees.previous-services-reg', compact('employeeServiceList'));
     }
 
-    /**
-     * Save or update the teacher's service record.
-     */
     public function saveServiceRecord()
     {
         $this->validate([
@@ -217,15 +194,10 @@ class PreviousServicesReg extends Component
         ]);
 
         try {
-
-            // Calculate retirement date (55 years from birth)
             $retirementDate = Carbon::parse($this->people->date_of_birth)->addYears(55);
-
-            // Generate appointment ID
             $appointmentId = EmployerAppointment::generateAppointmentId($this->firstAppointmentDate);
 
-            // Create Employer Appointment
-            $appointment = EmployerAppointment::create([
+            EmployerAppointment::create([
                 'appointment_id' => $appointmentId,
                 'employee_id' => $this->people->people_id,
                 'first_appointment_date' => $this->firstAppointmentDate,
@@ -238,50 +210,104 @@ class PreviousServicesReg extends Component
                 'appointment_letter_no' => $this->appointmentLetterNo,
                 'appointment_letter' => 'default_letter.pdf',
                 'w_op_no' => null,
-                'active_status' => '0', // Inactive as it's a previous record
+                'active_status' => '0',
             ]);
 
             session()->flash('success', 'New service record added successfully!');
             return $this->redirect(url()->previous(), navigate: true);
         } catch (\Exception $e) {
-            // Handle exception and show error message
-            session()->flash('error', 'An error occurred while saving the record: Dublicate entry or invalid data.');
+            session()->flash('error', 'An error occurred while saving the record: Duplicate entry or invalid data.');
             return $this->redirect(url()->previous(), navigate: true);
         }
     }
 
-    // Delete a single EmployerAppointmentHistory record
-    public function deleteServiceRecord($id)
+    public function confirmDeleteService(int $id): void
     {
-        $record = EmployerAppointment::find($id);
+        $this->serviceIdToDelete = $id;
+        $this->dispatch('modal-show', name: 'delete-service-confirmation');
+    }
 
-        if (!$record) {
-            session()->flash('error', 'Record not found.');
-            return $this->redirect(url()->previous(), navigate: true);
+    public function deleteServiceRecord(): void
+    {
+        if (!$this->serviceIdToDelete) return;
+
+        $record = EmployerAppointment::find($this->serviceIdToDelete);
+
+        if ($record && $record->active_status != 1 && !$record->currentAppointment()->exists() && !$record->appointmentHistory()->exists()) {
+            $record->delete();
+            session()->flash('success', 'Record deleted successfully.');
+        } else {
+            session()->flash('error', 'Cannot delete this record. It may be active or have associated history.');
         }
 
-        // Prevent deleting active record
-        if ($record->active_status == 1) {
-            session()->flash('error', 'Active records cannot be deleted.');
-            return $this->redirect(url()->previous(), navigate: true);
+        $this->serviceIdToDelete = null;
+        $this->dispatch('modal-close', name: 'delete-service-confirmation');
+        $this->redirect(url()->previous(), navigate: true);
+    }
+
+    public function confirmDeleteRank(int $id): void
+    {
+        $this->rankIdToDelete = $id;
+        $this->dispatch('modal-show', name: 'delete-rank-confirmation');
+    }
+
+    public function deleteRankHistoryRecord(): void
+    {
+        if (!$this->rankIdToDelete) return;
+
+        $record = EmployerAppointmentRankHistory::find($this->rankIdToDelete);
+
+        if ($record && !$record->is_active) {
+            $record->delete();
+            session()->flash('success', 'Rank history record deleted successfully.');
+        } else {
+            session()->flash('error', 'Active rank records cannot be deleted.');
         }
 
-        // Prevent delete if current appointment exists
-        if ($record->currentAppointment()->exists()) {
-            session()->flash('error', 'Cannot delete record with existing current appointment.');
-            return $this->redirect(url()->previous(), navigate: true);
+        $this->rankIdToDelete = null;
+        $this->dispatch('modal-close', name: 'delete-rank-confirmation');
+        $this->redirect(url()->previous(), navigate: true);
+    }
+
+    public function setAppointmentForHistory(string $appointmentId): void
+    {
+        $this->selectedAppointmentId = $appointmentId;
+
+        $appointment = EmployerAppointment::where('appointment_id', $appointmentId)->first();
+        if ($appointment) {
+            $this->ranksOptions = ServiceRank::where('service_id', $appointment->service_id)->get();
         }
 
-        // Prevent delete if any history exists
-        if ($record->appointmentHistory()->exists()) {
-            session()->flash('error', 'Cannot delete record with existing history.');
-            return $this->redirect(url()->previous(), navigate: true);
+        $this->reset(['historyRankId', 'historyStartDate', 'historyEndDate', 'historyRemarks', 'historyIsActive']);
+    }
+
+    public function saveRankHistory()
+    {
+        $this->validate([
+            'historyRankId' => ['required', 'exists:service_ranks,rank_id'],
+            'historyStartDate' => ['required', 'date'],
+            'historyEndDate' => ['nullable', 'date', 'after_or_equal:historyStartDate'],
+            'historyRemarks' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $appointment = EmployerAppointment::where('appointment_id', $this->selectedAppointmentId)->first();
+
+        if (!$appointment) {
+            session()->flash('error', 'Appointment not found.');
+            return;
         }
 
-        // Delete the record
-        $record->delete();
+        EmployerAppointmentRankHistory::create([
+            'appointment_id' => $this->selectedAppointmentId,
+            'employee_id' => $this->people->people_id,
+            'rank_id' => $this->historyRankId,
+            'start_date' => $this->historyStartDate,
+            'end_date' => $this->historyEndDate,
+            'is_active' => $this->historyIsActive,
+            'remarks' => $this->historyRemarks,
+        ]);
 
-        session()->flash('success', 'Record deleted successfully.');
+        session()->flash('success', 'Rank history record added successfully!');
         return $this->redirect(url()->previous(), navigate: true);
     }
 }

@@ -1,4 +1,5 @@
 {
+    "name": "cemis-lk",
     "private": true,
     "type": "module",
     "scripts": {
@@ -7,6 +8,7 @@
     },
     "dependencies": {
         "@tailwindcss/vite": "^4.1.11",
+        "apexcharts": "^5.12.0",
         "autoprefixer": "^10.4.20",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",

@@ -1,153 +1,138 @@
 <section class="w-full">
-    <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">{{ __('Divisional Education Office') }}</flux:heading>
-        <flux:subheading size="lg" class="mb-6">
-            {{ __('Statistics about Divisional Education Office structure and staff distribution.') }}
-        </flux:subheading>
-        <flux:separator variant="subtle" />
-    </div>
-
     <x-offices.deo.deo-layout :officeId="$officeId">
-
-        <!-- ================= MAIN STATS ================= -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
-
-            <!-- Students Card -->
-            <div class="group relative overflow-hidden rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700
-                bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900
-                hover:shadow-xl hover:-translate-y-1 transition-all">
-
-                <div class="absolute top-0 right-0 w-20 h-20 bg-blue-100 dark:bg-blue-900/20
-                    rounded-full -translate-y-10 translate-x-10 group-hover:scale-125 transition-transform duration-300"></div>
-
+        {{-- Main Stats Section --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            {{-- Students Card --}}
+            <div class="group relative overflow-hidden rounded-3xl p-7 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-50 dark:bg-indigo-950/20 rounded-bl-full -translate-y-2 translate-x-2 group-hover:scale-110 transition-transform duration-300"></div>
                 <div class="relative">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="text-4xl font-bold text-slate-900 dark:text-white">
-                            {{ $studentCount }}
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">{{ __('Student Population') }}</div>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
+                            <flux:icon name="users" variant="solid" class="w-6 h-6" />
                         </div>
-                        <svg class="w-8 h-8 text-blue-500 dark:text-blue-400 opacity-80" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4" />
-                        </svg>
                     </div>
-
-                    <div class="text-lg font-semibold text-slate-800 dark:text-slate-200">Students</div>
-                    <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">Estimated Total Students</div>
-
-                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
-                        <div class="text-xs text-slate-400 dark:text-slate-500 flex items-center">
-                            <span class="inline-block w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                            Active Academic Year
-                        </div>
+                    <div class="text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+                        {{ number_format($studentCount) }}
+                    </div>
+                    <div class="text-xs font-bold text-slate-500 dark:text-slate-500">
+                        {{ __('Estimated Total Students enrolled in active schools') }}
+                    </div>
+                    <div class="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                        <span class="inline-block w-2.5 h-2.5 bg-indigo-500 rounded-full animate-pulse"></span>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">{{ __('Active Academic Year') }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Institutions Card -->
-            <div class="group relative overflow-hidden rounded-xl p-6 shadow-lg border border-gray-200 dark:border-slate-700
-                bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900
-                hover:shadow-xl hover:-translate-y-1 transition-all">
-
-                <div class="absolute top-0 right-0 w-20 h-20 bg-emerald-100 dark:bg-emerald-900/20
-                    rounded-full -translate-y-10 translate-x-10 group-hover:scale-125 transition-transform duration-300"></div>
-
+            {{-- Institutions Card --}}
+            <div class="group relative overflow-hidden rounded-3xl p-7 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-violet-50 dark:bg-violet-950/20 rounded-bl-full -translate-y-2 translate-x-2 group-hover:scale-110 transition-transform duration-300"></div>
                 <div class="relative">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="text-4xl font-bold text-slate-900 dark:text-white">
-                            {{ $institutionCount }}
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">{{ __('Schools') }}</div>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400">
+                            <flux:icon name="academic-cap" variant="solid" class="w-6 h-6" />
                         </div>
-                        <svg class="w-8 h-8 text-emerald-500 dark:text-emerald-400 opacity-80" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z" />
-                        </svg>
                     </div>
-
-                    <div class="text-lg font-semibold text-slate-800 dark:text-slate-200">Schools / Institutions</div>
-                    <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">Institutions under Division</div>
-
-                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
-                        <div class="text-xs text-slate-400 dark:text-slate-500 flex items-center">
-                            <span class="inline-block w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
-                            Educational Units
-                        </div>
+                    <div class="text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+                        {{ number_format($institutionCount) }}
+                    </div>
+                    <div class="text-xs font-bold text-slate-500 dark:text-slate-500">
+                        {{ __('Schools and educational centers under supervision') }}
+                    </div>
+                    <div class="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                        <span class="inline-block w-2.5 h-2.5 bg-violet-500 rounded-full animate-pulse"></span>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">{{ __('Educational Institutions') }}</span>
                     </div>
                 </div>
             </div>
-
         </div>
 
-        <!-- ================= STAFF BY SERVICE ================= -->
+        {{-- Staff by Service Section --}}
         <div class="mt-12">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h2 class="text-xl font-bold text-slate-900 dark:text-white">Staff by Service</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                        Distribution of staff across service categories
-                    </p>
+                    <h2 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">{{ __('Staff by Service') }}</h2>
+                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-500 mt-1">{{ __('Distribution of personnel across different official services.') }}</p>
                 </div>
-                <div class="px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800">
-                    <span class="text-sm font-medium text-blue-700 dark:text-blue-300">
-                        {{ count($serviceCounts) }} Services
-                    </span>
+                <div class="px-3.5 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-800">
+                    <span class="text-xs font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-widest">{{ count($serviceCounts) }} {{ __('Services') }}</span>
                 </div>
             </div>
 
-            @php
-                $maxStaffCount = collect($serviceCounts)->max('staff_count') ?: 1;
-            @endphp
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach ($serviceCounts as $index => $service)
-                    <div class="group relative overflow-hidden rounded-xl p-5 shadow border border-gray-200 dark:border-slate-700
-                        bg-white dark:bg-slate-800 hover:shadow-lg hover:-translate-y-1 transition-all">
+                @php
+                $maxStaffCount = 0;
+                foreach ($serviceCounts as $service) {
+                if ($service['staff_count'] > $maxStaffCount) {
+                $maxStaffCount = $service['staff_count'];
+                }
+                }
+                $maxStaffCount = $maxStaffCount > 0 ? $maxStaffCount : 1;
+                @endphp
 
-                        <!-- Accent -->
-                        <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b
-                            @switch($index % 4)
-                                @case(0) from-blue-500 to-blue-400 @break
-                                @case(1) from-emerald-500 to-emerald-400 @break
-                                @case(2) from-amber-500 to-amber-400 @break
-                                @default from-violet-500 to-violet-400
-                            @endswitch">
+                @foreach ($serviceCounts as $index => $service)
+                @php
+                $colorIndex = $index % 4;
+
+                $gradientClass = match($colorIndex) {
+                0 => 'from-blue-500 to-indigo-400',
+                1 => 'from-emerald-500 to-teal-400',
+                2 => 'from-amber-500 to-orange-400',
+                default => 'from-violet-500 to-fuchsia-400',
+                };
+
+                $barClass = match($colorIndex) {
+                0 => 'bg-indigo-600 dark:bg-indigo-500',
+                1 => 'bg-emerald-600 dark:bg-emerald-500',
+                2 => 'bg-amber-600 dark:bg-amber-500',
+                default => 'bg-violet-600 dark:bg-violet-500',
+                };
+
+                $percentage = min(($service['staff_count'] / $maxStaffCount) * 100, 100);
+                @endphp
+                <div class="group relative overflow-hidden rounded-3xl p-6 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    {{-- Decorative edge color --}}
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b {{ $gradientClass }}"></div>
+
+                    <div class="pl-2 flex flex-col justify-between h-full">
+                        <div>
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="text-4xl font-black text-slate-950 dark:text-white tracking-tight">{{ number_format($service['staff_count']) }}</div>
+                                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                                    <flux:icon name="users" class="w-5 h-5" />
+                                </div>
+                            </div>
+
+                            <div class="mb-5">
+                                <h3 class="text-base font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-tight">{{ $service['name_en'] }}</h3>
+                                <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-1 leading-relaxed line-clamp-2">{{ $service['description'] ?? __('No description provided') }}</p>
+                            </div>
                         </div>
 
-                        <div class="ml-3">
-                            <div class="flex items-start justify-between mb-3">
-                                <div class="text-3xl font-bold text-slate-900 dark:text-white">
-                                    {{ $service['staff_count'] }}
-                                </div>
+                        {{-- Progress bar with beautiful small value formatting --}}
+                        <div class="mt-2 border-t border-slate-100 dark:border-slate-800/80 pt-4">
+                            <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1.5">
+                                <span>{{ __('Capacity') }}</span>
+                                <span>
+                                    @if ($service['staff_count'] > 0 && $percentage < 1)
+                                        {{ number_format($percentage, 1) }}%
+                                        @else
+                                        {{ round($percentage) }}%
+                                        @endif
+                                        </span>
                             </div>
-
-                            <div class="mb-2">
-                                <div class="text-base font-semibold text-slate-800 dark:text-slate-200">
-                                    {{ $service['name_en'] }}
-                                </div>
-                                <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                                    Staff in this service
-                                </div>
-                            </div>
-
-                            <!-- Progress -->
-                            <div class="mt-4">
-                                <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-                                    <span>Capacity</span>
-                                    <span>{{ round(($service['staff_count'] / $maxStaffCount) * 100) }}%</span>
-                                </div>
-                                <div class="h-1.5 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                    <div class="h-full rounded-full
-                                        @switch($index % 4)
-                                            @case(0) bg-blue-500 @break
-                                            @case(1) bg-emerald-500 @break
-                                            @case(2) bg-amber-500 @break
-                                            @default bg-violet-500
-                                        @endswitch"
-                                        style="width: {{ min(($service['staff_count'] / $maxStaffCount) * 100, 100) }}%">
-                                    </div>
+                            <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner">
+                                <div class="h-full rounded-full {{ $barClass }} transition-all duration-500"
+                                    style="width: {{ number_format($percentage, 2) }}%;">
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
                 @endforeach
             </div>
         </div>
-
     </x-offices.deo.deo-layout>
 </section>

@@ -8,7 +8,7 @@ use App\Models\Workplaces;
 use App\Models\Institution;
 use App\Models\ZonalEducationOffice;
 use App\Models\ProvincialEducationOffice;
-use App\Models\TransferPolicy;
+use App\Models\TeacherTransferPolicy;
 use App\Models\TransferReason;
 use App\Models\TeacherTransferApplication as TeacherTransferApplicationModel;
 use App\Models\TeacherTransferApplicationAchievement;
@@ -19,19 +19,13 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\EmployerAppointment;
 use App\Models\People;
-use App\Models\TransferCategory;
+use App\Models\TeacherTransferCategory;
+use App\Models\TeacherTransferSubCategory;
+use App\Support\Transfer\TransferAccess;
+use App\Support\Transfer\TransferSubCategoryRules;
 
 class TeacherTransferApplication extends Component
 {
-    private const PROVINCE_SELECT_CATEGORY_KEYWORDS = [
-        'inter province',
-        'other province',
-    ];
-
-    private const NATIONAL_SCHOOL_CATEGORY_KEYWORDS = [
-        'national school',
-    ];
-
     public $step = 1;
     public $applicationId = null;
     public $isEditMode = false;
@@ -66,6 +60,9 @@ class TeacherTransferApplication extends Component
 
     // Application Form
     public $policyId = '';
+    public bool $lockPolicySelection = false;
+    public bool $policyAllowsAchievements = false;
+    public $transferSubCategoryId = '';
     public $transferCategoryId = '';
     public $transferReasonTypeId = '';
     public $transferReason = '';
@@ -100,6 +97,7 @@ class TeacherTransferApplication extends Component
     public $declarationTrue = false;
 
     public $transferPolicies = [];
+    public $transferSubCategories = [];
     public $transferCatagory = [];
     public $provincialEducationOffices;
     public $zonalEducationOffices;
@@ -109,6 +107,8 @@ class TeacherTransferApplication extends Component
         $this->applicationId = $id;
         $this->provincialEducationOffices = collect();
         $this->zonalEducationOffices = collect();
+
+        abort_unless(TransferAccess::canViewTeacherSelfService(Auth::user()), 403);
 
         if (Auth::check()) {
             $user = Auth::user();
@@ -123,6 +123,7 @@ class TeacherTransferApplication extends Component
             if ($id) {
                 $this->loadExistingApplication($id);
             } else {
+                $this->applyRequestedPolicyContext(request()->query('policy'));
                 $this->initPreferences();
                 $this->initAchievements();
             }
@@ -176,7 +177,10 @@ class TeacherTransferApplication extends Component
 
     private function loadMetadata()
     {
-        $this->transferPolicies = TransferPolicy::active()->where('service_id', 'SER001')->orderByDesc('policy_year')->pluck('title', 'policy_id');
+        $this->transferPolicies = TeacherTransferPolicy::active()
+            ->orderByDesc('policy_year')
+            ->pluck('title', 'policy_id')
+            ->toArray();
         $this->transferReasonTypes = TransferReason::active()->orderBy('display_order')->get()->map(fn($r) => ['id' => $r->reason_id, 'name' => $r->title, 'category' => $r->category])->toArray();
         $this->provincialEducationOffices = ProvincialEducationOffice::active()->get();
     }
@@ -205,7 +209,12 @@ class TeacherTransferApplication extends Component
         }
 
         $this->isEditMode = true;
+        $this->lockPolicySelection = true;
+        if ($app->policy && !array_key_exists($app->policy_id, $this->transferPolicies)) {
+            $this->transferPolicies[$app->policy_id] = $app->policy->title;
+        }
         $this->policyId = $app->policy_id;
+        $this->transferSubCategoryId = $app->transfer_sub_category_id ?: $app->category?->transfer_sub_category_id;
         $this->transferCategoryId = $app->transfer_category;
         $this->transferReasonTypeId = $app->reason_category;
         $this->transferReason = $app->reason_details; // Assuming this field exists or check names
@@ -250,9 +259,30 @@ class TeacherTransferApplication extends Component
         $this->initAchievements();
     }
 
+    private function applyRequestedPolicyContext(?string $policyId): void
+    {
+        if (!filled($policyId)) {
+            return;
+        }
+
+        $policy = TeacherTransferPolicy::with('authority')
+            ->where('policy_id', $policyId)
+            ->firstOrFail();
+
+        abort_unless(
+            TransferAccess::canStartPolicyApplication(Auth::user(), $policy),
+            403,
+            'This policy is not open for new applications.'
+        );
+
+        $this->policyId = $policy->policy_id;
+        $this->lockPolicySelection = true;
+        $this->updatedPolicyId($this->policyId);
+    }
+
     private function initPreferences()
     {
-        $policy = TransferPolicy::where('policy_id', $this->policyId)->first();
+        $policy = TeacherTransferPolicy::where('policy_id', $this->policyId)->first();
         $this->maxPreferences = $policy->max_preferences ?? 5;
 
         for ($i = 1; $i <= $this->maxPreferences; $i++) {
@@ -265,11 +295,19 @@ class TeacherTransferApplication extends Component
 
     public function addAchievement(): void
     {
+        if (!$this->policyAllowsAchievements) {
+            return;
+        }
+
         $this->achievements[] = $this->blankAchievementRow();
     }
 
     public function removeAchievement(int $index): void
     {
+        if (!$this->policyAllowsAchievements) {
+            return;
+        }
+
         unset($this->achievements[$index]);
         $this->achievements = array_values($this->achievements);
         $this->initAchievements();
@@ -277,6 +315,12 @@ class TeacherTransferApplication extends Component
 
     private function initAchievements(): void
     {
+        if (!$this->policyAllowsAchievements) {
+            $this->achievements = [];
+
+            return;
+        }
+
         if (empty($this->achievements)) {
             $this->achievements[] = $this->blankAchievementRow();
         }
@@ -299,42 +343,88 @@ class TeacherTransferApplication extends Component
     public function updatedPolicyId($value)
     {
         if ($value) {
-            $policy = TransferPolicy::where('policy_id', $value)->first();
+            $policy = TeacherTransferPolicy::with('scoreRules')
+                ->where('policy_id', $value)
+                ->first();
             $this->maxPreferences = $policy->max_preferences ?? 5;
-            $this->transferCatagory = TransferCategory::scopedListQuery($value)
+            $this->policyAllowsAchievements = $this->policyUsesAchievements($policy);
+            $categories = TeacherTransferCategory::scopedListQuery($value)
+                ->with('transferSubCategory')
                 ->orderBy('transfer_category_name')
                 ->get()
                 ->map(fn($c) => [
                     'id' => $c->transfer_category_id,
                     'name' => $c->transfer_category_name,
                     'office_level_id' => $c->office_level_id,
-                    'targets_national_schools' => $this->categoryNameContains($c->transfer_category_name, self::NATIONAL_SCHOOL_CATEGORY_KEYWORDS),
-                    'requires_province_selection' => $this->categoryNameContains($c->transfer_category_name, self::PROVINCE_SELECT_CATEGORY_KEYWORDS),
+                    'sub_category_id' => $c->transfer_sub_category_id,
+                    'sub_category_name' => $c->transferSubCategory?->name,
                 ])
                 ->toArray();
+
+            $this->transferSubCategories = TeacherTransferSubCategory::active()
+                ->whereIn('transfer_sub_category_id', collect($categories)->pluck('sub_category_id')->filter()->unique())
+                ->orderBy('display_order')
+                ->get()
+                ->map(fn($subCategory) => [
+                    'id' => $subCategory->transfer_sub_category_id,
+                    'code' => $subCategory->code,
+                    'name' => $subCategory->name,
+                    'requires_target_province_selection' => (bool) $subCategory->requires_target_province_selection,
+                    'zone_scope_mode' => $subCategory->zone_scope_mode,
+                    'institution_scope_mode' => $subCategory->institution_scope_mode,
+                ])
+                ->values()
+                ->all();
+
+            $this->transferCatagory = $categories;
         } else {
+            $this->policyAllowsAchievements = false;
+            $this->transferSubCategories = [];
             $this->transferCatagory = [];
         }
 
-        if (!collect($this->transferCatagory)->contains('id', $this->transferCategoryId)) {
-            $this->transferCategoryId = '';
+        if (!collect($this->transferSubCategories)->contains('id', $this->transferSubCategoryId)) {
+            $this->transferSubCategoryId = '';
         }
 
-        $this->syncTargetProvinceForCategory();
-        $this->resetPreferenceSelections();
+        $this->refreshTransferCategoryOptions();
+
+        $this->syncTargetProvinceForSelection();
+        $this->reloadZoneOptions();
+        $this->resetPreferenceSelections($this->usesCurrentZoneOnly());
+        $this->initPreferences();
+        $this->syncAchievementsForPolicy();
+    }
+
+    public function updatedTransferSubCategoryId($value)
+    {
+        $this->refreshTransferCategoryOptions();
+
+        $this->syncTargetProvinceForSelection();
+        $this->reloadZoneOptions();
+        $this->resetPreferenceSelections($this->usesCurrentZoneOnly());
         $this->initPreferences();
     }
 
     public function updatedTransferCategoryId($value)
     {
-        $this->syncTargetProvinceForCategory();
+        if ($value && ($selectedCategory = $this->selectedCategoryData())) {
+            $this->transferSubCategoryId = $selectedCategory['sub_category_id'] ?? $this->transferSubCategoryId;
+        }
+
+        $this->refreshTransferCategoryOptions();
+
+        $this->syncTargetProvinceForSelection();
+        $this->reloadZoneOptions();
+        $this->resetPreferenceSelections($this->usesCurrentZoneOnly());
+        $this->initPreferences();
         $this->refreshInstitutionLists();
     }
 
     public function updatedSelectedProvinceId($value)
     {
-        $this->zonalEducationOffices = ZonalEducationOffice::active()->where('peo_wp_id', $value)->get();
-        $this->resetPreferenceSelections();
+        $this->reloadZoneOptions();
+        $this->resetPreferenceSelections($this->usesCurrentZoneOnly());
         $this->initPreferences();
     }
 
@@ -345,6 +435,7 @@ class TeacherTransferApplication extends Component
             $this->preferences[$index] = '';
             $this->distanceInKm[$index] = '';
             $this->institutionsLists[$index] = $this->fetchInstitutionsForZone($value);
+            $this->selectedZoneId = $this->selectedZones[1] ?? '';
         }
 
         if (str_starts_with($property, 'preferences.')) {
@@ -361,16 +452,18 @@ class TeacherTransferApplication extends Component
     {
         if (empty($zoneId)) return collect();
 
-        return $this->selectedCategoryTargetsNationalSchools()
-            ? Institution::active()->where('zeo_wp_id', $zoneId)->national()->get()
-            : Institution::active()->where('zeo_wp_id', $zoneId)->provincial()->get();
+        $query = Institution::active()->where('zeo_wp_id', $zoneId);
+
+        return $this->selectedSubCategoryTargetsNationalSchools()
+            ? $query->national()->get()
+            : $query->provincial()->get();
     }
 
     public function rules()
     {
         $rules = [
             'policyId' => 'required',
-            'transferCategoryId' => 'required',
+            'transferSubCategoryId' => 'required|exists:teacher_transfer_sub_categories,transfer_sub_category_id',
             'transferReasonTypeId' => 'required',
             'permanentAddress' => 'required|string|max:255',
             'temporaryAddress' => 'nullable|string|max:255|required_with:temporaryLatitude,temporaryLongitude',
@@ -412,10 +505,11 @@ class TeacherTransferApplication extends Component
     public function saveDraft()
     {
         try {
+            $this->validateTransferSelectionRules();
             $this->persistApplication('draft');
             session()->flash('success', __('Application saved as draft successfully.'));
 
-            return redirect()->route('my-transfer.teacher-annual-transfer');
+            return $this->redirectToPolicyRequests();
         } catch (\Throwable $e) {
             report($e);
             session()->flash('error', __('Unable to save the transfer application right now.'));
@@ -425,6 +519,7 @@ class TeacherTransferApplication extends Component
     public function submitApplication()
     {
         $this->validate();
+        $this->validateTransferSelectionRules();
         $this->step = 2;
     }
 
@@ -436,24 +531,46 @@ class TeacherTransferApplication extends Component
     public function confirmSubmission()
     {
         $this->validate();
+        $this->validateTransferSelectionRules();
 
         try {
             $this->persistApplication('submitted');
             session()->flash('success', __('Transfer Application submitted successfully.'));
 
-            return redirect()->route('my-transfer.teacher-annual-transfer');
+            return $this->redirectToTransferTypeList();
         } catch (\Throwable $e) {
             report($e);
             session()->flash('error', __('Unable to submit the transfer application right now.'));
         }
     }
 
+    private function redirectToPolicyRequests()
+    {
+        if (filled($this->policyId)) {
+            return redirect()->route('transfer.teacher-policy.requests', ['policyId' => $this->policyId]);
+        }
+
+        return redirect()->route('my-transfer');
+    }
+
+    private function redirectToTransferTypeList()
+    {
+        $transferType = TeacherTransferPolicy::where('policy_id', $this->policyId)->value('transfer_type');
+
+        return match ($transferType) {
+            'annual' => redirect()->route('my-transfer.teacher-annual-transfer'),
+            'mutual' => redirect()->route('my-transfer.teacher-mutual-transfer'),
+            'special' => redirect()->route('my-transfer.teacher-special-request'),
+            default => redirect()->route('my-transfer'),
+        };
+    }
+
     private function persistApplication($status)
     {
         try {
             DB::beginTransaction();
-            $this->syncTargetProvinceForCategory();
-            $transferType = TransferPolicy::where('policy_id', $this->policyId)->value('transfer_type') ?? 'annual';
+            $this->syncTargetProvinceForSelection();
+            $transferType = TeacherTransferPolicy::where('policy_id', $this->policyId)->value('transfer_type') ?? 'annual';
 
             $data = [
                 'policy_id' => $this->policyId,
@@ -475,6 +592,7 @@ class TeacherTransferApplication extends Component
                 'has_disciplinary_actions' => $this->hasDisciplinaryActions,
                 'disciplinary_actions_details' => filled($this->disciplinaryDetails) ? $this->disciplinaryDetails : null,
                 'transfer_category' => $this->transferCategoryId,
+                'transfer_sub_category_id' => $this->transferSubCategoryId,
                 'target_province' => $this->selectedProvinceId ?: $this->currentProvinceId,
                 'is_declared' => $this->declarationTrue,
                 'cwp_facilities_id' => filled($this->cwpFacilitiesId) ? $this->cwpFacilitiesId : null,
@@ -504,19 +622,21 @@ class TeacherTransferApplication extends Component
                 }
             }
 
-            $application->achievements()->delete();
-            foreach ($this->normalizedAchievementRows() as $achievement) {
-                TeacherTransferApplicationAchievement::create([
-                    'transfer_application_id' => $application->transfer_application_id,
-                    'achievement_type' => $achievement['achievement_type'],
-                    'achievement_level' => $achievement['achievement_level'],
-                    'title' => $achievement['title'],
-                    'event_name' => $achievement['event_name'],
-                    'achievement_date' => $achievement['achievement_date'],
-                    'details' => $achievement['details'],
-                    'contribution_details' => $achievement['contribution_details'],
-                    'is_included' => $achievement['is_included'],
-                ]);
+            if ($this->policyAllowsAchievements) {
+                $application->achievements()->delete();
+                foreach ($this->normalizedAchievementRows() as $achievement) {
+                    TeacherTransferApplicationAchievement::create([
+                        'transfer_application_id' => $application->transfer_application_id,
+                        'achievement_type' => $achievement['achievement_type'],
+                        'achievement_level' => $achievement['achievement_level'],
+                        'title' => $achievement['title'],
+                        'event_name' => $achievement['event_name'],
+                        'achievement_date' => $achievement['achievement_date'],
+                        'details' => $achievement['details'],
+                        'contribution_details' => $achievement['contribution_details'],
+                        'is_included' => $achievement['is_included'],
+                    ]);
+                }
             }
 
             DB::commit();
@@ -528,7 +648,7 @@ class TeacherTransferApplication extends Component
 
     private function setupWorkflow($application)
     {
-        $policy = TransferPolicy::with('steps')->where('policy_id', $this->policyId)->first();
+        $policy = TeacherTransferPolicy::with('steps')->where('policy_id', $this->policyId)->first();
         if ($policy && $policy->steps->isNotEmpty()) {
             $currentWorkplace = Workplaces::find($this->currentWorkplaceId);
             $parentIds = $currentWorkplace ? $currentWorkplace->getAllParentWorkplaces() : [];
@@ -548,14 +668,21 @@ class TeacherTransferApplication extends Component
         return view('livewire.teacher.transfer.teacher-transfer-application');
     }
 
-    public function getSelectedTransferCategoryProperty(): ?array
+    public function getSelectedTeacherTransferCategoryProperty(): ?array
     {
         return $this->selectedCategoryData();
     }
 
-    public function getSelectedTransferCategoryNameProperty(): string
+    public function getSelectedTeacherTransferCategoryNameProperty(): string
     {
-        return $this->selectedCategoryData()['name'] ?? '';
+        return $this->selectedVisibleCategoryName;
+    }
+
+    public function getSelectedVisibleCategoryNameProperty(): string
+    {
+        return $this->selectedSubCategoryData()['name']
+            ?? $this->selectedCategoryData()['name']
+            ?? '';
     }
 
     public function getShouldChooseTargetProvinceProperty(): bool
@@ -590,14 +717,55 @@ class TeacherTransferApplication extends Component
         return $this->formatCoordinatePair($this->temporaryLatitude, $this->temporaryLongitude);
     }
 
-    private function selectedCategoryTargetsNationalSchools(): bool
+    public function getAvailableTargetProvinceOptionsProperty()
     {
-        return (bool) ($this->selectedCategoryData()['targets_national_schools'] ?? false);
+        $subCategory = $this->selectedSubCategoryData();
+
+        if (!$subCategory) {
+            return collect();
+        }
+
+        $provinces = collect($this->provincialEducationOffices);
+
+        return match ($subCategory['code'] ?? null) {
+            TransferSubCategoryRules::CODE_ANOTHER_PROVINCE => $provinces
+                ->reject(fn ($province) => (string) $province->workplace_id === (string) $this->currentProvinceId)
+                ->values(),
+            TransferSubCategoryRules::CODE_NATIONAL_SCHOOL => $provinces->values(),
+            default => $provinces
+                ->where('workplace_id', $this->currentProvinceId)
+                ->values(),
+        };
     }
 
-    private function syncTargetProvinceForCategory(): void
+    public function getSelectedTeacherTransferSubCategoryNameProperty(): string
     {
-        if (!$this->transferCategoryId) {
+        return $this->selectedVisibleCategoryName;
+    }
+
+    public function getIsCurrentZoneLockedProperty(): bool
+    {
+        return $this->usesCurrentZoneOnly();
+    }
+
+    public function getResolvedPrimaryTargetZoneNameProperty(): string
+    {
+        $zoneId = $this->selectedZones[1] ?? $this->currentZoneId;
+
+        return $this->zonalEducationOffices
+            ->where('workplace_id', $zoneId)
+            ->first()
+            ->name ?? 'N/A';
+    }
+
+    private function selectedSubCategoryTargetsNationalSchools(): bool
+    {
+        return ($this->selectedSubCategoryData()['institution_scope_mode'] ?? null) === TransferSubCategoryRules::INSTITUTION_SCOPE_NATIONAL_ONLY;
+    }
+
+    private function syncTargetProvinceForSelection(): void
+    {
+        if (!$this->transferSubCategoryId) {
             return;
         }
 
@@ -605,19 +773,27 @@ class TeacherTransferApplication extends Component
             $this->selectedProvinceId = $this->currentProvinceId;
         }
 
-        if ($this->selectedProvinceId) {
-            $this->zonalEducationOffices = ZonalEducationOffice::active()
-                ->where('peo_wp_id', $this->selectedProvinceId)
-                ->get();
+        if ($this->usesCurrentZoneOnly()) {
+            $this->selectedProvinceId = $this->currentProvinceId;
+            $this->selectedZoneId = $this->currentZoneId;
         }
     }
 
-    private function resetPreferenceSelections(): void
+    private function resetPreferenceSelections(bool $preselectCurrentZone = false): void
     {
         $this->selectedZones = [];
         $this->preferences = [];
         $this->distanceInKm = [];
         $this->institutionsLists = [];
+
+        if ($preselectCurrentZone && $this->currentZoneId) {
+            for ($i = 1; $i <= max(1, $this->maxPreferences); $i++) {
+                $this->selectedZones[$i] = $this->currentZoneId;
+                $this->institutionsLists[$i] = $this->fetchInstitutionsForZone($this->currentZoneId);
+            }
+
+            $this->selectedZoneId = $this->currentZoneId;
+        }
     }
 
     private function refreshInstitutionLists(): void
@@ -627,27 +803,193 @@ class TeacherTransferApplication extends Component
         }
     }
 
+    private function reloadZoneOptions(): void
+    {
+        $subCategory = $this->selectedSubCategoryData();
+
+        if (!$subCategory) {
+            $this->zonalEducationOffices = collect();
+
+            return;
+        }
+
+        $query = ZonalEducationOffice::active();
+
+        if (($subCategory['zone_scope_mode'] ?? null) === TransferSubCategoryRules::ZONE_SCOPE_CURRENT_ZONE_ONLY) {
+            $this->zonalEducationOffices = $query
+                ->where('workplace_id', $this->currentZoneId)
+                ->get();
+
+            return;
+        }
+
+        if (($subCategory['zone_scope_mode'] ?? null) === TransferSubCategoryRules::ZONE_SCOPE_SOURCE_PROVINCE_ONLY) {
+            $this->zonalEducationOffices = $query
+                ->where('peo_wp_id', $this->currentProvinceId)
+                ->when(
+                    $this->shouldExcludeCurrentZoneFromPreferenceOptions(),
+                    fn ($zoneQuery) => $zoneQuery->where('workplace_id', '!=', $this->currentZoneId)
+                )
+                ->get();
+
+            $this->clearCurrentZoneSelectionsIfNeeded();
+
+            return;
+        }
+
+        if (($subCategory['code'] ?? null) === TransferSubCategoryRules::CODE_ANOTHER_PROVINCE
+            && filled($this->selectedProvinceId)
+            && $this->selectedProvinceId === $this->currentProvinceId) {
+            $this->selectedProvinceId = '';
+        }
+
+        if (filled($this->selectedProvinceId)) {
+            $this->zonalEducationOffices = $query
+                ->where('peo_wp_id', $this->selectedProvinceId)
+                ->get();
+
+            return;
+        }
+
+        $this->zonalEducationOffices = collect();
+    }
+
+    private function syncAchievementsForPolicy(): void
+    {
+        if (!$this->policyAllowsAchievements) {
+            $this->achievements = [];
+
+            return;
+        }
+
+        $this->initAchievements();
+    }
+
     private function selectedCategoryData(): ?array
     {
         return collect($this->transferCatagory)->firstWhere('id', $this->transferCategoryId);
     }
 
-    private function shouldChooseTargetProvinceForSelectedCategory(): bool
+    private function selectedSubCategoryData(): ?array
     {
-        return !$this->currentProvinceId || (bool) ($this->selectedCategoryData()['requires_province_selection'] ?? false);
+        return collect($this->transferSubCategories)->firstWhere('id', $this->transferSubCategoryId);
     }
 
-    private function categoryNameContains(?string $categoryName, array $needles): bool
+    private function shouldExcludeCurrentZoneFromPreferenceOptions(): bool
     {
-        $categoryName = strtolower((string) $categoryName);
+        return ($this->selectedSubCategoryData()['code'] ?? null) === TransferSubCategoryRules::CODE_ANOTHER_ZONE;
+    }
 
-        foreach ($needles as $needle) {
-            if (str_contains($categoryName, $needle)) {
-                return true;
+    private function clearCurrentZoneSelectionsIfNeeded(): void
+    {
+        if (!$this->shouldExcludeCurrentZoneFromPreferenceOptions() || !filled($this->currentZoneId)) {
+            return;
+        }
+
+        foreach (range(1, $this->maxPreferences) as $index) {
+            if (($this->selectedZones[$index] ?? null) !== $this->currentZoneId) {
+                continue;
+            }
+
+            $this->selectedZones[$index] = '';
+            $this->preferences[$index] = '';
+            $this->distanceInKm[$index] = '';
+            $this->institutionsLists[$index] = collect();
+        }
+    }
+
+    private function policyUsesAchievements(?TeacherTransferPolicy $policy): bool
+    {
+        if (!$policy) {
+            return false;
+        }
+
+        $scoreRules = $policy->relationLoaded('scoreRules')
+            ? $policy->scoreRules
+            : $policy->scoreRules()->get();
+
+        return $scoreRules
+            ->where('criteria_key', 'achievements')
+            ->where('active_status', true)
+            ->isNotEmpty();
+    }
+
+    private function shouldChooseTargetProvinceForSelectedCategory(): bool
+    {
+        return !$this->currentProvinceId || (bool) ($this->selectedSubCategoryData()['requires_target_province_selection'] ?? false);
+    }
+
+    private function usesCurrentZoneOnly(): bool
+    {
+        return ($this->selectedSubCategoryData()['zone_scope_mode'] ?? null) === TransferSubCategoryRules::ZONE_SCOPE_CURRENT_ZONE_ONLY;
+    }
+
+    private function refreshTransferCategoryOptions(): void
+    {
+        if (!filled($this->policyId) || !filled($this->transferSubCategoryId)) {
+            $this->transferCategoryId = '';
+
+            return;
+        }
+
+        $categories = collect($this->transferCatagory)
+            ->where('sub_category_id', $this->transferSubCategoryId)
+            ->values()
+            ->all();
+
+        if (empty($categories)) {
+            $this->transferCategoryId = '';
+
+            return;
+        }
+
+        if (!collect($categories)->contains('id', $this->transferCategoryId)) {
+            $this->transferCategoryId = (string) ($categories[0]['id'] ?? '');
+        }
+    }
+
+    private function validateTransferSelectionRules(): void
+    {
+        $selectedCategory = $this->selectedCategoryData();
+        $selectedSubCategory = $this->selectedSubCategoryData();
+
+        if (!$selectedSubCategory) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'transferSubCategoryId' => __('Select a valid category.'),
+            ]);
+        }
+
+        if (!$selectedCategory || ($selectedCategory['sub_category_id'] ?? null) !== $this->transferSubCategoryId) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'transferSubCategoryId' => __('Select a valid category for this policy.'),
+            ]);
+        }
+
+        if (($selectedSubCategory['code'] ?? null) === TransferSubCategoryRules::CODE_ANOTHER_PROVINCE
+            && $this->selectedProvinceId === $this->currentProvinceId) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'selectedProvinceId' => __('Select a destination province outside your current province.'),
+            ]);
+        }
+
+        if ($this->usesCurrentZoneOnly()) {
+            foreach (range(1, $this->maxPreferences) as $index) {
+                $this->selectedZones[$index] = $this->currentZoneId;
+                $this->institutionsLists[$index] = $this->fetchInstitutionsForZone($this->currentZoneId);
             }
         }
 
-        return false;
+        if ($this->shouldExcludeCurrentZoneFromPreferenceOptions()) {
+            foreach (range(1, $this->maxPreferences) as $index) {
+                if (($this->selectedZones[$index] ?? null) !== $this->currentZoneId) {
+                    continue;
+                }
+
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    "selectedZones.{$index}" => __('For "To Another Zone", your current working zone cannot be selected as a preference.'),
+                ]);
+            }
+        }
     }
 
     private function normalizeTemporaryAddress(?string $value): string

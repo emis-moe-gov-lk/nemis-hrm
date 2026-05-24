@@ -8,8 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('transfer_boards', function (Blueprint $table) {
-            if (!Schema::hasColumn('transfer_boards', 'board_type')) {
+        if (! Schema::hasTable('teacher_transfer_boards')) {
+            return;
+        }
+
+        Schema::table('teacher_transfer_boards', function (Blueprint $table) {
+            if (!Schema::hasColumn('teacher_transfer_boards', 'board_type')) {
                 $table->string('board_type', 20)
                     ->default('transfer')
                     ->after('bo_workplace_id');
@@ -21,8 +25,12 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('transfer_boards', function (Blueprint $table) {
-            if (Schema::hasColumn('transfer_boards', 'board_type')) {
+        if (! Schema::hasTable('teacher_transfer_boards')) {
+            return;
+        }
+
+        Schema::table('teacher_transfer_boards', function (Blueprint $table) {
+            if (Schema::hasColumn('teacher_transfer_boards', 'board_type')) {
                 $table->dropIndex('tb_board_type_idx');
                 $table->dropColumn('board_type');
             }

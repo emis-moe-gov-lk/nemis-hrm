@@ -40,9 +40,11 @@ class TeacherList extends Component
         // base query: restrict to teachers in allowed workplaces
         $peopleQuery = People::query()
             ->active()
+            ->whereHas('appointment', function ($q) {
+                $q->where('service_id', 'SER001');
+            })
             ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds) {
-                $q->where('service_id', 'SER001')
-                    ->whereIn('workplace_id', $allowedWorkplaceIds)
+                $q->whereIn('workplace_id', $allowedWorkplaceIds)
                     ->whereHas('workplace.institution', function ($instQ) {
                         $instQ->where('authority_id', 'AUID01');
                     });
@@ -88,6 +90,7 @@ class TeacherList extends Component
 
         // Main teacher query
         $employees = People::with([
+            'appointment.service',
             'currentAppointment.workplace',
             'currentAppointment.position',
             'currentAppointment.rank',
@@ -99,9 +102,11 @@ class TeacherList extends Component
             'currentAppointment.workplace.divisional',
             'currentAppointment.workplace.institution',
         ])
+            ->whereHas('appointment', function ($q) {
+                $q->where('service_id', 'SER001');       // Teachers
+            })
             ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds) {
-                $q->where('service_id', 'SER001')       // Teachers
-                    ->whereIn('workplace_id', $allowedWorkplaceIds)
+                $q->whereIn('workplace_id', $allowedWorkplaceIds)
                     ->whereHas('workplace.institution', function ($instQ) {
                         $instQ->where('authority_id', 'AUID01');
                     });

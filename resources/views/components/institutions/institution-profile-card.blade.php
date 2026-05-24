@@ -24,10 +24,10 @@
 
                 <!-- Logo & Quick Info Mobile -->
                 <div class="flex items-start space-x-4 mb-4">
-                    <div class="relative flex-shrink-0">
-                        <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-800 p-3 border border-blue-100 dark:border-blue-800/50">
+                    <div class="relative shrink-0">
+                        <div class="w-16 h-16 rounded-lg bg-linear-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-800 p-3 border border-blue-100 dark:border-blue-800/50">
                             <div class="w-full h-full flex items-center justify-center">
-                                <img src="{{ $institution->logo_url }}" class="w-full h-full object-contain">
+                                <flux:icon.academic-cap variant="mini" class="size-10 text-indigo-600 dark:text-indigo-400" />
                             </div>
                         </div>
                     </div>
@@ -54,9 +54,9 @@
                     <div class="flex items-start space-x-6">
                         <!-- Logo Container -->
                         <div class="relative">
-                            <div class="w-20 h-20 rounded-lg bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-800 p-2 border border-blue-100 dark:border-blue-800/50">
+                            <div class="w-20 h-20 rounded-lg bg-linear-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-800 p-2 border border-blue-100 dark:border-blue-800/50">
                                 <div class="w-full h-full flex items-center justify-center">
-                                    <img src="{{ $institution->logo_url }}" class="w-full h-full object-contain">
+                                    <flux:icon.academic-cap variant="mini" class="size-12 text-indigo-600 dark:text-indigo-400" />
                                 </div>
                             </div>
 
@@ -94,12 +94,9 @@
                                 </div>
                             </div>
 
-                            <!-- Quick Stats -->
                             <div class="flex items-center space-x-6 text-sm">
                                 <div class="flex items-center space-x-2">
-                                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                                    </svg>
+                                    <flux:icon.map-pin variant="micro" class="size-4 text-gray-400" />
                                     <span class="text-gray-600 dark:text-gray-300">{{ ucwords(strtolower($institution->address ?? '')) }}</span>
                                 </div>
                             </div>
@@ -141,16 +138,12 @@
     <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm opacity-90">
         <div class="relative">
             <!-- Suspended Banner -->
-            <div class="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 text-sm font-medium">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <span class="text-xs sm:text-sm">ACCOUNT SUSPENDED</span>
-                    </div>
+            <div class="bg-linear-to-r from-red-500 to-red-600 text-white px-4 py-2 text-sm font-medium">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <flux:icon.exclamation-triangle variant="micro" />
+                            <span class="text-xs sm:text-sm">ACCOUNT SUSPENDED</span>
+                        </div>
 
                     <span class="text-xs opacity-90 hidden sm:block">
                         Suspended since: {{ optional($institution->updated_at)->format('M d, Y') ?? 'N/A' }}
@@ -184,14 +177,13 @@
 
                     <!-- Mobile Logo & Stats -->
                     <div class="flex items-start space-x-4 mb-4">
-                        <div class="relative flex-shrink-0">
-                            <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-gray-50 to-white
+                        <div class="relative shrink-0">
+                            <div class="w-16 h-16 rounded-lg bg-linear-to-br from-gray-50 to-white
                             dark:from-gray-800 dark:to-gray-900 p-3 border border-gray-200
                             dark:border-gray-700 grayscale opacity-70">
 
                                 <div class="w-full h-full flex items-center justify-center">
-                                    <img src="{{ $institution->logo_url }}"
-                                        class="w-full h-full object-contain opacity-70">
+                                    <flux:icon.academic-cap variant="mini" class="size-10 text-gray-400" />
                                 </div>
                             </div>
                         </div>
@@ -218,12 +210,7 @@
                     <!-- Warning -->
                     <div class="mb-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-800/30">
                         <div class="flex items-start space-x-2">
-                            <svg class="w-4 h-4 text-red-500 dark:text-red-400 flex-shrink-0 mt-0.5"
-                                fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                    clip-rule="evenodd" />
-                            </svg>
+                            <flux:icon.exclamation-circle variant="micro" class="text-red-500 dark:text-red-400 shrink-0 mt-0.5" />
                             <p class="text-xs text-red-700 dark:text-red-400">
                                 This institution's account is suspended. Contact admin to reactivate.
                             </p>
@@ -236,8 +223,8 @@
                     <div class="flex items-start space-x-6">
                         <!-- Logo -->
                         <div class="relative">
-                            <div class="w-20 h-20 rounded-lg bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 p-4 border border-gray-200 dark:border-gray-700 grayscale opacity-70">
-                                <img src="{{ $institution->logo_url }}" class="w-full h-full object-contain opacity-70">
+                            <div class="w-20 h-20 rounded-lg bg-linear-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 p-4 border border-gray-200 dark:border-gray-700 grayscale opacity-70">
+                                <flux:icon.academic-cap variant="mini" class="size-12 text-gray-400" />
                             </div>
 
                             <!-- Badge -->
@@ -284,9 +271,7 @@
 
                             <!-- Location -->
                             <div class="flex items-center space-x-2">
-                                <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                                </svg>
+                                <flux:icon.map-pin variant="micro" class="size-4 text-gray-400" />
 
                                 <span class="text-sm text-gray-600 dark:text-gray-300">
                                     {{ ucwords(strtolower($institution->address)) }}
@@ -298,11 +283,7 @@
                     <!-- Suspension Details Footer -->
                     <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
                         <div class="flex items-start space-x-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-800/30">
-                            <svg class="w-5 h-5 text-red-500 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                    clip-rule="evenodd" />
-                            </svg>
+                            <flux:icon.exclamation-circle variant="micro" class="size-5 text-red-500 dark:text-red-400" />
 
                             <div class="flex-1">
                                 <p class="text-sm font-medium text-red-800 dark:text-red-300 mb-1">

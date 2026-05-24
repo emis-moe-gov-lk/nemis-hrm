@@ -36,7 +36,9 @@ class ZeoDmsCadreSummary extends Component
 
         $this->circular = CadreCirculars::active()->first();
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId);
+        $this->rows = $this->circular
+            ? CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId)
+            : [];
 
         $this->authorityOption = Authority::active()->get();
         $this->divisionOption = DivisionalEducationOffice::where('zeo_wp_id',  $this->workplaceId)->get();
@@ -53,7 +55,9 @@ class ZeoDmsCadreSummary extends Component
 
         $this->divisionOption = DivisionalEducationOffice::where('zeo_wp_id',  $this->workplaceId)->get();
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority);
+        $this->rows = $this->circular
+            ? CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority)
+            : [];
     }
 
     public function updatedDivision($value)
@@ -66,7 +70,9 @@ class ZeoDmsCadreSummary extends Component
 
         $this->institutionOption = Institution::where('deo_wp_id', $this->division)->get();
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, $this->division);
+        $this->rows = $this->circular
+            ? CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, $this->division)
+            : [];
     }
 
 
@@ -77,7 +83,9 @@ class ZeoDmsCadreSummary extends Component
             $this->institution = null;
         }
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, $this->institution);
+        $this->rows = $this->circular
+            ? CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, $this->institution)
+            : [];
     }
 
     public function render()

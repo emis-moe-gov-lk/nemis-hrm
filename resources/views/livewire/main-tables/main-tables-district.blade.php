@@ -36,12 +36,12 @@
             {{-- DISTRICT CARDS GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 @forelse ($districtList as $key => $data)
-                    <div class="relative group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 shadow-sm hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-800 transition-all duration-300">
+                    <div class="relative group bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 shadow-sm hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-800 transition-all duration-300">
                         
                         {{-- Top Metadata Row --}}
                         <div class="flex justify-between items-center mb-5">
                             <div class="flex items-center gap-2">
-                                <span class="text-[10px] font-black text-slate-400 tabular-nums tracking-widest uppercase">
+                                <span class="text-[10px] font-black text-slate-500 tabular-nums tracking-widest uppercase">
                                     #{{ $districtList->firstItem() + $key }}
                                 </span>
                                 <div class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">
@@ -65,8 +65,8 @@
                         </div>
 
                         {{-- Province Sub-Card --}}
-                        <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-[1.5rem] border border-slate-100 dark:border-slate-800 mb-6">
-                            <p class="text-[9px] uppercase font-black text-slate-400 leading-none mb-2 tracking-widest">{{ __('Parent Province') }}</p>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-[1.5rem] border border-slate-200 dark:border-slate-700 mb-6">
+                            <p class="text-[9px] uppercase font-black text-slate-500 leading-none mb-2 tracking-widest">{{ __('Parent Province') }}</p>
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-indigo-500">
                                     <flux:icon.globe-asia-australia variant="micro" />
@@ -81,7 +81,7 @@
                         {{-- Action Buttons --}}
                         <div class="flex gap-2">
                             <flux:modal.trigger wire:click="editDistrict({{ $data->id }})" class="flex-1">
-                                <flux:button size="sm" variant="ghost" icon="pencil-square" class="w-full !rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
+                                <flux:button size="sm" variant="ghost" icon="pencil-square" class="w-full !rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-indigo-700">
                                     {{ __('Edit') }}
                                 </flux:button>
                             </flux:modal.trigger>
@@ -99,10 +99,10 @@
                     </div>
                 @empty
                     <div class="col-span-full py-24 text-center">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 mb-4 text-slate-300">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 mb-4 text-slate-300">
                             <flux:icon.map size="xl" />
                         </div>
-                        <h3 class="text-lg font-black text-slate-400 uppercase tracking-widest">{{ __('No Districts Registered') }}</h3>
+                        <h3 class="text-lg font-black text-slate-500 uppercase tracking-widest">{{ __('No Districts Registered') }}</h3>
                     </div>
                 @endforelse
             </div>

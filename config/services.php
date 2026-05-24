@@ -10,7 +10,7 @@ return [
     | This file is for storing the credentials for third party services such
     | as Mailgun, Postmark, AWS and more. This file provides the de facto
     | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
+    | a convenational file to locate the various service credentials.
     |
     */
 
@@ -26,6 +26,20 @@ return [
 
     'resend' => [
         'key' => env('RESEND_KEY'),
+    ],
+
+    'turnstile' => [
+        'enabled' => (bool) env('TURNSTILE_ENABLED', false),
+        'site_key' => env('TURNSTILE_SITE_KEY'),
+        'secret' => env('TURNSTILE_SECRET_KEY'),
+    ],
+
+    'mobitel' => [
+        'enabled' => (bool) env('SMS_ENABLED', false),
+        'url' => env('SMS_GATEWAY_URL'),
+        'user' => env('SMS_USER'),
+        'password' => env('SMS_PASSWORD'),
+        'alias' => env('SMS_ALIAS'),
     ],
 
     'osrm' => [

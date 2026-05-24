@@ -37,6 +37,7 @@ class AuthorityController extends Controller
     public function update(Request $request, $id)
     {
         $authority = Authority::find($id);
+        /** @var \App\Models\Authority|null $authority */
 
         if (!$authority) {
             return response()->json([

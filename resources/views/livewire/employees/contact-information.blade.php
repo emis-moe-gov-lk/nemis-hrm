@@ -1,90 +1,79 @@
-<div>
+<div class="space-y-8">
     <section>
-        {{-- Header matching the Personal/Health style --}}
-        <div class="flex items-center justify-between mb-5 px-1">
+        {{-- Section Header --}}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
-                <h2 class="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">Contact Details</h2>
-                <p class="text-sm text-gray-500">Communication channels</p>
+                <h2 class="text-base font-black tracking-widest text-slate-700 dark:text-zinc-200 uppercase">Contact Details</h2>
+                <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-[0.2em] mt-0.5">Communication Channels</p>
             </div>
             @if($canEdit)
                 <flux:modal.trigger name="edit-contact-info">
-                    <flux:button variant="ghost" icon="pencil-square" class="rounded-full">
+                    <flux:button variant="ghost" size="sm" class="rounded-xl border border-slate-300 dark:border-zinc-700 font-bold text-xs px-5 text-slate-600 dark:text-zinc-300 hover:border-emerald-400 hover:text-emerald-600 transition-all">
                         Edit Details
                     </flux:button>
                 </flux:modal.trigger>
             @endif
         </div>
 
-        <div class="space-y-4">
-            {{-- Primary Contact Card: Email --}}
-            <a href="mailto:{{ $employee->email }}" 
-            class="block bg-gradient-to-br from-white to-blue-50/30 dark:from-gray-800 dark:to-blue-900/10 p-5 rounded-2xl border border-blue-100 dark:border-gray-700 shadow-sm transition-all hover:shadow-md hover:border-blue-300 group">
-                <div class="flex items-center gap-4">
-                    <div class="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-xl group-hover:scale-110 transition-transform">
-                        <flux:icon.envelope class="size-6 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Primary Email</p>
-                        <p class="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 truncate flex items-center gap-2">
-                            {{ $employee->email }}
-                            <flux:icon.arrow-top-right-on-square class="size-3 opacity-0 group-hover:opacity-100 text-blue-500 transition-opacity" />
-                        </p>
-                    </div>
-                </div>
-            </a>
+        {{-- Data Table --}}
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-700 overflow-hidden">
 
-            {{-- Secondary Contact Card: Phone --}}
-            <a href="tel:{{ $employee->phone }}" 
-            class="block bg-gradient-to-br from-white to-green-50/30 dark:from-gray-800 dark:to-green-900/10 p-5 rounded-2xl border border-green-100 dark:border-gray-700 shadow-sm transition-all hover:shadow-md hover:border-green-300 group">
-                <div class="flex items-center gap-4">
-                    <div class="p-3 bg-green-100 dark:bg-green-900/40 rounded-xl group-hover:scale-110 transition-transform">
-                        <flux:icon.phone class="size-6 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Mobile Number</p>
-                        <p class="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 leading-tight flex items-center gap-2">
-                            {{ $employee->phone }}
-                            <flux:icon.phone-arrow-up-right class="size-3 opacity-0 group-hover:opacity-100 text-green-500 transition-opacity" />
-                        </p>
-                    </div>
+            {{-- Email --}}
+            <div class="flex flex-col sm:flex-row sm:items-center border-b border-dashed border-slate-300 dark:border-zinc-700 px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors gap-1 sm:gap-0">
+                <span class="w-full sm:w-48 sm:shrink-0 text-[11px] font-black text-slate-500 dark:text-zinc-400 uppercase tracking-widest">Email</span>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-semibold text-slate-800 dark:text-zinc-100">{{ $employee->email }}</span>
+                    <a href="mailto:{{ $employee->email }}" class="text-indigo-500 hover:text-indigo-700 transition-colors">
+                        <flux:icon.pencil-square variant="micro" class="size-3.5" />
+                    </a>
                 </div>
-            </a>
+            </div>
+
+            {{-- Phone --}}
+            <div class="flex flex-col sm:flex-row sm:items-center px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors gap-1 sm:gap-0">
+                <span class="w-full sm:w-48 sm:shrink-0 text-[11px] font-black text-slate-500 dark:text-zinc-400 uppercase tracking-widest">Phone</span>
+                <span class="text-sm font-semibold text-slate-800 dark:text-zinc-100">{{ $employee->phone }}</span>
+            </div>
+
         </div>
     </section>
 
-    {{-- Mobile-First Modal --}}
+    {{-- Edit Modal --}}
     @if($canEdit)
-        <flux:modal wire:model="showModalContactInfo" name="edit-contact-info" class="md:w-125">
-            <div class="space-y-6">
-                <flux:heading size="lg" badge="Contact">Update Channels</flux:heading>
+        <flux:modal wire:model="showModalContactInfo" name="edit-contact-info" class="md:w-150">
+            <div class="space-y-8">
+                <div>
+                    <h3 class="text-sm font-black tracking-widest text-slate-900 dark:text-white uppercase">Update Contact</h3>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mt-0.5">Primary communication channels</p>
+                </div>
 
-                <form wire:submit.prevent="editContactInfo" class="space-y-5">
+                <form wire:submit.prevent="editContactInfo" class="space-y-6">
                     @csrf
                     
-                    <flux:field>
-                        <flux:input 
-                            label="Mobile Phone" 
-                            icon="phone" 
-                            wire:model.live="contact" 
-                            placeholder="e.g. 0771234567" 
-                        />
-                    </flux:field>
+                    <flux:input 
+                        label="Mobile Phone" 
+                        icon="phone" 
+                        wire:model.live="contact" 
+                        placeholder="e.g. 0771234567" 
+                        class="font-bold"
+                    />
 
-                    <flux:field>
-                        <flux:input 
-                            label="Email Address" 
-                            type="email" 
-                            icon="envelope" 
-                            wire:model.live="email" 
-                            placeholder="you@company.com" 
-                        />
-                    </flux:field>
+                    <flux:input 
+                        label="Email Address" 
+                        type="email" 
+                        icon="envelope" 
+                        wire:model.live="email" 
+                        placeholder="you@company.com" 
+                        class="font-bold"
+                    />
 
-                    <div class="flex gap-3 pt-4">
+                    <div class="flex gap-4 pt-4">
                         <flux:modal.close>
-                            <flux:button variant="ghost" class="flex-1">Cancel</flux:button>
+                            <flux:button variant="ghost" class="flex-1 font-bold rounded-xl h-12">Cancel</flux:button>
                         </flux:modal.close>
-                        <flux:button type="submit" variant="primary" class="flex-1">Save Changes</flux:button>
+                        <flux:button type="submit" variant="primary" class="flex-1 font-black rounded-xl h-12 bg-indigo-600 dark:bg-white text-white dark:text-slate-900 hover:scale-[1.02] active:scale-95 transition-all">
+                            Save Contact Changes
+                        </flux:button>
                     </div>
                 </form>
             </div>

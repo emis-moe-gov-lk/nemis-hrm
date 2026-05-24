@@ -39,9 +39,11 @@ class SleasList extends Component
         // base query: restrict to SLEAS in allowed workplaces
         $peopleQuery = People::query()
             ->active()
+            ->whereHas('appointment', function ($q) {
+                $q->where('service_id', 'SER005');
+            })
             ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds) {
-                $q->where('service_id', 'SER005')
-                    ->whereIn('workplace_id', $allowedWorkplaceIds)
+                $q->whereIn('workplace_id', $allowedWorkplaceIds)
                     ->whereHas('workplace.institution', function ($instQ) {
                         $instQ->where('authority_id', 'AUID01');
                     });
@@ -87,6 +89,7 @@ class SleasList extends Component
 
         // Main SLEAS query
         $employees = People::with([
+            'appointment.service',
             'currentAppointment.workplace',
             'currentAppointment.position',
             'currentAppointment.rank',
@@ -98,9 +101,11 @@ class SleasList extends Component
             'currentAppointment.workplace.divisional',
             'currentAppointment.workplace.institution',
         ])
+            ->whereHas('appointment', function ($q) {
+                $q->where('service_id', 'SER005');       // SLEAS
+            })
             ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds) {
-                $q->where('service_id', 'SER005')       // SLEAS
-                    ->whereIn('workplace_id', $allowedWorkplaceIds)
+                $q->whereIn('workplace_id', $allowedWorkplaceIds)
                     ->whereHas('workplace.institution', function ($instQ) {
                         $instQ->where('authority_id', 'AUID01');
                     });

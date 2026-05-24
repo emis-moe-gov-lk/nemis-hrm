@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use App\Models\TeacherTransferApplication;
 
+/**
+ * Class TransferReason
+ *
+ * @property string $id
+ * @property string $reason
+ */
 class TransferReason extends Model
 {
     use HasFactory;

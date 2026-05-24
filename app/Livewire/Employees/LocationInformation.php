@@ -9,33 +9,35 @@ use App\Models\GnDivision;
 use App\Models\DistrictsList;
 use Illuminate\Support\Facades\DB;
 use App\Models\DivisionalSecretariatOffice;
+use Illuminate\Http\Request;
+use App\Http\Controllers\PeopleController;
 
 class LocationInformation extends Component
 {
-    public $peopleId;
-    public $canEdit;
-    public $employee;
-    public $showModalLocationInfo = false;
+    public string $peopleId;
+    public bool $canEdit = false;
+    public People $employee;
+    public bool $showModalLocationInfo = false;
 
     // -------------------------
     // Location Details
     // -------------------------
-    public $district;
-    public $divisionalDecretaryOffice;
-    public $gnDivision;
-    public $addressLine1;
-    public $addressLine2;
-    public $addressLine3;
-    public $postalCode;
-    public $latitude;
-    public $longitude;
+    public ?string $district = null;
+    public ?string $divisionalDecretaryOffice = null;
+    public ?string $gnDivision = null;
+    public ?string $addressLine1 = null;
+    public ?string $addressLine2 = null;
+    public ?string $addressLine3 = null;
+    public ?string $postalCode = null;
+    public ?string $latitude = null;
+    public ?string $longitude = null;
 
     // -------------------------
     // Dropdown Options
     // -------------------------
-    public $districtOption = [];
-    public $divisionalSecretaryofficeOption = [];
-    public $gnDivisionOption = [];
+    public array $districtOption = [];
+    public array $divisionalSecretaryofficeOption = [];
+    public array $gnDivisionOption = [];
 
     // -------------------------
     // Validation Rules
@@ -55,19 +57,19 @@ class LocationInformation extends Component
         ];
     }
 
-    public function updated($property)
+    public function updated(string $property)
     {
         $this->validateOnly($property);
     }
 
-    public function mount($peopleId)
+    public function mount(string $peopleId)
     {
         $this->employee = People::where('people_id', $peopleId)->firstOrFail();
         //$this->canEdit = $canEdit;
 
         // Load stored values
         $this->district = $this->employee->district_id;
-        $this->divisionalDecretaryOffice = $this->employee->gnDivision->dso_id;
+        $this->divisionalDecretaryOffice = $this->employee->gnDivision->dso_id ?? '';
         $this->gnDivision = $this->employee->gn_division_id;
 
         $this->addressLine1 = $this->employee->address_line1;
@@ -78,59 +80,71 @@ class LocationInformation extends Component
         $this->longitude = $this->employee->longitude;
 
         // Initial dropdown data
-        $this->districtOption = DistrictsList::orderBy('district_name', 'asc')->get();
-        $this->divisionalSecretaryofficeOption = DivisionalSecretariatOffice::where('district_id', $this->district)->orderBy('dso_name', 'asc')->get();
-        $this->gnDivisionOption = GnDivision::where('dso_id', $this->divisionalDecretaryOffice)->orderBy('gn_division_name', 'asc')->get();
+        $this->districtOption = DistrictsList::orderBy('district_name', 'asc')->get()->all();
+        $this->divisionalSecretaryofficeOption = DivisionalSecretariatOffice::where('district_id', $this->district)->orderBy('dso_name', 'asc')->get()->all();
+        $this->gnDivisionOption = GnDivision::where('dso_id', $this->divisionalDecretaryOffice)->orderBy('gn_division_name', 'asc')->get()->all();
     }
 
-    public function updatedDistrict($value)
+    public function updatedDistrict(mixed $value)
     {
         $this->divisionalSecretaryofficeOption =
-            DivisionalSecretariatOffice::where('district_id', $value)->orderBy('dso_name', 'asc')->get();
+            DivisionalSecretariatOffice::where('district_id', $value)->orderBy('dso_name', 'asc')->get()->all();
 
         // Reset downstream fields
         $this->divisionalDecretaryOffice = '';
         $this->gnDivision = '';
-        $this->gnDivisionOption = collect();
+        $this->gnDivisionOption = [];
     }
 
-    public function updatedDivisionalDecretaryOffice($value)
+    public function updatedDivisionalDecretaryOffice(mixed $value)
     {
         $this->gnDivisionOption =
-            GnDivision::where('dso_id', $value)->orderBy('gn_division_name')->get();
+            GnDivision::where('dso_id', $value)->orderBy('gn_division_name')->get()->all();
 
         $this->gnDivision = '';
     }
 
     public function editLocationInfo()
     {
-        $validated = $this->validate();
+        $request = new Request([
+            'people_id' => $this->employee->people_id,
+            'district_id' => $this->district,
+            'gn_division_id' => $this->gnDivision,
+            'address_line1' => $this->addressLine1,
+            'address_line2' => $this->addressLine2,
+            'address_line3' => $this->addressLine3,
+            'postal_code' => $this->postalCode,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+        ]);
 
-        DB::beginTransaction();
+        $controller = new PeopleController();
+        $response = $controller->updateResidentialAddress($request);
+        $result = $response->getData();
 
-        try {
-            $this->employee->update([
-                'district_id'      => $this->district,
-                'dso_id'           => $this->divisionalDecretaryOffice,
-                'gn_division_id'   => $this->gnDivision,
-                'address_line1'    => $this->addressLine1,
-                'address_line2'    => $this->addressLine2,
-                'address_line3'    => $this->addressLine3,
-                'postal_code'      => $this->postalCode,
-                'latitude'         => $this->latitude,
-                'longitude'        => $this->longitude,
-            ]);
-
-            DB::commit();
-
-            session()->flash('success', 'Location information updated successfully.');
+        if ($result->status === 'success') {
+            session()->flash('success', $result->message ?? 'Location information updated successfully.');
             $this->showModalLocationInfo = false;
-
             return $this->redirect(url()->previous(), navigate: true);
-
-        } catch (Exception $e) {
-            DB::rollBack();
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        } else {
+            if ($result->status === 'validation_error') {
+                foreach ($result->errors as $field => $messages) {
+                    $propertyMap = [
+                        'district_id' => 'district',
+                        'gn_division_id' => 'gnDivision',
+                        'address_line1' => 'addressLine1',
+                        'address_line2' => 'addressLine2',
+                        'address_line3' => 'addressLine3',
+                        'postal_code' => 'postalCode',
+                        'latitude' => 'latitude',
+                        'longitude' => 'longitude',
+                    ];
+                    $propertyName = $propertyMap[$field] ?? $field;
+                    $this->addError($propertyName, $messages[0]);
+                }
+            } else {
+                session()->flash('error', $result->message ?? 'An error occurred.');
+            }
         }
     }
 

@@ -57,7 +57,7 @@ return new class extends Migration
 
             $table->foreign('transfer_board_id', 'ttbr_board_fk')
                 ->references('board_id')
-                ->on('transfer_boards');
+                ->on('teacher_transfer_boards');
 
             $table->foreign('ttbr_list_id', 'ttbr_list_fk')
                 ->references('ttbr_list_id')

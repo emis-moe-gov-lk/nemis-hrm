@@ -45,6 +45,11 @@ class EmployerAttachmentAppointment extends Model
         return $this->belongsTo(People::class, 'employee_id', 'people_id');
     }
 
+    public function appointment()
+    {
+        return $this->belongsTo(EmployerAppointment::class, 'appointment_id', 'appointment_id');
+    }
+
     public function position()
     {
         return $this->belongsTo(Position::class, 'position_id', 'position_id');

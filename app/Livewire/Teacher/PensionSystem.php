@@ -9,6 +9,7 @@ use App\Models\EmployerCurrentAppointment;
 use App\Models\Institution;
 use App\Models\People;
 use App\Models\ReasonsForTerminationOfService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -56,13 +57,21 @@ class PensionSystem extends Component
 
     public function pensionTeacher($id)
     {
-        $this->teacher = People::whereHas('currentAppointment', function ($q) {
-            $q->where('service_id', 'SER001')
-                ->whereIn('workplace_id', $this->allowedWorkplaceIds);
-        })
+        $this->teacher = People::with(['currentAppointment.appointment'])
+            ->whereHas('appointment', function ($q) {
+                $q->where('service_id', 'SER001');
+            })
+            ->whereHas('currentAppointment', function ($q) {
+                $q->whereIn('workplace_id', $this->allowedWorkplaceIds);
+            })
             ->where('id', $id)
             ->active()
             ->first();
+
+        if (! $this->teacher || ! $this->teacher->currentAppointment) {
+            session()->flash('error', 'Teacher not found or no active current appointment available.');
+            return;
+        }
 
         $this->editAppointmentId = $this->teacher->currentAppointment->appointment_id;
 
@@ -76,13 +85,20 @@ class PensionSystem extends Component
         // Get current appointment safely
         $current = $this->teacher?->currentAppointment;
 
-        if (!$current) {
+        if (! $current) {
             session()->flash('error', 'No active appointment found!');
             return;
         }
 
+        $appointment = $current->appointment;
+
+        if (! $appointment) {
+            session()->flash('error', 'Parent appointment record is missing for this teacher.');
+            return;
+        }
+
         try {
-            \DB::transaction(function () use ($current) {
+            DB::transaction(function () use ($current, $appointment) {
 
                 // 1. Update main appointment
                 EmployerAppointment::where('appointment_id', $this->editAppointmentId)->update([
@@ -98,7 +114,7 @@ class PensionSystem extends Component
                     'appointment_letter_no' => $current->appointment_letter_no,
                     'appoint_date' => $current->appoint_date,
                     'end_date' => $this->pension_effect_date,
-                    'service_id' => $current->service_id,
+                    'service_id' => $appointment->service_id,
                     'rank_id' => $current->rank_id,
                     'position_id' => $current->position_id,
                     'office_level_id' => $current->office_level_id,
@@ -130,10 +146,12 @@ class PensionSystem extends Component
     public function render()
     {
         // ✅ Build query FIRST
-        $query = People::whereHas('currentAppointment', function ($q) {
-            $q->where('service_id', 'SER001')
-                ->whereIn('workplace_id', $this->allowedWorkplaceIds);
+        $query = People::whereHas('appointment', function ($q) {
+            $q->where('service_id', 'SER001');
         })
+            ->whereHas('currentAppointment', function ($q) {
+                $q->whereIn('workplace_id', $this->allowedWorkplaceIds);
+            })
             ->active();
 
         // Apply search BEFORE paginate

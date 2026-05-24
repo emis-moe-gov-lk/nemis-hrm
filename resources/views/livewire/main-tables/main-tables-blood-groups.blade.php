@@ -36,7 +36,7 @@
             {{-- Card Grid --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4 lg:px-0">
                 @forelse ($bloodgroup as $key => $data)
-                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/60 dark:hover:shadow-rose-500/10 hover:-translate-y-1.5 flex flex-col">
+                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/60 dark:hover:shadow-rose-500/10 hover:-translate-y-1.5 flex flex-col">
                         
                         {{-- Top Row: Index & Status --}}
                         <div class="flex justify-between items-start mb-6">
@@ -52,12 +52,12 @@
                         {{-- Core Content: Large Blood Group Display --}}
                         <div class="space-y-4 mb-8 text-center">
                             <div class="py-6 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-transparent group-hover:border-rose-100 dark:group-hover:border-rose-900/30 transition-colors duration-300">
-                                <span class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-widest">{{ __('Blood Type') }}</span>
+                                <span class="block text-[10px] font-bold uppercase text-slate-500 mb-1 tracking-widest">{{ __('Blood Type') }}</span>
                                 <span class="text-3xl font-black text-slate-900 dark:text-white">{{ $data->blood_group }}</span>
                             </div>
                             
                             <div class="flex items-center justify-center gap-2">
-                                <span class="text-[10px] font-bold uppercase text-slate-400 tracking-wider">{{ __('System ID:') }}</span>
+                                <span class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">{{ __('System ID:') }}</span>
                                 <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{ $data->blood_group_id }}</span>
                             </div>
                         </div>
@@ -83,7 +83,7 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-20 bg-slate-50/50 dark:bg-slate-800/10 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-center">
+                    <div class="col-span-full py-20 bg-slate-50/50 dark:bg-slate-800/10 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center text-center">
                         <div class="w-20 h-20 bg-rose-50 dark:bg-rose-900/20 rounded-full flex items-center justify-center mb-6 text-rose-500">
                             <flux:icon.variable size="xl" />
                         </div>

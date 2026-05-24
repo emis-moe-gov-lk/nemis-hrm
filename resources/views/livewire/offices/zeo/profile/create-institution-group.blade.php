@@ -1,15 +1,13 @@
 <section class="w-full">
-    {{-- Page Header --}}
-    <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1" class="text-slate-900 dark:text-white">{{ __('Zonal Education Office') }}</flux:heading>
-        <flux:subheading size="lg" class="mb-6 text-slate-500 dark:text-slate-400">
-            {{ __('Statistics about Zonal Education Office structure and staff distribution.') }}
-        </flux:subheading>
-        <flux:separator variant="subtle" />
-    </div>
-
     <x-offices.zeo.zeo-layout :officeId="$officeId">
-
+        {{-- Page Header --}}
+        <div class="relative mb-6 w-full">
+            <flux:heading size="xl" level="1" class="text-slate-900 dark:text-white">{{ __('Zonal Education Office') }}</flux:heading>
+            <flux:subheading size="lg" class="mb-6 text-slate-500 dark:text-slate-500">
+                {{ __('Statistics about Zonal Education Office structure and staff distribution.') }}
+            </flux:subheading>
+            <flux:separator variant="subtle" />
+        </div>
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-semibold text-slate-900 dark:text-white">
                 {{ __('Create Institution Group') }}
@@ -23,7 +21,7 @@
 
 
         <div class="mx-auto">
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-10 shadow-sm relative overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-3xl p-6 md:p-10 shadow-sm relative overflow-hidden">
                 <div class="absolute right-0 top-0 w-64 h-64 bg-linear-to-bl from-blue-100 to-transparent dark:from-blue-900/20 rounded-bl-full -z-10 opacity-70"></div>
 
                 <form wire:submit.prevent="createInstiutionGroup" class="space-y-8 relative z-10">
@@ -80,10 +78,10 @@
                     <div class="space-y-3">
                         <flux:label>{{ __('Selected Institutions') }}</flux:label>
                         @foreach ($selectedInstitutions as $index => $institution)
-                        <div class="flex items-center gap-3 p-3 mt-1 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <div class="flex items-center gap-3 p-3 mt-1 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-300 dark:border-slate-700">
                             <div class="flex-1">
                                 <p class="font-medium text-slate-900 dark:text-white">{{ $institution['name'] }}</p>
-                                <p class="text-sm text-slate-500 dark:text-slate-400">
+                                <p class="text-sm text-slate-500 dark:text-slate-500">
                                     Census No: {{ str_pad($institution['census_no'], 5, '0', STR_PAD_LEFT) }}
                                 </p>
                             </div>

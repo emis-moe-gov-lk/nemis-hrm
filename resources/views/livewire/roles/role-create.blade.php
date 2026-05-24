@@ -1,27 +1,22 @@
-<div class="max-w-6xl mx-left px-4 sm:px-6 lg:px-8 py-10">
-    {{-- Header --}}
-    <header class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-indigo-600 mb-2">
-                <flux:icon.shield-check variant="micro" />
-                {{ __('Access Control') }}
-            </div>
-            <flux:heading size="xl" level="1" class="!font-black tracking-tight text-slate-900 dark:text-white">
-                {{ __('Create New Role') }}
-            </flux:heading>
-            <flux:subheading>
-                {{ __('Define a job function and assign specific granular permissions.') }}
-            </flux:subheading>
-        </div>
-        
-        <flux:button icon="arrow-uturn-left" variant="ghost" size="sm" href="{{ route('roles.index') }}" wire:navigate>
-            {{ __('Back to Roles') }}
-        </flux:button>
-    </header>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <x-page-header
+        title="Create New Role"
+        subtitle="Define a job function and assign specific granular permissions."
+        icon="shield-check"
+        :breadcrumbs="[
+            'Registry' => '#',
+            'Roles' => route('roles.index'),
+            'Create' => '#'
+        ]"
+    >
+        <x-slot:actions>
+            <flux:button icon="arrow-uturn-left" variant="ghost" size="sm" href="{{ route('roles.index') }}" wire:navigate>
+                {{ __('Back to Roles') }}
+            </flux:button>
+        </x-slot:actions>
+    </x-page-header>
 
-    <flux:separator variant="subtle" class="mb-10" />
-
-    <form wire:submit.prevent="createRole" class="space-y-10">
+    <form wire:submit.prevent="createRole" class="space-y-8">
         {{-- Role Name Section --}}
         <section class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <aside>
@@ -62,9 +57,9 @@
                         @endphp
 
                         @foreach ($groupedPermissions as $prefix => $permissions)
-                            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+                            <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm">
                                 {{-- Module Header --}}
-                                <div class="px-5 py-3 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                                <div class="px-5 py-3 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                                     <span class="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
                                         {{ $prefix }} Management
                                     </span>
@@ -78,7 +73,7 @@
                                                 value="{{ $item->name }}" 
                                                 class="transition-transform group-hover:scale-110"
                                             />
-                                            <span class="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                                            <span class="text-sm text-slate-600 dark:text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                                                 {{ str_replace($prefix . '.', '', $item->name) }}
                                             </span>
                                         </label>
@@ -92,7 +87,7 @@
         </section>
 
         {{-- Fixed Action Bar --}}
-        <div class="flex items-center justify-end gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
+        <div class="flex items-center justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
             <flux:button variant="ghost" href="{{ route('roles.index') }}" wire:navigate>{{ __('Cancel') }}</flux:button>
             <flux:button type="submit" variant="primary" icon="shield-check" class="px-10 shadow-lg shadow-indigo-500/20">
                 {{ __('Save Role Configuration') }}

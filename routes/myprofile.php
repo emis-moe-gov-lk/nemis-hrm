@@ -7,6 +7,7 @@ use App\Livewire\MyProfile\MyEmployment;
 use App\Livewire\MyProfile\MyFamily;
 use App\Livewire\MyProfile\EditRequest;
 use App\Livewire\MyProfile\PensionPayment;
+use App\Http\Controllers\Pdf\TeacherPdf;
 
 
 
@@ -40,4 +41,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('my-profile/edit-request', EditRequest::class)
         ->name('my-profile.edit-request')
         ->middleware(['permission:my-profile.edit-request.view']);
+
+    Route::get('my-profile/download-pdf', [TeacherPdf::class, 'downloadMyProfile'])
+        ->name('my-profile.pdf')
+        ->middleware(['permission:my-profile.pdf.view']);
 });

@@ -9,7 +9,7 @@
                         {{ __('Teacher Types') }}
                     </flux:heading>
                     <flux:subheading size="lg" class="flex items-center gap-2">
-                        <flux:icon.user-group variant="micro" class="text-slate-400" />
+                        <flux:icon.user-group variant="micro" class="text-slate-500" />
                         {{ __('Manage staff classifications and role identifiers') }}
                     </flux:subheading>
                 </div>
@@ -36,17 +36,17 @@
             {{-- CARD GRID --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 @forelse ($teacherTypes as $key => $data)
-                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 shadow-sm hover:shadow-2xl hover:border-indigo-500/30 transition-all duration-300 flex flex-col justify-between">
+                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 shadow-sm hover:shadow-2xl hover:border-indigo-500/30 transition-all duration-300 flex flex-col justify-between">
                         
                         <div>
                             {{-- Header: ID and Status --}}
                             <div class="flex justify-between items-start mb-6">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-100 dark:border-slate-700 font-black text-xs text-slate-400 group-hover:text-indigo-500 group-hover:bg-indigo-50 transition-colors">
+                                    <div class="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 font-black text-xs text-slate-500 group-hover:text-indigo-500 group-hover:bg-indigo-50 transition-colors">
                                         {{ $teacherTypes->firstItem() + $key }}
                                     </div>
                                     <div class="flex flex-col">
-                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none">Reference ID</span>
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 leading-none">Reference ID</span>
                                         <span class="text-xs font-bold text-slate-900 dark:text-white mt-1">{{ $data->teacher_types_id }}</span>
                                     </div>
                                 </div>
@@ -61,13 +61,13 @@
                                     {{ $data->type_name }}
                                 </h3>
                                 <div class="mt-2 flex items-center gap-2">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">System Classification</span>
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">System Classification</span>
                                 </div>
                             </div>
                         </div>
 
                         {{-- Action Area --}}
-                        <div class="flex items-center gap-2 pt-4 border-t border-slate-50 dark:border-slate-800">
+                        <div class="flex items-center gap-2 pt-4 border-t border-slate-200 dark:border-slate-700">
                             <flux:modal.trigger wire:click="editTeacherType({{ $data->id }})" name="edit-teacher-type">
                                 <flux:button variant="ghost" icon="pencil-square" class="flex-1 !rounded-xl !text-slate-500 hover:!text-indigo-600">
                                     {{ __('Edit') }}
@@ -87,10 +87,10 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-24 text-center bg-slate-50/50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-24 text-center bg-slate-50/50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <flux:icon.user-group size="xl" class="mx-auto text-slate-200 mb-4" />
-                        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest">{{ __('No Teacher Types Found') }}</h3>
-                        <p class="text-xs text-slate-400 mt-2 italic">{{ __('Start by clicking "Add Teacher Type" above') }}</p>
+                        <h3 class="text-sm font-black text-slate-500 uppercase tracking-widest">{{ __('No Teacher Types Found') }}</h3>
+                        <p class="text-xs text-slate-500 mt-2 italic">{{ __('Start by clicking "Add Teacher Type" above') }}</p>
                     </div>
                 @endforelse
             </div>

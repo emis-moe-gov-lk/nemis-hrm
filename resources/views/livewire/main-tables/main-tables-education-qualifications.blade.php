@@ -37,11 +37,11 @@
             {{-- QUALIFICATION CARDS GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse ($eqList as $key => $data)
-                    <div class="relative group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 shadow-sm hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-800 transition-all duration-300">
+                    <div class="relative group bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 shadow-sm hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-800 transition-all duration-300">
                         
                         {{-- Badge & Index --}}
                         <div class="flex justify-between items-center mb-5">
-                            <span class="text-[10px] font-black text-slate-400 tabular-nums tracking-widest uppercase">
+                            <span class="text-[10px] font-black text-slate-500 tabular-nums tracking-widest uppercase">
                                 #{{ $eqList->firstItem() + $key }}
                             </span>
                             <flux:badge size="sm" variant="pill" color="{{ $data->active_status ? 'green' : 'red' }}" class="!font-black uppercase tracking-widest text-[9px]">
@@ -62,33 +62,33 @@
                         {{-- Framework Section (Replaces Metadata) --}}
                         <div class="space-y-4 mb-6">
                             <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-indigo-500 transition-colors">
+                                <div class="w-9 h-9 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-500 group-hover:text-indigo-500 transition-colors">
                                     <flux:icon.queue-list variant="micro" />
                                 </div>
                                 <div>
-                                    <p class="text-[9px] uppercase font-black text-slate-400 leading-none mb-1">{{ __('Display Order') }}</p>
+                                    <p class="text-[9px] uppercase font-black text-slate-500 leading-none mb-1">{{ __('Display Order') }}</p>
                                     <p class="text-sm font-bold text-slate-700 dark:text-slate-300">{{ str_pad($data->qualification_order, 2, '0', STR_PAD_LEFT) }}</p>
                                 </div>
                             </div>
                         </div>
 
                         {{-- Levels Chip (Matching City GPS Chip) --}}
-                        <div class="flex items-center gap-2 p-3 bg-slate-50/50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-2xl mb-6">
+                        <div class="flex items-center gap-2 p-3 bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl mb-6">
                             <div class="flex-1 text-center">
-                                <p class="text-[8px] uppercase font-black text-slate-400">SLQF</p>
-                                <p class="text-[11px] font-bold tabular-nums text-slate-600 dark:text-slate-400">{{ $data->slql ?? '—' }}</p>
+                                <p class="text-[8px] uppercase font-black text-slate-500">SLQF</p>
+                                <p class="text-[11px] font-bold tabular-nums text-slate-600 dark:text-slate-500">{{ $data->slql ?? '—' }}</p>
                             </div>
                             <div class="w-px h-4 bg-slate-200 dark:bg-slate-700"></div>
                             <div class="flex-1 text-center">
-                                <p class="text-[8px] uppercase font-black text-slate-400">NVQ</p>
-                                <p class="text-[11px] font-bold tabular-nums text-slate-600 dark:text-slate-400">{{ $data->nvql ?? '—' }}</p>
+                                <p class="text-[8px] uppercase font-black text-slate-500">NVQ</p>
+                                <p class="text-[11px] font-bold tabular-nums text-slate-600 dark:text-slate-500">{{ $data->nvql ?? '—' }}</p>
                             </div>
                         </div>
 
                         {{-- Actions --}}
                         <div class="flex gap-2">
                             <flux:modal.trigger wire:click="editEQLevel({{ $data->id }})" class="flex-1">
-                                <flux:button size="sm" variant="ghost" icon="pencil-square" class="w-full !rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
+                                <flux:button size="sm" variant="ghost" icon="pencil-square" class="w-full !rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-indigo-700">
                                     {{ __('Edit') }}
                                 </flux:button>
                             </flux:modal.trigger>
@@ -106,10 +106,10 @@
                     </div>
                 @empty
                     <div class="col-span-full py-24 text-center">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-[2rem] bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 mb-4 text-slate-300">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-4xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 mb-4 text-slate-300">
                             <flux:icon.academic-cap size="xl" />
                         </div>
-                        <h3 class="text-lg font-black text-slate-400 uppercase tracking-widest">{{ __('No Records Found') }}</h3>
+                        <h3 class="text-lg font-black text-slate-500 uppercase tracking-widest">{{ __('No Records Found') }}</h3>
                     </div>
                 @endforelse
             </div>
@@ -148,8 +148,8 @@
                         <flux:input label="Qualification Name" wire:model.live="educationQualification" placeholder="e.g. Bachelor of Science" />
                     </flux:field>
 
-                    <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] border border-slate-100 dark:border-slate-800 space-y-4">
-                        <flux:heading size="sm" class="!font-black uppercase tracking-widest text-slate-400 text-[10px]">{{ __('Framework Mapping') }}</flux:heading>
+                    <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-4xl border border-slate-200 dark:border-slate-700 space-y-4">
+                        <flux:heading size="sm" class="!font-black uppercase tracking-widest text-slate-500 text-[10px]">{{ __('Framework Mapping') }}</flux:heading>
                         <div class="grid grid-cols-2 gap-4">
                             <flux:field>
                                 <flux:select label="SLQF Level" wire:model.live="slqfl">
@@ -204,7 +204,7 @@
                         <flux:input label="Qualification Name" wire:model.live="updateEducationQualification" />
                     </flux:field>
 
-                    <div class="grid grid-cols-2 gap-4 p-5 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-800">
+                    <div class="grid grid-cols-2 gap-4 p-5 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-slate-200 dark:border-slate-700">
                         <flux:field>
                             <flux:select label="SLQF Level" wire:model.live="updateSlqfl">
                                 <option value="">Select</option>

@@ -2,127 +2,122 @@
 
 namespace App\Livewire\Principal\Profile;
 
+use Exception;
 use App\Models\People;
 use Livewire\Component;
 use App\Models\Principal;
 use App\Models\SubjectList;
+use Illuminate\Support\Collection;
 use App\Models\MediumOfInstruction;
 use App\Models\EmployerCadreSubject;
 use App\Models\PrincipalRecruitmentCategory;
+use App\Http\Controllers\PrincipalServiceController;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PrincipalData extends Component
 {
-    public $peopleId;
-    public $employee;
-    public $principalData;
-    public $cadreData;
+    use AuthorizesRequests;
 
-    public $appointmentId;
+    public string $peopleId;
+    public ?People $employee = null;
+    public ?Principal $principalData = null;
+    public ?EmployerCadreSubject $cadreData = null;
+
+    public ?string $appointmentId = null;
 
     // Form fields
-    public $principalCategory;
-    public $cadreSubject;
-    public $cadreMedium;
+    public ?string $principalCategory = null;
+    public ?string $cadreSubject = null;
+    public ?string $cadreMedium = null;
 
-    // Dropdown options (always collections)
-    public $principalCategoriesOption = [];
-    public $subjectOption = [];
-    public $mediumOption = [];
+    // Dropdown options
+    public Collection $principalCategoriesOption;
+    public Collection $subjectOption;
+    public Collection $mediumOption;
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'principalCategory' => ['required', 'exists:principal_recruitment_categories,category_id'],
-            'cadreSubject' => ['required', 'string'],
-            'cadreMedium' => ['required', 'string'],
+            'cadreSubject'      => ['required', 'exists:subject_lists,subject_id'],
+            'cadreMedium'       => ['required', 'exists:medium_of_instructions,medium_id'],
         ];
     }
 
-    // Live validation per-field
-    public function updated($property)
+    public function updated(string $property): void
     {
         $this->validateOnly($property);
     }
 
-    /**
-     * MOUNT → Load initial data + current appointment information
-     */
-    public function mount()
+    public function mount(): void
     {
-        $this->employee = People::with('appointment')->where('people_id', $this->peopleId)->first();
-        if (! $this->employee) {
-            throw new Exception('Employee not found.');
+        $this->initializeCollections();
+
+        try {
+            $people = People::with('appointment')->where('people_id', $this->peopleId)->first();
+            if (!$people) return;
+
+            $this->employee = $people;
+            $appointment = $this->employee->appointment;
+
+            if ($appointment && $appointment->service_id == 'SER004') {
+                $this->appointmentId = $appointment->appointment_id;
+                $this->principalData = Principal::where('appointment_id', $this->appointmentId)->first();
+                $this->cadreData = EmployerCadreSubject::where('appointment_id', $this->appointmentId)->first();
+
+                if ($this->principalData) {
+                    $this->principalCategory = $this->principalData->recruitment_category;
+                }
+                
+                if ($this->cadreData) {
+                    $this->cadreSubject = $this->cadreData->main_subject;
+                    $this->cadreMedium = $this->cadreData->appointment_medium;
+                }
+            }
+
+            $this->loadOptions();
+        } catch (Exception $e) {
+            session()->flash('error', 'Error loading principal data: ' . $e->getMessage());
         }
-        $this->appointmentId = $this->employee->appointment->appointment_id;
-        $appointmentService = $this->employee->appointment->service_id;
-
-        if ($this->appointmentId && $appointmentService == 'SER004') {
-            $this->principalData = Principal::where('appointment_id', $this->appointmentId)->first();
-            $this->principalCategory = $this->principalData->recruitment_category ?? '';
-
-            $this->cadreData = EmployerCadreSubject::where('appointment_id', $this->appointmentId)->first();
-            $this->cadreSubject = $this->cadreData->main_subject ?? '';
-            $this->cadreMedium = $this->cadreData->appointment_medium ?? '';
-        }
-
-        $this->principalCategoriesOption = PrincipalRecruitmentCategory::Active()->get();
-
-        
-
-        $this->subjectOption = SubjectList::active()->where('type', '=', '2')->orderBy('name_en', 'asc')->get();
-        $this->mediumOption = MediumOfInstruction::active()->orderBy('id', 'asc')->get();
-        
     }
 
+    private function initializeCollections(): void
+    {
+        $this->principalCategoriesOption = collect();
+        $this->subjectOption = collect();
+        $this->mediumOption = collect();
+    }
 
-    /**
-     * Save -> Update job data with error handling
-     */
+    private function loadOptions(): void
+    {
+        $this->principalCategoriesOption = PrincipalRecruitmentCategory::Active()->get();
+        $this->subjectOption            = SubjectList::Active()->where('type', '2')->orderBy('name_en', 'asc')->get();
+        $this->mediumOption             = MediumOfInstruction::Active()->orderBy('id', 'asc')->get();
+    }
+
     public function save()
     {
-        // Validate incoming data
         $this->validate();
 
         try {
-            Principal::updateOrCreate(
-                [
-                    // UNIQUE condition (VERY IMPORTANT)
-                    'employee_id' => $this->peopleId,
-                ],
-                [
-                    'appointment_id' => $this->appointmentId,
-                    'recruitment_category' => $this->principalCategory,
-                    'updated_by'           => auth()->user()->people_id ?? null,
-                ]
-            );
+            $controller = new PrincipalServiceController();
+            
+            $controller->updatePrincipalService([
+                'appointment_id'        => $this->appointmentId,
+                'employee_id'           => $this->peopleId,
+                'principal_category_id' => $this->principalCategory,
+                'medium_id'             => $this->cadreMedium,
+                'subject_id'            => $this->cadreSubject,
+            ]);
 
-            EmployerCadreSubject::updateOrCreate(
-                [
-                    // UNIQUE key(s)
-                    'appointment_id' => $this->appointmentId,
-                ],
-                [
-                    'employee_id'        => $this->peopleId,
-                    'main_subject'       => $this->cadreSubject,
-                    'appointment_medium' => $this->cadreMedium,
-                    'updated_by'         => auth()->user()->people_id ?? null,
-                ]
-            );
-
-            session()->flash('success', 'Employment updated successfully.');
-            $this->reset('principalCategory');
-        } catch (\Exception $e) {
-
-            // Log the error if needed
-            // logger()->error($e->getMessage());
-
-            session()->flash('error', 'Something went wrong while updating the record.'. $e->getMessage());
+            session()->flash('success', 'Principal service details updated successfully.');
+            return $this->redirect(url()->previous(), navigate: true);
+        } catch (Exception $e) {
+            session()->flash('error', 'Update failed: ' . $e->getMessage());
         }
-
-        return $this->redirect(url()->previous(), navigate: true);
     }
 
-    public function resetFields()
+    public function resetFields(): void
     {
         $this->mount();
     }
@@ -132,3 +127,4 @@ class PrincipalData extends Component
         return view('livewire.principal.profile.principal-data');
     }
 }
+

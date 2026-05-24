@@ -5,6 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class ServiceRank
+ *
+ * @property string $rank_id
+ */
 class ServiceRank extends Model
 {
     use HasFactory;

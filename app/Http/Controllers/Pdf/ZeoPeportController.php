@@ -12,6 +12,9 @@ class ZeoPeportController extends Controller
 {
     public function teacherList($id)
     {
+        ini_set('pcre.backtrack_limit', '5000000');
+        ini_set('pcre.recursion_limit', '5000000');
+
         // Load ZEO only (NOT teachers yet)
         $zeo = ZonalEducationOffice::find($id);
 

@@ -6,7 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 use Illuminate\Support\Facades\DB;
+
+/**
+ * Class ZonalEducationOffice
+ *
+ * @property int $id
+ * @property string $workplace_id
+ * @property string|null $peo_wp_id
+ * @property-read \App\Models\ProvincialEducationOffice|null $provincialEducationOffice
+ * @property-read \App\Models\DistrictsList|null $district
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Institution[] $institutions
+ */
 
 class ZonalEducationOffice extends Model
 {
@@ -87,6 +99,21 @@ class ZonalEducationOffice extends Model
         );
     }
 
+    /**
+     * Teachers appointed to institutions under this ZEO.
+     */
+    public function teachers()
+    {
+        return $this->hasManyThrough(
+            EmployerCurrentAppointment::class,
+            Institution::class,
+            'zeo_wp_id',
+            'workplace_id',
+            'workplace_id',
+            'workplace_id'
+        )->where('employer_current_appointments.position_id', 'POS001');
+    }
+
     public static function employeeCountByServiceGroupedByZeoUsingWorkplaces(string $peoWpId)
     {
         $zeos = self::where('peo_wp_id', $peoWpId)
@@ -112,10 +139,16 @@ class ZonalEducationOffice extends Model
             // COUNT DISTINCT employees per service (with service name)
             $counts = EmployerCurrentAppointment::query()
                 ->join(
+                    'employer_appointments',
+                    'employer_appointments.appointment_id',
+                    '=',
+                    'employer_current_appointments.appointment_id'
+                )
+                ->join(
                     'services',
                     'services.service_id',
                     '=',
-                    'employer_current_appointments.service_id'
+                    'employer_appointments.service_id'
                 )
                 ->whereIn('employer_current_appointments.workplace_id', $workplaceIds)
                 ->select(
@@ -123,7 +156,7 @@ class ZonalEducationOffice extends Model
                     DB::raw('COUNT(DISTINCT CONCAT(
                     employer_current_appointments.employee_id,
                     "-",
-                    employer_current_appointments.service_id
+                    employer_appointments.service_id
                 )) as total')
                 )
                 ->groupBy('services.service_name')

@@ -1,4 +1,4 @@
-<section class="w-full">
+
 
     <x-main-tables.layout>
         <div class="max-w-[1440px] mx-auto pb-12">
@@ -11,7 +11,7 @@
                     </flux:heading>
                     <div class="flex items-center gap-2">
                         <div class="h-1.5 w-8 bg-indigo-500 rounded-full"></div>
-                        <flux:subheading size="lg" class="!font-bold text-slate-400 uppercase tracking-widest text-[11px]">
+                        <flux:subheading size="lg" class="!font-bold text-slate-500 uppercase tracking-widest text-[11px]">
                             {{ __('Career Classification & Localization') }}
                         </flux:subheading>
                     </div>
@@ -39,11 +39,11 @@
             {{-- CARD GRID - NO TABLES HERE --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8 px-4">
                 @forelse ($occupations as $key => $data)
-                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[3rem] p-8 hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.5)] hover:border-indigo-500/50 transition-all duration-500">
+                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[3rem] p-8 hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.5)] hover:border-indigo-500/50 transition-all duration-500">
                         
                         {{-- Card Header: ID & Toggle --}}
                         <div class="flex justify-between items-start mb-8">
-                            <span class="text-[10px] font-black uppercase tracking-widest px-4 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full border border-slate-200 dark:border-slate-700">
+                            <span class="text-[10px] font-black uppercase tracking-widest px-4 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 rounded-full border border-slate-300 dark:border-slate-700">
                                 {{ $data->occ_id }}
                             </span>
                             
@@ -60,18 +60,18 @@
                             <h3 class="text-xl font-black text-slate-900 dark:text-white leading-tight uppercase tracking-tight group-hover:text-indigo-600 transition-colors">
                                 {{ $data->occ_name_en }}
                             </h3>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Classification Unit</p>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-1">Classification Unit</p>
                         </div>
 
                         {{-- Translations Stack --}}
                         <div class="space-y-3 mb-10">
-                            <div class="p-4 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 group-hover:bg-indigo-50/30 transition-colors">
+                            <div class="p-4 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 group-hover:bg-indigo-50/30 transition-colors">
                                 <div class="flex flex-col">
                                     <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest mb-1 italic">Sinhala Translation</span>
                                     <span class="text-sm font-bold text-slate-700 dark:text-slate-300">{{ $data->occ_name_si }}</span>
                                 </div>
                             </div>
-                            <div class="p-4 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 group-hover:bg-indigo-50/30 transition-colors">
+                            <div class="p-4 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 group-hover:bg-indigo-50/30 transition-colors">
                                 <div class="flex flex-col">
                                     <span class="text-[9px] font-black text-indigo-500 uppercase tracking-widest mb-1 italic">Tamil Translation</span>
                                     <span class="text-sm font-bold text-slate-700 dark:text-slate-300">{{ $data->occ_name_ta }}</span>
@@ -80,7 +80,7 @@
                         </div>
 
                         {{-- Card Actions --}}
-                        <div class="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div class="mt-auto pt-6 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
                              <div class="flex items-center gap-2 text-slate-300 font-bold text-xs uppercase tracking-widest">
                                 <flux:icon.hashtag variant="micro" />
                                 <span>{{ $occupations->firstItem() + $key }}</span>
@@ -103,11 +103,11 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-32 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/40 rounded-[4rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-32 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/40 rounded-[4rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
                             <flux:icon.briefcase size="xl" class="text-slate-300" />
                         </div>
-                        <p class="text-slate-400 font-black uppercase tracking-[0.3em] text-sm">{{ __('No Occupations Found') }}</p>
+                        <p class="text-slate-500 font-black uppercase tracking-[0.3em] text-sm">{{ __('No Occupations Found') }}</p>
                     </div>
                 @endforelse
             </div>
@@ -163,7 +163,7 @@
         <flux:modal wire:model="showModelEditOccupation" name="edit-occupation" class="w-full max-w-lg rounded-[3rem] p-12">
             <div class="space-y-8">
                 <div class="flex items-center gap-5">
-                    <div class="w-16 h-16 bg-slate-900 dark:bg-white rounded-[1.5rem] flex items-center justify-center text-white dark:text-slate-900 shadow-2xl">
+                    <div class="w-16 h-16 bg-indigo-600 dark:bg-white rounded-[1.5rem] flex items-center justify-center text-white dark:text-slate-900 shadow-2xl">
                         <flux:icon.pencil-square size="lg" />
                     </div>
                     <div>
@@ -201,4 +201,3 @@
         </flux:modal>
 
     </x-main-tables.layout>
-</section>

@@ -6,6 +6,7 @@ use App\Models\Family;
 use App\Models\People;
 use App\Models\FamilyMember;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use misterspelik\LaravelPdf\Facades\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -14,8 +15,20 @@ class TeacherPdf extends Controller
 {
     public function generateSimplePdf($id)
     {
-        $people = People::find($id);
-        //dd($teacher->families);
+        $people = People::findOrFail($id);
+
+        return $this->streamProfilePdf($people);
+    }
+
+    public function downloadMyProfile()
+    {
+        $people = People::where('people_id', Auth::user()?->people_id)->firstOrFail();
+
+        return $this->streamProfilePdf($people);
+    }
+
+    private function streamProfilePdf(People $people)
+    {
         // Generate QR
         $svg = QrCode::format('svg')
             ->size(120)
@@ -33,6 +46,6 @@ class TeacherPdf extends Controller
 
         $pdf->SetProtection(['copy', 'print'], '', 'pass');
 
-        return $pdf->stream($people->nic . '.pdf');
+        return $pdf->stream(($people->nic ?? $people->people_id) . '.pdf');
     }
 }

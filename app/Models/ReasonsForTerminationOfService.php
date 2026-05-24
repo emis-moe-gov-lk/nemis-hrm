@@ -22,4 +22,10 @@ class ReasonsForTerminationOfService extends Model
     protected $casts = [
         'active_status' => 'boolean',
     ];
+
+    // If you want to filter active institutions by default
+    public function scopeActive($query)
+    {
+        return $query->where('active_status', 1);
+    }
 }

@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->char('position_id', 10)->unique()->comment('e.g., POS001, POS002');
             $table->char('service_id', 10)->comment('Position belongs to which service');
+            $table->smallInteger('position_order')->comment('e.g., 1, 2, 3, 4, 5, 6, 7, 8, 9, 10');
             $table->string('position_name')->unique()->comment('e.g., Teacher, Principal, Admin Officer');
             $table->string('description')->nullable();
-            $table->smallInteger('position_order')->comment('e.g., 1, 2, 3, 4, 5, 6, 7, 8, 9, 10');
             $table->boolean('active_status')->default(true)->comment('true: Active, false: Inactive');
             $table->timestamps();
 

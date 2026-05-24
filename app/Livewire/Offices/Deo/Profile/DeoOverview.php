@@ -9,60 +9,62 @@ use App\Models\Institution;
 use App\Models\DivisionalEducationOffice;
 use App\Models\EmployerCurrentAppointment;
 
-
 class DeoOverview extends Component
 {
     public $officeId;
     public $workplace;
-    public $studentCount;
-    public $divisionCount;
-    public $institutionCount;
+    public $studentCount = 0;
+    public $divisionCount = 0;
+    public $institutionCount = 0;
     public $serviceCounts = [];
 
     public function mount($id)
     {
         $this->officeId = $id;
 
-        $this->studentCount = 0; // Placeholder until real logic is needed
+        // Safely load and find DEO
+        $office = DivisionalEducationOffice::find($this->officeId);
 
-        // Optional: get the current workplace if needed in the view
-         $workplace = DivisionalEducationOffice::find($this->officeId);
+        if (!$office) {
+            abort(404, 'Divisional Education Office not found');
+        }
 
-         //dd($workplace);
+        $this->workplace = $office;
+        $workplaceId = $office->workplace_id;
 
-        // Get all descendant workplaces
-        //$peos = ProvincialEducationOffice::where('pmoe_wp_id', $workplace->workplace_id)->get();
-        //$peoIds = $peos->pluck('workplace_id')->toArray();
+        // Calculate Student Population for current year within this DEO
+        $this->studentCount = \App\Models\InstitutionStudentAdmission::where('academic_year', date('Y'))
+            ->whereHas('class.grade', function($query) use ($workplaceId) {
+                $query->whereIn('institution_id', function($subQuery) use ($workplaceId) {
+                    $subQuery->select('id')->from('institutions')
+                        ->where('deo_wp_id', $workplaceId);
+                });
+            })
+            ->sum(\Illuminate\Support\Facades\DB::raw('male_count + female_count'));
 
-        //$zeos = ZonalEducationOffice::where('peo_wp_id', $workplace->workplace_id)->get();
-        //$zeoIds = $zeos->pluck('workplace_id')->toArray();
-
-        //$deos = DivisionalEducationOffice::where('zeo_wp_id', $workplace->workplace_id)->get();
-        //$deoIds = $deos->pluck('workplace_id')->toArray();
-
-        $institutions = Institution::where('deo_wp_id', $workplace->workplace_id)->get();
+        // Load institutions under this DEO
+        $institutions = Institution::where('deo_wp_id', $workplaceId)->get();
         $institutionIds = $institutions->pluck('workplace_id')->toArray();
 
-        // Combine all workplace IDs
-        $allWorkplaceIds = array_merge(  $institutionIds);
+        // Combine all descendant workplace IDs including the DEO itself
+        $allWorkplaceIds = array_merge([$workplaceId], $institutionIds);
 
         // Counts
-       // $this->provincialDeptCount = count($peos);
-       // $this->zonalOfficeCount = count($zeos);
-       // $this->divisionCount = count($deos);
         $this->institutionCount = count($institutions);
 
-        // Service-wise staff counts
+        // Service-wise staff counts (OPTIMIZED)
         $services = Service::all();
         foreach ($services as $service) {
             $staffCount = \App\Models\People::whereHas('currentAppointment', function ($q) use ($service, $allWorkplaceIds) {
-                $q->where('service_id', $service->service_id)
-                  ->whereIn('workplace_id', $allWorkplaceIds);
+                $q->whereIn('workplace_id', $allWorkplaceIds)
+                  ->whereHas('appointment', fn($sq) => $sq->where('service_id', $service->service_id));
             })->active()->count();
 
+            // Load service details safely
             $this->serviceCounts[] = [
                 'service_id' => $service->service_id,
                 'name_en' => $service->service_name,
+                'description' => $service->description,
                 'staff_count' => $staffCount
             ];
         }
@@ -72,7 +74,6 @@ class DeoOverview extends Component
     {
         return view('livewire.offices.deo.profile.deo-overview', [
             'officeId' => $this->officeId,
-            // 'workplace' => $workplace ?? null // if needed in blade
         ]);
     }
 }

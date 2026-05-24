@@ -5,6 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class DivisionOffice
+ *
+ * @property string $id
+ */
 class DivisionOffice extends Model
 {
     use HasFactory;

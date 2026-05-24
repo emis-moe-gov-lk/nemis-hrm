@@ -10,7 +10,7 @@
                         {{ __('Institution Authorities') }}
                     </flux:heading>
                     <flux:subheading size="lg" class="flex items-center gap-2">
-                        <flux:icon.shield-check variant="micro" class="text-slate-400" />
+                        <flux:icon.shield-check variant="micro" class="text-slate-500" />
                         {{ __('Governing bodies and official institutional records') }}
                     </flux:subheading>
                 </div>
@@ -37,11 +37,11 @@
             {{-- CARD GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 @forelse ($insauthorities as $key => $data)
-                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500/30 transition-all duration-500">
+                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500/30 transition-all duration-500">
                         
                         {{-- Card Header: Code & Status --}}
                         <div class="flex justify-between items-start mb-4">
-                            <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full border border-slate-200 dark:border-slate-700">
+                            <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 rounded-full border border-slate-300 dark:border-slate-700">
                                 {{ $data->authority_id }}
                             </span>
                             
@@ -65,19 +65,19 @@
                             <h3 class="text-lg font-black text-slate-900 dark:text-white leading-tight uppercase tracking-tight group-hover:text-blue-600 transition-colors">
                                 {{ $data->authority_name }}
                             </h3>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-3 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
+                            <p class="text-sm text-slate-500 dark:text-slate-500 mt-3 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
                                 {{ $data->description }}
                             </p>
                         </div>
 
                         {{-- Card Footer: Meta Info --}}
-                        <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-700">
                             <div class="flex items-center gap-3">
                                 <div class="flex shrink-0 w-10 h-10 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 transition-colors group-hover:bg-blue-600 group-hover:text-white">
                                     <flux:icon.shield-check variant="micro" />
                                 </div>
                                 <div>
-                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">Entity Rank</p>
+                                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-tighter leading-none mb-1">Entity Rank</p>
                                     <p class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-tight">
                                         Official Authority
                                     </p>
@@ -87,7 +87,7 @@
 
                         {{-- Hover Action Bar (Glassmorphism) --}}
                         <div class="absolute inset-x-0 -bottom-2 flex justify-center opacity-0 group-hover:opacity-100 group-hover:bottom-4 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto">
-                            <div class="flex items-center gap-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-200 dark:border-slate-700 p-1.5 rounded-2xl shadow-xl">
+                            <div class="flex items-center gap-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-300 dark:border-slate-700 p-1.5 rounded-2xl shadow-xl">
                                 <flux:modal.trigger wire:click="editInsAuthority({{ $data->id }})" name="edit-ins-authority">
                                     <flux:button size="sm" variant="ghost" icon="pencil-square" class="!rounded-xl hover:!bg-blue-50 hover:!text-blue-600 transition-colors" />
                                 </flux:modal.trigger>
@@ -106,9 +106,9 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-24 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-24 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <flux:icon.magnifying-glass size="xl" class="text-slate-300 mb-4" />
-                        <p class="text-slate-400 font-black uppercase tracking-widest text-sm italic">{{ __('No Authorities Registered') }}</p>
+                        <p class="text-slate-500 font-black uppercase tracking-widest text-sm italic">{{ __('No Authorities Registered') }}</p>
                     </div>
                 @endforelse
             </div>
