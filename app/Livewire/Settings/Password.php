@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Settings;
 
+use App\Services\Auth\MfaManager;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
@@ -32,9 +34,14 @@ class Password extends Component
             throw $e;
         }
 
-        Auth::user()->update([
+        $user = Auth::user();
+
+        $user->update([
             'password' => Hash::make($validated['password']),
+            'remember_token' => Str::random(60),
         ]);
+
+        app(MfaManager::class)->handleCredentialSensitiveChange($user);
 
         $this->reset('current_password', 'password', 'password_confirmation');
 

@@ -1,18 +1,12 @@
-<section class="w-full">
-    <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">{{ __('Alerts Overview') }}</flux:heading>
-        <flux:subheading size="lg" class="mb-6">{{ __('Manage Alerts!') }}
-        </flux:subheading>
-        <flux:separator variant="subtle" />
-    </div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <x-page-header
+        title="Pending Verification List"
+        subtitle="Manage pending profile and account verifications for {{ Auth::user()->workplace?->office_name ?? 'All Workplaces' }}."
+        icon="bell"
+    />
 
     <x-alerts.layout>
-
-        <div class="relative mb-6 w-full">
-            <flux:heading size="xl" level="1">{{ __('Pending Verification List for') }} {{ Auth::user()->workplace?->office_name ?? 'All Workplaces' }}</flux:heading>
-            <flux:subheading size="lg" class="mb-6">{{ __('Manage pending verification profile and account') }}
-            </flux:subheading>
-            <flux:separator variant="subtle" />
+        <div>
 
             <div>
                 @if (session('success'))
@@ -49,14 +43,14 @@
                 </flux:modal.trigger>
 
                 {{-- Search Modal --}}
-                <flux:modal name="search-profile" class="md:w-md rounded-xl shadow-lg dark:bg-zinc-900 border dark:border-zinc-800">
+                <flux:modal name="search-profile" class="md:w-md rounded-xl shadow-lg dark:bg-zinc-900 border dark:border-zinc-700">
                     <div class="space-y-6 p-4">
                         {{-- Header --}}
                         <div class="text-center">
                             <flux:heading size="lg" class="text-zinc-800 dark:text-zinc-100">
                                 Search Pending Verification Profile
                             </flux:heading>
-                            <flux:text class="mt-2 text-zinc-500 dark:text-zinc-400 text-sm">
+                            <flux:text class="mt-2 text-zinc-400 dark:text-zinc-400 text-sm">
                                 Search for a pending verification profile by
                                 <span class="font-semibold text-zinc-700 dark:text-zinc-300">NIC or email or contact number </span>.
                             </flux:text>
@@ -76,7 +70,7 @@
                                 class="py-2.5 px-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 rounded-lg cursor-pointer transition-colors duration-200">
                                 @php
                                 // Determine route based on service
-                                $routeName = match($employee->currentAppointment->service_id) {
+                                $routeName = match($employee->appointment?->service_id) {
                                 'SER001' => 'teacher.profile.index',
                                 'SER002' => 'sltes.profile.index',
                                 'SER003' => 'sltas.profile.index',
@@ -85,6 +79,7 @@
                                 'SER006' => 'slas.profile.index',
                                 'SER007' => 'dos.profile.index',
                                 'SER008' => 'mso.profile.index',
+                                default => 'employees.index',
                                 };
                                 @endphp
 
@@ -93,7 +88,7 @@
                                         <span class="font-semibold text-zinc-800 dark:text-zinc-100">
                                             {{ $employee->name_with_initials }}
                                         </span>
-                                        <span class="text-sm font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">
+                                        <span class="text-sm font-medium text-zinc-400 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">
                                             {{ $employee->nic }}
                                         </span>
                                     </div>
@@ -102,7 +97,7 @@
                             @endforeach
                         </ul>
                         @elseif(strlen($query) >= 10)
-                        <p class="text-sm text-zinc-500 dark:text-zinc-400 text-center py-6 flex flex-col items-center gap-2">
+                        <p class="text-sm text-zinc-400 dark:text-zinc-400 text-center py-6 flex flex-col items-center gap-2">
                             <svg class="w-8 h-8 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -117,7 +112,7 @@
 
             </div>
 
-            <div class="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm bg-white dark:bg-zinc-900/50">
+            <div class="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-900/50">
                 <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800">
                     <thead class="bg-zinc-50 dark:bg-zinc-800/50">
                         <tr>
@@ -157,7 +152,7 @@
                                                 {{ $employee->title->title_name ?? '' }} {{ $employee->name_with_initials }}
                                             </flux:link>
                                         </div>
-                                        <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                        <div class="text-xs text-zinc-400 dark:text-zinc-400 mt-0.5">
                                             NIC: <span class="font-medium text-zinc-700 dark:text-zinc-300">{{ $employee->nic }}</span>
                                         </div>
                                     </div>
@@ -169,7 +164,7 @@
                                 <div class="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                                     {{ $employee->currentAppointment?->position?->position_name ?? 'N/A' }}
                                 </div>
-                                <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                <div class="text-xs text-zinc-400 dark:text-zinc-400 mt-0.5">
                                     {{ $employee->currentAppointment?->service?->service_name ?? 'N/A' }}
                                 </div>
                             </td>
@@ -206,7 +201,7 @@
 
                                     @php
                                     // Determine route name based on service
-                                    $routeName = match($employee->currentAppointment->service_id) {
+                                    $routeName = match($employee->appointment?->service_id) {
                                     'SER001' => 'teacher.profile.index',
                                     'SER002' => 'sltes.profile.index',
                                     'SER003' => 'sltas.profile.index',
@@ -215,6 +210,7 @@
                                     'SER006' => 'slas.profile.index',
                                     'SER007' => 'dos.profile.index',
                                     'SER008' => 'mso.profile.index',
+                                    default => 'employees.index',
                                     };
                                     @endphp
 
@@ -231,12 +227,12 @@
                             <td colspan="5" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-full mb-4">
-                                        <svg class="w-8 h-8 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg class="w-8 h-8 text-zinc-400 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                         </svg>
                                     </div>
                                     <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">No employees found</h3>
-                                    <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">There are currently no employees pending verification.</p>
+                                    <p class="text-sm text-zinc-400 dark:text-zinc-400 mt-1">There are currently no employees pending verification.</p>
                                 </div>
                             </td>
                         </tr>
@@ -252,4 +248,4 @@
         </div>
 
     </x-alerts.layout>
-</section>
+</div>

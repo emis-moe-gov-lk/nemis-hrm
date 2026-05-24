@@ -1,7 +1,7 @@
 <div>
     <!-- Back to Top Button -->
     <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
-        class="fixed bottom-8 right-8 p-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+        class="fixed bottom-8 right-8 p-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
         id="backToTop"
         style="display: none;">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -8,6 +8,17 @@ use App\Traits\Blameable;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
+/**
+ * Class TeacherTransferBoardRecommendation
+ *
+ * @property int $id
+ * @property string $transfer_application_id
+ * @property string|null $transfer_board_id
+ * @property-read \App\Models\TeacherTransferApplication|null $application
+ * @property-read \App\Models\TeacherTransferBoard|null $board
+ * @property-read \App\Models\ZonalEducationOffice|null $selectedZone
+ * @property-read \App\Models\Institution|null $selectedSchool
+ */
 class TeacherTransferBoardRecommendation extends Model
 {
     use HasFactory, Blameable, LogsActivity;
@@ -64,7 +75,7 @@ class TeacherTransferBoardRecommendation extends Model
     public function board()
     {
         return $this->belongsTo(
-            TransferBoard::class,
+            TeacherTransferBoard::class,
             'transfer_board_id',
             'board_id'
         );

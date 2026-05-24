@@ -10,6 +10,24 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * Class Institution
+ *
+ * @property string $workplace_id
+ * @property string|null $census_no
+ * @property int|null $active_status
+ * @property-read \App\Models\ZonalEducationOffice|null $zonalEducationOffice
+ * @property-read \App\Models\DivisionalEducationOffice|null $divisionalEducationOffice
+ * @property-read \App\Models\DistrictsList|null $district
+ * @property-read \App\Models\InstitutionCategory|null $institutionCategory
+ * @property-read \App\Models\InstitutionAuthority|null $authority
+ * @property-read \App\Models\InstitutionLanguages|null $institutionLanguages
+ * @property-read \App\Models\InstitutionGender|null $typeByGender
+ * @property-read \App\Models\InstitutionType|null $institutionType
+ * @property-read \App\Models\GradeSpan|null $gradeSpan
+ * @property-read \App\Models\PoliceStation|null $policeStation
+ * @property-read \App\Models\MohArea|null $mohArea
+ */
 class Institution extends Model
 {
     use HasFactory, LogsActivity, Blameable;

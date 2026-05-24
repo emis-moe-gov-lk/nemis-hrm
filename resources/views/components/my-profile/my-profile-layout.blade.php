@@ -1,143 +1,118 @@
-<div class="max-w-7xl mx-left pb-10 px-0 md:px-4">
-    {{-- 1. Profile Header Section --}}
-    <div class="bg-white dark:bg-gray-900 rounded-2xl border-x border-b border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-        {{-- Cover Photo --}}
-        <div class="h-32 md:h-52 bg-gradient-to-r from-blue-600 to-indigo-600 relative">
-            <div class="absolute inset-0 opacity-100 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+<div class="max-w-7xl mx-auto pb-10 px-4 md:px-6">
+    {{-- 1. Profile Header Section - Premium Redesign --}}
+    <div class="bg-white dark:bg-zinc-900 rounded-4xl border border-slate-300/60 dark:border-zinc-700 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] overflow-hidden">
+        {{-- Cover Photo with multi-layer effect --}}
+        <div class="h-24 md:h-36 bg-indigo-600 relative overflow-hidden">
+            <div class="absolute inset-0 bg-linear-to-br from-indigo-600/90 via-blue-600/80 to-slate-900"></div>
+            <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+            <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-white/10 blur-3xl rounded-full"></div>
+            <div class="absolute -top-24 -left-24 w-64 h-64 bg-indigo-500/20 blur-3xl rounded-full"></div>
         </div>
 
         {{-- Profile Info Area --}}
-        <div class="px-4 md:px-8 pb-2">
-            <div class="relative flex flex-col md:flex-row items-center md:items-end -mt-12 md:-mt-16 mb-4 gap-4">
-                {{-- Profile Image --}}
-                <div class="relative">
-                    @if ($myprofile->gender_id == 'G02')
-                        <img src="{{ asset('images/profile_f.png') }}" alt="Profile" class="w-28 h-28 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-900 shadow-lg object-cover bg-white" />
-                    @else
-                        <img src="{{ asset('images/profile_m.png') }}" alt="Profile" class="w-28 h-28 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-900 shadow-lg object-cover bg-white" />
-                    @endif
-                    <span class="absolute bottom-2 right-2 md:bottom-3 md:right-3 block h-4 w-4 md:h-5 md:w-5 rounded-full border-2 border-white dark:border-gray-900 {{ $myprofile->appointment->is_confirmed ? 'bg-green-500' : 'bg-red-500' }}"></span>
-                </div>
-
-                <div class="flex-1 text-center md:text-left md:mb-4">
-                    <h1 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tighter">
-                        {{ $myprofile->title->title_name }} {{ $myprofile->name_with_initials }}
-                    </h1>
-                    
-                    <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 mt-1">
-                        <p class="text-indigo-600 dark:text-indigo-400 font-bold text-xs md:text-sm uppercase tracking-widest">
-                            {{ $myprofile->currentAppointment->service->service_name }}
-                        </p>
-
-                        <span class="hidden md:block w-1 h-1 bg-slate-300 rounded-full"></span>
-
-                        <p class="text-slate-500 dark:text-slate-400 font-medium text-sm md:text-base flex items-center justify-center md:justify-start gap-1.5">
-                            <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-7h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                            </svg>
-                            {{ $myprofile->currentAppointment->workplace->office()->name ?? 'No Workplace Assigned' }}
-                        </p>
+        <div class="px-6 md:px-12 pb-6">
+            <div class="relative flex flex-col md:flex-row items-center md:items-end -mt-16 md:-mt-20 mb-6 gap-6">
+                {{-- Profile Image with glow --}}
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-linear-to-tr from-indigo-500 to-blue-500 rounded-full blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+                    <div class="relative">
+                        @if ($myprofile->gender_id == 'G02')
+                        <img src="{{ asset('images/profile_f.png') }}" alt="Profile" class="w-32 h-32 md:w-48 md:h-48 rounded-full border-4 border-white dark:border-zinc-900 shadow-2xl object-cover bg-white" />
+                        @else
+                        <img src="{{ asset('images/profile_m.png') }}" alt="Profile" class="w-32 h-32 md:w-48 md:h-48 rounded-full border-4 border-white dark:border-zinc-900 shadow-2xl object-cover bg-white" />
+                        @endif
+                        <span class="absolute bottom-3 right-3 md:bottom-5 md:right-5 block h-5 w-5 md:h-6 md:w-6 rounded-full border-4 border-white dark:border-zinc-900 {{ $myprofile->appointment->is_confirmed ? 'bg-green-500' : 'bg-rose-500' }} shadow-sm"></span>
                     </div>
                 </div>
 
-                {{-- Header Actions with Original Logos --}}
-                <div class="flex gap-2 mb-4 w-full md:w-auto justify-center px-4 md:px-0">
+                <div class="flex-1 text-center md:text-left md:mb-6">
+                    <div class="space-y-1">
+                        <h1 class="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">
+                            {{ $myprofile->title->title_name }} {{ $myprofile->name_with_initials }}
+                        </h1>
+                        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-2">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em]">
+                                {{ $myprofile->currentAppointment?->appointment?->service?->service_name ?? 'Service Not Assigned' }}
+                            </span>
+                            <div class="flex items-center justify-center md:justify-start gap-2 text-slate-500 dark:text-slate-500 font-bold text-sm">
+                                <flux:icon.map-pin variant="micro" class="opacity-50" />
+                                {{ $myprofile->currentAppointment?->workplace?->office_name ?? 'No Workplace Assigned' ?? 'No Workplace Assigned' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Header Actions --}}
+                <div class="flex items-center gap-3 mb-6">
                     @can('my-profile.edit-request.create')
                     <flux:modal.trigger name="edit-profile">
-                        <button class="flex-1 md:flex-none inline-flex justify-center items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 transition shadow-sm">
-                            <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                            </svg>
+                        <flux:button variant="filled" size="sm" class="font-black uppercase tracking-widest text-[10px] px-6 py-2.5 rounded-xl bg-indigo-600 dark:bg-white text-white dark:text-slate-900 hover:bg-indigo-700 transition-all active:scale-95">
                             {{ __('Send Edit Request') }}
-                        </button>
+                        </flux:button>
                     </flux:modal.trigger>
                     @endcan
-                    
+
                     @can('my-profile.pdf.view')
-                    <a href="{{ route('teacher.profile.pdf', $myprofile->id) }}" download class="flex-1 md:flex-none">
-                        <button class="w-full inline-flex justify-center items-center px-4 py-2 bg-blue-600 border border-transparent rounded-lg text-xs md:text-sm font-medium text-white hover:bg-blue-700 transition shadow-sm">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.5l5 5v2m0 0h-5"></path>
-                            </svg>
-                            {{ __('Get Document') }}
-                        </button>
+                    <a href="{{ route('my-profile.pdf') }}" download>
+                        <flux:button variant="ghost" size="sm" icon="cloud-arrow-down" class="rounded-xl border border-slate-300 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all" />
                     </a>
                     @endcan
                 </div>
             </div>
 
-            <hr class="border-gray-200 dark:border-gray-700" />
+            {{-- 2. Modern Navigation Bar - Image Reference Style --}}
+            <div class="border-t border-slate-200 dark:border-zinc-700 px-6 md:px-12 py-3 overflow-x-auto custom-scrollbar">
+                <nav class="flex items-center gap-2">
+                    @php
+                    $navItemClass = "flex items-center gap-2.5 px-6 py-2.5 rounded-2xl text-sm font-black transition-all duration-300 whitespace-nowrap uppercase tracking-widest";
+                    $activeClass = "bg-white dark:bg-zinc-900 text-indigo-600 dark:text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-zinc-700 scale-[1.02]";
+                    $inactiveClass = "text-slate-500 hover:text-slate-600 dark:text-zinc-400 dark:hover:text-zinc-300";
+                    @endphp
 
-            {{-- 2. Horizontal Navigation --}}
-            <div class="w-full mt-2">
-                <nav class="flex justify-between md:justify-start gap-1 md:gap-5 p-1 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
                     {{-- General --}}
-                    <a href="{{ route('my-profile.index', $myprofile->id) }}" wire:navigate 
-                    class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
-                    {{ request()->routeIs('my-profile.index') 
-                            ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
-                            : 'text-gray-500 hover:bg-gray-200/60 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-white' }}">
-                        <flux:icon.user class="w-6 h-6 md:w-5 md:h-5 md:mr-2" />
-                        <span class="hidden md:inline">{{ __('General') }}</span>
+                    <a href="{{ route('my-profile.index', $myprofile->id) }}" wire:navigate
+                        class="{{ $navItemClass }} {{ request()->routeIs('my-profile.index') ? $activeClass : $inactiveClass }}">
+                        <flux:icon.user variant="micro" class="{{ request()->routeIs('my-profile.index') ? 'text-indigo-600' : 'text-slate-500' }}" />
+                        <span>{{ __('General') }}</span>
                     </a>
 
-                    {{-- Qualification --}}
                     @can('my-profile.qualification.view')
-                    <a href="{{ route('my-profile.qualification', $myprofile->id) }}" wire:navigate 
-                    class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
-                    {{ request()->routeIs('my-profile.qualification') 
-                            ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
-                            : 'text-gray-500 hover:bg-gray-200/60 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-white' }}">
-                        <flux:icon.academic-cap class="w-6 h-6 md:w-5 md:h-5 md:mr-2" />
-                        <span class="hidden md:inline">{{ __('Qualification') }}</span>
+                    <a href="{{ route('my-profile.qualification', $myprofile->id) }}" wire:navigate
+                        class="{{ $navItemClass }} {{ request()->routeIs('my-profile.qualification') ? $activeClass : $inactiveClass }}">
+                        <flux:icon.academic-cap variant="micro" class="{{ request()->routeIs('my-profile.qualification') ? 'text-indigo-600' : 'text-slate-500' }}" />
+                        <span>{{ __('Qualification') }}</span>
                     </a>
                     @endcan
 
-                    {{-- Employment --}}
                     @can('my-profile.employment.view')
-                    <a href="{{ route('my-profile.employment', $myprofile->id) }}" wire:navigate 
-                    class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
-                    {{ request()->routeIs('my-profile.employment') 
-                            ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
-                            : 'text-gray-500 hover:bg-gray-200/60 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-white' }}">
-                        <flux:icon.briefcase class="w-6 h-6 md:w-5 md:h-5 md:mr-2" />
-                        <span class="hidden md:inline">{{ __('Employment') }}</span>
+                    <a href="{{ route('my-profile.employment', $myprofile->id) }}" wire:navigate
+                        class="{{ $navItemClass }} {{ request()->routeIs('my-profile.employment') ? $activeClass : $inactiveClass }}">
+                        <flux:icon.briefcase variant="micro" class="{{ request()->routeIs('my-profile.employment') ? 'text-indigo-600' : 'text-slate-500' }}" />
+                        <span>{{ __('Employment') }}</span>
                     </a>
                     @endcan
 
-                    {{-- W&OP --}}
                     @can('my-profile.pension-and-payment.view')
-                    <a href="{{ route('my-profile.pension-and-payment', $myprofile->id) }}" wire:navigate 
-                    class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
-                    {{ request()->routeIs('my-profile.pension-and-payment') 
-                            ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
-                            : 'text-gray-500 hover:bg-gray-200/60 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-white' }}">
-                        <flux:icon.credit-card class="w-6 h-6 md:w-5 md:h-5 md:mr-2" />
-                        <span class="hidden md:inline">{{ __('W&OP') }}</span>
+                    <a href="{{ route('my-profile.pension-and-payment', $myprofile->id) }}" wire:navigate
+                        class="{{ $navItemClass }} {{ request()->routeIs('my-profile.pension-and-payment') ? $activeClass : $inactiveClass }}">
+                        <flux:icon.credit-card variant="micro" class="{{ request()->routeIs('my-profile.pension-and-payment') ? 'text-indigo-600' : 'text-slate-500' }}" />
+                        <span>{{ __('W&OP') }}</span>
                     </a>
                     @endcan
 
-                    {{-- Family --}}
                     @can('my-profile.family.view')
-                    <a href="{{ route('my-profile.family', $myprofile->id) }}" wire:navigate 
-                    class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
-                    {{ request()->routeIs('my-profile.family') 
-                            ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
-                            : 'text-gray-500 hover:bg-gray-200/60 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-white' }}">
-                        <flux:icon.users class="w-6 h-6 md:w-5 md:h-5 md:mr-2" />
-                        <span class="hidden md:inline">{{ __('Family') }}</span>
+                    <a href="{{ route('my-profile.family', $myprofile->id) }}" wire:navigate
+                        class="{{ $navItemClass }} {{ request()->routeIs('my-profile.family') ? $activeClass : $inactiveClass }}">
+                        <flux:icon.users variant="micro" class="{{ request()->routeIs('my-profile.family') ? 'text-indigo-600' : 'text-slate-500' }}" />
+                        <span>{{ __('Family') }}</span>
                     </a>
                     @endcan
 
-                    {{-- Edit Request --}}
                     @can('my-profile.edit-request.view')
-                    <a href="{{ route('my-profile.edit-request', $myprofile->id) }}" wire:navigate 
-                    class="flex flex-1 md:flex-none flex-col md:flex-row items-center justify-center py-2.5 px-3 rounded-lg text-sm font-bold transition-all duration-200 
-                    {{ request()->routeIs('my-profile.edit-request') 
-                            ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' 
-                            : 'text-gray-500 hover:bg-gray-200/60 dark:hover:bg-gray-700/50 hover:text-gray-700 dark:hover:text-white' }}">
-                        <flux:icon.pencil-square class="w-6 h-6 md:w-5 md:h-5 md:mr-2" />
-                        <span class="hidden md:inline text-center">{{ __('Edit Request') }}</span>
+                    <a href="{{ route('my-profile.edit-request', $myprofile->id) }}" wire:navigate
+                        class="{{ $navItemClass }} {{ request()->routeIs('my-profile.edit-request') ? $activeClass : $inactiveClass }}">
+                        <flux:icon.pencil-square variant="micro" class="{{ request()->routeIs('my-profile.edit-request') ? 'text-indigo-600' : 'text-slate-500' }}" />
+                        <span>{{ __('Edit Request') }}</span>
                     </a>
                     @endcan
                 </nav>
@@ -145,89 +120,106 @@
         </div>
     </div>
 
-    {{-- 3. Main Grid --}}
-    <div class="mt-4 md:mt-6 flex flex-col lg:flex-row gap-6 md:px-0">
-        
-        {{-- INTRO SECTION: Top on Mobile (2 columns), Right on Desktop --}}
-        <div class="order-1 lg:order-2 w-full lg:w-[320px] space-y-4">
-            <div class="bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                <h2 class="text-lg font-bold mb-4 dark:text-white">Intro</h2>
-                <div class="grid grid-cols-2 lg:grid-cols-1 gap-y-6 gap-x-4">
-                    <div>
-                        <p class="text-[10px] uppercase font-bold text-gray-400">National ID</p>
-                        <p class="text-sm font-mono font-medium text-gray-900 dark:text-gray-200">{{ $myprofile->nic }}</p>
+    {{-- 3. Main Content Grid --}}
+    <div class="mt-8 flex flex-col lg:flex-row gap-8">
+
+        {{-- SIDEBAR: Info Cards --}}
+        <div class="order-1 lg:order-2 w-full lg:w-[340px] space-y-6">
+            <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-slate-300/60 dark:border-zinc-700 shadow-sm">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="h-8 w-1 bg-indigo-600 rounded-full"></div>
+                    <h2 class="text-lg font-black text-slate-900 dark:text-white tracking-tight">System Info</h2>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="group">
+                        <p class="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1 group-hover:text-indigo-600 transition-colors">National ID</p>
+                        <p class="text-sm font-mono font-bold text-slate-900 dark:text-white bg-slate-50 dark:bg-zinc-800 px-3 py-2 rounded-xl">{{ $myprofile->nic }}</p>
                     </div>
-                    <div>
-                        <p class="text-[10px] uppercase font-bold text-gray-400">Employee ID</p>
-                        <p class="text-sm font-mono font-medium text-gray-900 dark:text-gray-200">{{ $myprofile->people_id }}</p>
+                    <div class="group">
+                        <p class="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1 group-hover:text-indigo-600 transition-colors">Employee ID</p>
+                        <p class="text-sm font-mono font-bold text-slate-900 dark:text-white bg-slate-50 dark:bg-zinc-800 px-3 py-2 rounded-xl">{{ $myprofile->people_id }}</p>
                     </div>
-                    <div>
-                        <p class="text-[10px] uppercase font-bold text-gray-400">W&OP No</p>
-                        <p class="text-sm font-mono font-medium text-gray-900 dark:text-gray-200">{{ $myprofile->appointment->w_op_no ?? 'N/A' }}</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="group">
+                            <p class="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1">W&OP No</p>
+                            <p class="text-xs font-mono font-bold text-slate-700 dark:text-zinc-300">{{ $myprofile->appointment->w_op_no ?? 'N/A' }}</p>
+                        </div>
+                        <div class="group">
+                            <p class="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1">Pay Sheet No</p>
+                            <p class="text-xs font-mono font-bold text-slate-700 dark:text-zinc-300">{{ $myprofile->appointment->pay_sheet_no ?? 'N/A' }}</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-[10px] uppercase font-bold text-gray-400">Pay Sheet No</p>
-                        <p class="text-sm font-mono font-medium text-gray-900 dark:text-gray-200">{{ $myprofile->appointment->pay_sheet_no ?? 'N/A' }}</p>
-                    </div>
+                </div>
+            </div>
+
+            {{-- Quick Links or Status Card --}}
+            <div class="bg-indigo-600 rounded-2xl p-6 text-white overflow-hidden relative group">
+                <flux:icon.sparkles class="absolute -right-4 -top-4 size-24 text-white/10 group-hover:scale-125 transition-transform duration-700" />
+                <h3 class="text-lg font-black tracking-tight mb-2 relative z-10">Profile Status</h3>
+                <p class="text-indigo-100 text-xs font-medium mb-4 relative z-10">Your profile information is verified and up to date.</p>
+                <div class="relative z-10 inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-widest">
+                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                    Live Data
                 </div>
             </div>
         </div>
 
-        {{-- CONTENT AREA --}}
-        <div class="order-2 lg:order-1 flex-1 min-w-0">
-            
+        {{-- MAIN CONTENT AREA --}}
+        <div class="order-2 lg:order-1 flex-1 min-w-0 space-y-6">
+
             {{-- RESTORED: Verify and Confirm Alerts (Original Logic) --}}
             @if (!$myprofile->appointment?->is_confirmed && !$myprofile->appointment?->is_verified)
-                @can('my-profile.profile.verify')
-                <div class="mb-6">
-                    <x-alert type="warning" :dismissible="false">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div class="flex flex-col gap-1">
-                                <span class="font-semibold">Profile Not Verified</span>
-                                <span>This profile has not been verified yet. Please review the details.</span>
-                            </div>
-                            <flux:modal.trigger name="verify-profile">
-                                <button class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium whitespace-nowrap shadow-sm">Verify</button>
-                            </flux:modal.trigger>
+            @can('my-profile.profile.verify')
+            <div class="mb-6">
+                <x-alert type="warning" :dismissible="false">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-semibold">Profile Not Verified</span>
+                            <span>This profile has not been verified yet. Please review the details.</span>
                         </div>
-                    </x-alert>
-                </div>
-                @endcan
+                        <flux:modal.trigger name="verify-profile">
+                            <button class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium whitespace-nowrap shadow-sm">Verify</button>
+                        </flux:modal.trigger>
+                    </div>
+                </x-alert>
+            </div>
+            @endcan
             @elseif(!$myprofile->appointment?->is_confirmed && $myprofile->appointment?->is_verified)
-                @can('my-profile.profile.confirm')
-                <div class="mb-6">
-                    <x-alert type="warning" :dismissible="false">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div class="flex flex-col gap-1">
-                                <span class="font-semibold">Profile Not Confirmed</span>
-                                <span>This profile has not been confirmed yet. Please review the details.</span>
-                            </div>
-                            <flux:modal.trigger name="confirm-profile">
-                                <button class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium whitespace-nowrap shadow-sm">Confirm</button>
-                            </flux:modal.trigger>
+            @can('my-profile.profile.confirm')
+            <div class="mb-6">
+                <x-alert type="warning" :dismissible="false">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-semibold">Profile Not Confirmed</span>
+                            <span>This profile has not been confirmed yet. Please review the details.</span>
                         </div>
-                    </x-alert>
-                </div>
-                @endcan
+                        <flux:modal.trigger name="confirm-profile">
+                            <button class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium whitespace-nowrap shadow-sm">Confirm</button>
+                        </flux:modal.trigger>
+                    </div>
+                </x-alert>
+            </div>
+            @endcan
             @endif
 
             {{-- Pending Edit Request Alert --}}
             @if ($myprofile->profileEditRequests->where('status', 1)->isNotEmpty())
-                @can('my-profile.profile.edit-request.response')
-                <div class="mb-6">
-                    <x-alert type="info" :dismissible="false">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div class="flex flex-col gap-1">
-                                <span class="font-semibold">Profile Edit Request Pending</span>
-                                <span>You have a pending profile edit request. Please wait for approval.</span>
-                            </div>
-                            <flux:modal.trigger name="edit-profile-request-response">
-                                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap shadow-sm">Response</button>
-                            </flux:modal.trigger>
+            @can('my-profile.profile.edit-request.response')
+            <div class="mb-6">
+                <x-alert type="info" :dismissible="false">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-semibold">Profile Edit Request Pending</span>
+                            <span>You have a pending profile edit request. Please wait for approval.</span>
                         </div>
-                    </x-alert>
-                </div>
-                @endcan
+                        <flux:modal.trigger name="edit-profile-request-response">
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap shadow-sm">Response</button>
+                        </flux:modal.trigger>
+                    </div>
+                </x-alert>
+            </div>
+            @endcan
             @endif
 
             {{-- Original Session Messages --}}
@@ -239,7 +231,7 @@
             </div>
 
             {{-- SLOT --}}
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-3 shadow-sm">
+            <div class="min-w-0">
                 {{ $slot }}
             </div>
         </div>

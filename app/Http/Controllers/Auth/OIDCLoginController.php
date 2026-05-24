@@ -4,11 +4,15 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\Auth\MfaManager;
+use App\Services\Auth\TrustedDeviceService;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use App\Services\OIDCProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class OIDCLoginController extends Controller
 {
@@ -29,61 +33,73 @@ class OIDCLoginController extends Controller
      * Handle callback from OIDC provider.
      */
     public function handleProviderCallback(Request $request)
-{
-    try {
-        // Create the OIDC provider instance
-        $provider = Socialite::buildProvider(
-            OIDCProvider::class,
-            config('services.oidc')
-        );
+    {
+        try {
+            $provider = Socialite::buildProvider(
+                OIDCProvider::class,
+                config('services.oidc')
+            );
 
-        // Attempt to retrieve the user via OIDC
-        $oidcUser = $provider->user();
+            $oidcUser = $provider->user();
+            $idToken = $oidcUser->token ?? $oidcUser->id_token ?? null;
+            $user = User::where('email', $oidcUser->getEmail())->first();
 
-        // Retrieve ID token if available
-        $idToken = $oidcUser->token ?? $oidcUser->id_token ?? null;
+            if (! $user) {
+                Log::warning('OIDC login attempt for unknown email: '.$oidcUser->getEmail());
 
-        // Find user by email
-        $user = User::where('email', $oidcUser->getEmail())->first();
+                return redirect()
+                    ->route('login')
+                    ->with('error', 'No account found for this email. Please contact the admin.');
+            }
 
-        if (!$user) {
-            // Optionally log for debugging
-            Log::warning('OIDC login attempt for unknown email: ' . $oidcUser->getEmail());
+            $requiresMfa = config('mfa.enabled', true)
+                && ! app(TrustedDeviceService::class)->validForUser($request, $user);
+
+            if ($requiresMfa) {
+                $mfaManager = app(MfaManager::class);
+                $availableMethods = $mfaManager->enabledMethods($user)->pluck('method')->values()->all();
+                $preferredMethod = $mfaManager->preferredMethod($user);
+
+                Session::put('auth.mfa.pending', [
+                    'challenge_id' => (string) Str::uuid(),
+                    'user_id' => $user->id,
+                    'remember' => true,
+                    'available_methods' => $availableMethods,
+                    'current_method' => $preferredMethod->method,
+                    'sent_methods' => [],
+                    'initiated_at' => now()->toIso8601String(),
+                ]);
+            } else {
+                Auth::login($user, remember: true);
+                $request->session()->regenerate();
+            }
+
+            session()->put('oidc_user', [
+                'id' => $oidcUser->getId(),
+                'name' => $oidcUser->getName(),
+                'email' => $oidcUser->getEmail(),
+                'avatar' => $oidcUser->getAvatar(),
+                'user_info' => $oidcUser->user,
+            ]);
+
+            if ($idToken) {
+                session()->put('oidc_id_token', $idToken);
+            }
+
+            return $requiresMfa
+                ? redirect()->route('mfa.challenge')
+                : redirect()->intended(route('dashboard'));
+        } catch (\Throwable $e) {
+            Log::error('OIDC Authentication failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 
             return redirect()
                 ->route('login')
-                ->with('error', 'No account found for this email. Please contact the admin.');
+                ->with('error', 'Authentication failed: '.$e->getMessage());
         }
-
-        // Log the user in (remember = true)
-        Auth::login($user, remember: true);
-
-        // Store OIDC session data
-        session()->put('oidc_user', [
-            'id' => $oidcUser->getId(),
-            'name' => $oidcUser->getName(),
-            'email' => $oidcUser->getEmail(),
-            'avatar' => $oidcUser->getAvatar(),
-            'user_info' => $oidcUser->user,
-        ]);
-
-        if ($idToken) {
-            session()->put('oidc_id_token', $idToken);
-        }
-
-        return redirect()->intended(route('dashboard'));
-    } catch (\Throwable $e) {
-        // Use Laravel 12's modern exception handling features
-        Log::error('OIDC Authentication failed', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-        ]);
-
-        return redirect()
-            ->route('login')
-            ->with('error', 'Authentication failed: ' . $e->getMessage());
     }
-}
 
     /**
      * Logout and redirect to OIDC endsession.

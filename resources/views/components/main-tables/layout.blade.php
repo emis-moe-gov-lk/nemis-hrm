@@ -1,17 +1,19 @@
 <div class="space-y-8 px-2 py-8 max-w-7xl mx-left">
     {{-- Header --}}
-    <div class="flex items-center justify-between px-6">
-        <div>
-            <flux:heading size="xl" level="1" class="!font-black tracking-tight">{{ __('System Master Data') }}</flux:heading>
-            <flux:subheading>{{ __('Central repository for all system lookup tables and configurations.') }}</flux:subheading>
-        </div>
-    </div>
+    <x-page-header
+        title="System Master Data"
+        subtitle="Central repository for all system lookup tables and configurations."
+        icon="square-3-stack-3d"
+        :breadcrumbs="[
+            'System Master Data' => route('main-tables.overview')
+        ]"
+    />
 
     {{-- The Mega Navigation Grid --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         
         {{-- 1. Administrative & Geography (7 Tables) --}}
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-5 shadow-sm">
+        <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-4xl p-5 shadow-sm">
             <div class="flex items-center gap-2 mb-4 px-2">
                 <flux:icon.map-pin variant="micro" class="text-indigo-600" />
                 <h3 class="text-xs font-black uppercase tracking-widest text-slate-500">{{ __('Geography & Admin') }}</h3>
@@ -28,7 +30,7 @@
         </div>
 
         {{-- 2. Institutional Framework (8 Tables) --}}
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-5 shadow-sm">
+        <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-4xl p-5 shadow-sm">
             <div class="flex items-center gap-2 mb-4 px-2">
                 <flux:icon.building-library variant="micro" class="text-indigo-600" />
                 <h3 class="text-xs font-black uppercase tracking-widest text-slate-500">{{ __('Institutions') }}</h3>
@@ -46,7 +48,7 @@
         </div>
 
         {{-- 3. Human Resources & Services (8 Tables) --}}
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-5 shadow-sm">
+        <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-4xl p-5 shadow-sm">
             <div class="flex items-center gap-2 mb-4 px-2">
                 <flux:icon.identification variant="micro" class="text-indigo-600" />
                 <h3 class="text-xs font-black uppercase tracking-widest text-slate-500">{{ __('Staff & Services') }}</h3>
@@ -58,13 +60,14 @@
                 <flux:navlist.item :href="route('main-tables.occupations-lists')" :current="request()->routeIs('main-tables.occupations-lists')" wire:navigate>{{ __('Occupations') }}</flux:navlist.item>
                 <flux:navlist.item :href="route('main-tables.sleas-categories')" :current="request()->routeIs('main-tables.sleas-categories')" wire:navigate>{{ __('SLEAS Cat.') }}</flux:navlist.item>
                 <flux:navlist.item :href="route('main-tables.teacher-categories')" :current="request()->routeIs('main-tables.teacher-categories')" wire:navigate>{{ __('Teacher Cat.') }}</flux:navlist.item>
+                <flux:navlist.item :href="route('main-tables.transfer-categories')" :current="request()->routeIs('main-tables.transfer-categories')" wire:navigate>{{ __('Transfer Cat.') }}</flux:navlist.item>
                 <flux:navlist.item :href="route('main-tables.teacher-types')" :current="request()->routeIs('main-tables.teacher-types')" wire:navigate>{{ __('Teacher Types') }}</flux:navlist.item>
                 <flux:navlist.item :href="route('main-tables.principal-recruitment-categories')" :current="request()->routeIs('main-tables.principal-recruitment-categories')" wire:navigate>{{ __('Principal Rec.') }}</flux:navlist.item>
             </div>
         </div>
 
         {{-- 4. Academic & Curriculum (7 Tables) --}}
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-5 shadow-sm">
+        <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-4xl p-5 shadow-sm">
             <div class="flex items-center gap-2 mb-4 px-2">
                 <flux:icon.academic-cap variant="micro" class="text-indigo-600" />
                 <h3 class="text-xs font-black uppercase tracking-widest text-slate-500">{{ __('Academic') }}</h3>
@@ -81,7 +84,7 @@
         </div>
 
         {{-- 5. Demographics (5 Tables) --}}
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-5 shadow-sm">
+        <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-4xl p-5 shadow-sm">
             <div class="flex items-center gap-2 mb-4 px-2">
                 <flux:icon.user-circle variant="micro" class="text-indigo-600" />
                 <h3 class="text-xs font-black uppercase tracking-widest text-slate-500">{{ __('Demographics') }}</h3>
@@ -97,7 +100,7 @@
         </div>
 
         {{-- 6. System & Governance (4 Tables) --}}
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-5 shadow-sm">
+        <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-4xl p-5 shadow-sm">
             <div class="flex items-center gap-2 mb-4 px-2">
                 <flux:icon.adjustments-horizontal variant="micro" class="text-indigo-600" />
                 <h3 class="text-xs font-black uppercase tracking-widest text-slate-500">{{ __('System & Logs') }}</h3>
@@ -111,7 +114,7 @@
     </div>
 
     {{-- The Active Data View --}}
-    <main class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[3rem] p-8 shadow-xl min-h-[60vh] transition-all duration-300">
+    <main class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[3rem] p-8 shadow-xl min-h-[60vh] transition-all duration-300">
         {{ $slot }}
     </main>
 </div>

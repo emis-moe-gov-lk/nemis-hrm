@@ -53,7 +53,11 @@ class DmsApprovedCadre extends Component
 
         $this->circular = CadreCirculars::active()->first();
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority);
+        if ($this->circular) {
+            $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority);
+        } else {
+            $this->rows = [];
+        }
 
         $this->provinceOption = ProvincialEducationOffice::active()->get();
     }
@@ -68,7 +72,9 @@ class DmsApprovedCadre extends Component
 
         $this->zonalOption = ZonalEducationOffice::where('peo_wp_id',  $this->province)->get();
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, null, null, $this->province);
+        if ($this->circular) {
+            $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, null, null, $this->province);
+        }
     }
 
     public function updatedZonal($value)
@@ -81,7 +87,9 @@ class DmsApprovedCadre extends Component
 
         $this->divisionOption = DivisionalEducationOffice::where('zeo_wp_id',  $this->zonal)->get();
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, null, $this->zonal);
+        if ($this->circular) {
+            $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, null, $this->zonal);
+        }
     }
 
     public function updatedDivision($value)
@@ -94,7 +102,9 @@ class DmsApprovedCadre extends Component
 
         $this->institutionOption = Institution::where('deo_wp_id', $this->division)->where('authority_id', $this->authority)->get();
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, $this->division);
+        if ($this->circular) {
+            $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, $this->division);
+        }
     }
 
     public function updatedInstitution($value)
@@ -103,7 +113,9 @@ class DmsApprovedCadre extends Component
             $this->institution = null;
         }
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, $this->institution);
+        if ($this->circular) {
+            $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, $this->institution);
+        }
     }
 
     public function downloadPdf()

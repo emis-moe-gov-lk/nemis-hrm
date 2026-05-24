@@ -36,12 +36,12 @@
             {{-- Change Log Bento Grid --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 lg:px-0">
                 @forelse ($changelogs as $key => $data)
-                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-1.5 flex flex-col">
+                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-1.5 flex flex-col">
                         
                         {{-- Top Row: Version & Type --}}
                         <div class="flex justify-between items-start mb-6">
-                            <div class="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                                <span class="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-tighter">
+                            <div class="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700">
+                                <span class="text-xs font-black text-slate-600 dark:text-slate-500 uppercase tracking-tighter">
                                     {{ $data->version_id }}
                                 </span>
                             </div>
@@ -69,7 +69,7 @@
                                     {{ $data->title }}
                                 </flux:heading>
                                 <div class="mt-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-transparent group-hover:border-emerald-100 dark:group-hover:border-emerald-900/30 transition-colors duration-300">
-                                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4">
+                                    <p class="text-sm text-slate-600 dark:text-slate-500 leading-relaxed line-clamp-4">
                                         {{ $data->description }}
                                     </p>
                                 </div>
@@ -97,7 +97,7 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-20 bg-slate-50/50 dark:bg-slate-800/10 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-center">
+                    <div class="col-span-full py-20 bg-slate-50/50 dark:bg-slate-800/10 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center text-center">
                         <div class="w-20 h-20 bg-emerald-50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center mb-6 text-emerald-500">
                             <flux:icon.document-text size="xl" />
                         </div>
@@ -160,7 +160,7 @@
                         <flux:textarea label="Detailed Description" wire:model.live="description" class="!rounded-xl shadow-sm" rows="4" placeholder="Describe what was changed and why..." />
                     </flux:field>
 
-                    <div class="flex flex-col-reverse md:flex-row gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    <div class="flex flex-col-reverse md:flex-row gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
                         <flux:modal.close class="flex-1">
                             <flux:button variant="ghost" class="w-full !rounded-xl">{{ __('Cancel') }}</flux:button>
                         </flux:modal.close>
@@ -217,7 +217,7 @@
                         <flux:textarea label="Detailed Description" wire:model.live="updateDescription" class="!rounded-xl shadow-sm" rows="4" />
                     </flux:field>
 
-                    <div class="flex flex-col-reverse md:flex-row gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    <div class="flex flex-col-reverse md:flex-row gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
                         <flux:modal.close class="flex-1">
                             <flux:button variant="ghost" class="w-full !rounded-xl">{{ __('Discard') }}</flux:button>
                         </flux:modal.close>

@@ -84,12 +84,12 @@ return new class extends Migration
                     'teacher_transfer_applications',
                     'tta_app_cat_fk',
                     'transfer_category',
-                    'transfer_categories',
+                    'teacher_transfer_categories',
                     'transfer_category_id'
                 )) {
                 $table->foreign('transfer_category', 'tta_app_cat_fk')
                     ->references('transfer_category_id')
-                    ->on('transfer_categories');
+                    ->on('teacher_transfer_categories');
             }
 
             if (Schema::hasColumn('teacher_transfer_applications', 'created_by')
@@ -154,7 +154,7 @@ return new class extends Migration
                 'teacher_transfer_applications',
                 'tta_app_cat_fk',
                 'transfer_category',
-                'transfer_categories',
+                'teacher_transfer_categories',
                 'transfer_category_id'
             );
 
@@ -163,7 +163,7 @@ return new class extends Migration
                 'teacher_transfer_applications',
                 'teacher_transfer_applications_transfer_category_foreign',
                 'transfer_category',
-                'transfer_categories',
+                'teacher_transfer_categories',
                 'transfer_category_id'
             );
 

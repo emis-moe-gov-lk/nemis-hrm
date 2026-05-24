@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('employee_id', 12)->unique();
             $table->date('appoint_date');
             $table->string('appointment_letter_no')->nullable()->comment('Appointment letter number');
-            $table->char('service_id', 20)->index()->comment('e.g., POS001, POS002, get from position table');
             $table->char('rank_id', 20)->index()->comment('e.g., RANK001, RANK002, get from rank table');
             $table->char('office_level_id', 10)->index()->comment('e.g., OFF001, OFF002');
             $table->string('position_id', 10)->index()->comment('e.g., POS001, POS002, get from position table');
@@ -26,14 +25,8 @@ return new class extends Migration
             $table->string('updated_by', 12)->nullable();
             $table->timestamps();
 
-            $table->index(
-                ['service_id', 'workplace_id', 'employee_id'],
-                'idx_eca_service_workplace_employee'
-            );
-
             $table->foreign('appointment_id')->references('appointment_id')->on('employer_appointments')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('employee_id')->references('people_id')->on('people')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('service_id')->references('service_id')->on('services')->onDelete('restrict')->onUpdate('cascade');
             $table->foreign('rank_id')->references('rank_id')->on('service_ranks')->onDelete('restrict')->onUpdate('cascade');
             $table->foreign('office_level_id')->references('office_level_id')->on('office_levels')->onDelete('restrict')->onUpdate('cascade');
             $table->foreign('position_id')->references('position_id')->on('positions')->onDelete('restrict')->onUpdate('cascade');

@@ -56,7 +56,7 @@ return new class extends Migration
 
             $table->foreign('policy_id', 'tta_policy_fk')
                 ->references('policy_id')
-                ->on('transfer_policies');
+                ->on('teacher_transfer_policies');
 
             $table->foreign('created_by', 'tta_created_fk')
                 ->references('people_id')

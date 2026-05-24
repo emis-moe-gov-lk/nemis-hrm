@@ -9,7 +9,7 @@
                         {{ __('Religion Settings') }}
                     </flux:heading>
                     <flux:subheading size="lg" class="flex items-center gap-2">
-                        <flux:icon.heart variant="micro" class="text-slate-400" />
+                        <flux:icon.heart variant="micro" class="text-slate-500" />
                         {{ __('Define religious affiliations used across the platform') }}
                     </flux:subheading>
                 </div>
@@ -36,11 +36,11 @@
             {{-- COMPACT CARD GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 @forelse ($religion as $key => $data)
-                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:border-indigo-500/30 transition-all duration-300">
+                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:border-indigo-500/30 transition-all duration-300">
                         
                         <div class="flex justify-between items-start">
                             <div class="flex flex-col">
-                                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 leading-none mb-1">
                                     {{ $data->religion_id }}
                                 </span>
                                 <h3 class="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight group-hover:text-indigo-600 transition-colors">
@@ -53,7 +53,7 @@
                                 
                                 <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <flux:modal.trigger wire:click="editReligion({{ $data->id }})" name="edit-religion">
-                                        <flux:button size="xs" variant="ghost" icon="pencil-square" class="!rounded-lg text-slate-400 hover:text-indigo-600" />
+                                        <flux:button size="xs" variant="ghost" icon="pencil-square" class="!rounded-lg text-slate-500 hover:text-indigo-600" />
                                     </flux:modal.trigger>
                                     
                                     <flux:button 
@@ -69,9 +69,9 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-16 text-center bg-slate-50/50 dark:bg-slate-900/50 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-16 text-center bg-slate-50/50 dark:bg-slate-900/50 rounded-[2.5rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <flux:icon.heart size="xl" class="mx-auto text-slate-200 mb-4" />
-                        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest">{{ __('No Records Found') }}</h3>
+                        <h3 class="text-sm font-black text-slate-500 uppercase tracking-widest">{{ __('No Records Found') }}</h3>
                     </div>
                 @endforelse
             </div>

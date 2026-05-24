@@ -7,18 +7,27 @@ use App\Models\People;
 use Livewire\Component;
 use App\Models\EducationQualification;
 use App\Models\PeopleEducationQualification;
+use App\Http\Controllers\PeopleEduQualificationsController;
+use Illuminate\Http\Request;
 
 class EducationalQualification extends Component
 {
-    public $peopleId;
-    public $canCreate;
-    public $canDelete;
-    public $employee;
+    public string $peopleId;
+    public bool $canCreate = false;
+    public bool $canDelete = false;
+    public People $employee;
 
-    public $educationQualificationList = [];
-    public $gradeOption;
+    public array $educationQualificationList = [];
+    public array $gradeOption = [];
 
-    public $qualification, $institution, $effectiveDate, $grade, $description;
+    public ?string $qualification = null;
+    public ?string $institution = null;
+    public ?string $effectiveDate = null;
+    public ?string $grade = null;
+    public ?string $description = null;
+
+    public bool $showDeleteModal = false;
+    public ?string $qualificationIdToDelete = null;
 
     // -------------------------
     // Validation Rules
@@ -37,36 +46,28 @@ class EducationalQualification extends Component
     // -------------------------
     // Live Validation on Field Update
     // -------------------------
-    public function updated($propertyName)
+    public function updated(string $propertyName)
     {
         $this->validateOnly($propertyName);
     }
 
-    public $showModal = false; // control modal visibility
+    public bool $showModal = false; // control modal visibility
 
-    public function mount($peopleId)
+    public function mount(string $peopleId)
     {
         $this->employee = People::where('people_id', $peopleId)->firstOrFail();
         //$this->canCreate = $canCreate;
         //$this->canDelete = $canDelete;
 
-        $this->educationQualificationList = EducationQualification::Active()->get();
+        $this->educationQualificationList = EducationQualification::Active()->get()->all();
 
         // Static grade options
-        $this->gradeOption = EducationalQualificationGrade::Active()->pluck('grade', 'grade_id');
+        $this->gradeOption = EducationalQualificationGrade::Active()->pluck('grade', 'grade_id')->all();
     }
 
     public function save()
     {
-        $this->validate([
-            'qualification' => 'required',
-            'institution' => 'required|string|max:255',
-            'effectiveDate' => 'required|date',
-            'grade' => 'required',
-            'description' => 'nullable|string|max:500',
-        ]);
-
-        PeopleEducationQualification::create([
+        $request = new Request([
             'people_id' => $this->employee->people_id,
             'qualifications_id' => $this->qualification,
             'institution' => $this->institution,
@@ -75,28 +76,61 @@ class EducationalQualification extends Component
             'description' => $this->description,
         ]);
 
-        // Reset form fields
-        $this->reset(['qualification', 'institution', 'effectiveDate', 'grade', 'description']);
+        $controller = new PeopleEduQualificationsController();
+        $response = $controller->createQualification($request);
+        $result = $response->getData();
 
-        // Close modal
-        $this->showModal = false;
-
-        session()->flash('success', 'Qualification updated successfully!');
-    }
-
-    public function delete($id)
-    {
-        // Optional: confirm record exists
-        $record = PeopleEducationQualification::find($id);
-
-        if ($record) {
-            $record->delete();
-            session()->flash('success', 'Qualification deleted successfully.');
+        if ($result->status === 'success') {
+            session()->flash('success', $result->message ?? 'Qualification added successfully.');
+            // Reset form fields
+            $this->reset(['qualification', 'institution', 'effectiveDate', 'grade', 'description']);
+            // Close modal
+            $this->showModal = false;
         } else {
-            session()->flash('error', 'Record not found.');
+            if ($result->status === 'validation_error') {
+                foreach ($result->errors as $field => $messages) {
+                    $propertyMap = [
+                        'qualifications_id' => 'qualification',
+                        'institution' => 'institution',
+                        'effective_date' => 'effectiveDate',
+                        'grade' => 'grade',
+                        'description' => 'description',
+                    ];
+                    $propertyName = $propertyMap[$field] ?? $field;
+                    $this->addError($propertyName, $messages[0]);
+                }
+            } else {
+                session()->flash('error', $result->message ?? 'An error occurred.');
+            }
         }
     }
-    
+
+    public function confirmDelete(string $id)
+    {
+        $this->qualificationIdToDelete = $id;
+        $this->showDeleteModal = true;
+    }
+
+    public function delete()
+    {
+        if (!$this->qualificationIdToDelete) return;
+
+        $request = new Request(['id' => $this->qualificationIdToDelete]);
+
+        $controller = new PeopleEduQualificationsController();
+        $response = $controller->deleteQualification($request);
+        $result = $response->getData();
+
+        if ($result->status === 'success') {
+            session()->flash('success', $result->message ?? 'Qualification deleted successfully.');
+        } else {
+            session()->flash('error', $result->message ?? 'An error occurred.');
+        }
+
+        $this->showDeleteModal = false;
+        $this->qualificationIdToDelete = null;
+    }
+
     public function render()
     {
         $qualificationList = PeopleEducationQualification::where('active_status', '1')->where('people_id', $this->employee->people_id)->get();

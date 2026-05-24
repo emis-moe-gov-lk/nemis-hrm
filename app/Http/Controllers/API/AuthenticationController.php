@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 use App\Models\User;
 use Carbon\Carbon;
 
@@ -20,7 +21,7 @@ class AuthenticationController extends Controller
         $request->validate([
             'name'     => 'required|string|min:4',
             'email'    => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
+            'password' => ['required', 'string', PasswordRule::defaults()],
         ]);
 
         try {
@@ -58,7 +59,8 @@ class AuthenticationController extends Controller
         ]);
 
         try {
-            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            if (Auth::attempt(['email' => $request->email, 'password' => $request->password, 'active_status' => 1])) {
+                $request->session()->regenerate();
                 $user        = Auth::user();
                 $accessToken = $user->createToken('authToken')->plainTextToken;
 

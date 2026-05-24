@@ -64,7 +64,7 @@ class SuperAdminSeeder extends Seeder
                 'name'          => $person->name_with_initials,
                 'email'         => 'superadmin@example.com',
                 'contact'       => '0712345678',
-                'password'      => Hash::make('password@*'),
+                'password'      => Hash::make('Password@123'),
                 'active_status' => '1',
             ]
         );
@@ -93,7 +93,6 @@ class SuperAdminSeeder extends Seeder
             [
                 'appointment_id' => $appointment->appointment_id,
                 'appoint_date'   => $appointment->first_appointment_date,
-                'service_id'     => $appointment->service_id,
                 'rank_id'        => $appointment->rank_id,
                 'office_level_id' => $appointment->office_level_id,
                 'position_id'    => $appointment->position_id,

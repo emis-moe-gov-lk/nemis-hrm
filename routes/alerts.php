@@ -15,7 +15,8 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::get('alerts/overview', AlertsOverview::class)
-    ->name('alerts.overview');
+    ->name('alerts.overview')
+    ->middleware(['permission:alerts.overview.view']);
 
     /*
     |--------------------------------------------------------------------------

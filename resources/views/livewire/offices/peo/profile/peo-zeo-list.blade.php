@@ -1,14 +1,14 @@
 <section class="w-full">
-    {{-- Page Header --}}
-    <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">{{ __('Provincial Department of Education') }}</flux:heading>
-        <flux:subheading size="lg" class="mb-6">
-            {{ __('Statistics about provincial education structure and staff distribution.') }}
-        </flux:subheading>
-        <flux:separator variant="subtle" />
-    </div>
-
     <x-offices.peo.peo-layout :officeId="$officeId">
+
+        {{-- Page Header --}}
+        <div class="relative mb-6 w-full">
+            <flux:heading size="xl" level="1">{{ __('Zonal Education Offices') }}</flux:heading>
+            <flux:subheading size="lg" class="mb-6">
+                {{ __('List of Zonal Education Offices under the selected Provincial Department of Education.') }}
+            </flux:subheading>
+            <flux:separator variant="subtle" />
+        </div>
 
         {{-- Table --}}
         <div class="space-y-2">
@@ -21,7 +21,7 @@
                         <h3 class="font-semibold text-gray-900">{{ $zeoName }}</h3>
                         <p class="text-sm text-gray-500 mt-1">{{ count($services) }} services • {{ number_format(array_sum($services)) }} total</p>
                     </div>
-                    <svg class="w-4 h-4 text-gray-500 flex-shrink-0 ml-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-gray-500 shrink-0 ml-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
@@ -71,4 +71,3 @@
 
 
     </x-offices.peo.peo-layout>
-</section>

@@ -4,51 +4,49 @@ namespace App\Livewire\Employees;
 
 use Exception;
 use App\Models\People;
-use App\Models\Service;
 use Livewire\Component;
 use App\Models\Position;
 use App\Models\Workplaces;
 use App\Models\Institution;
 use App\Models\OfficeLevel;
 use App\Models\ServiceRank;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 use App\Models\InstitutionCategory;
 use App\Models\ZonalEducationOffice;
+use App\Http\Controllers\PeopleEmploymentController;
 
 class AppointmentCurrentStatus extends Component
 {
-    public $peopleId;
-    public $canEdit;
-    public $employee;
+    // Identity
+    public string $peopleId;
+    public bool $canEdit = false;
+    public ?People $employee = null;
 
-    // Form fields
-    public $appointmentDate;
-    public $appointmentLetterNo;
-    public $service;
-    public $serviceRank;
-    public $position;
-    public $officeLevel;
-    public $zonalEducationOffice;
-    public $institutionCategory;
-    public $workingPlace;
+    // Form fields (Typed for PHP 8.x)
+    public ?string $appointmentDate = null;
+    public ?string $appointmentLetterNo = null;
+    public ?string $serviceRank = null;
+    public ?string $position = null;
+    public ?string $officeLevel = null;
+    public ?string $zonalEducationOffice = null;
+    public ?string $institutionCategory = null;
+    public ?string $workingPlace = null;
 
-    // Dropdown options (always collections)
-    public $userServicesOptions;
-    public $ranksOptions;
-    public $positionOption;
-    public $officeLevelOption;
-    public $zonalEducationOfficeOption;
-    public $institutionCategoryOption;
-    public $workingPlaceOption;
+    // Dropdown options (Typed as Collections)
+    public Collection $ranksOptions;
+    public Collection $positionOption;
+    public Collection $officeLevelOption;
+    public Collection $zonalEducationOfficeOption;
+    public Collection $institutionCategoryOption;
+    public Collection $workingPlaceOption;
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'appointmentDate'      => ['required', 'date'],
-            'appointmentLetterNo'  => ['nullable', 'string'],
-            'service'              => ['required', 'exists:services,service_id'],
+            'appointmentLetterNo'  => ['nullable', 'string', 'max:255'],
             'serviceRank'          => ['required', 'exists:service_ranks,rank_id'],
-            'position'             => ['nullable', 'exists:positions,position_id'],
+            'position'             => ['required', 'exists:positions,position_id'],
             'officeLevel'          => ['required', 'exists:office_levels,office_level_id'],
             'zonalEducationOffice' => ['nullable', 'exists:workplaces,workplace_id'],
             'institutionCategory'  => ['nullable', 'exists:institution_categories,institution_category_id'],
@@ -56,55 +54,48 @@ class AppointmentCurrentStatus extends Component
         ];
     }
 
-    // Live validation per-field
-    public function updated($property)
+    public function updated(string $property): void
     {
         $this->validateOnly($property);
     }
 
     /**
-     * MOUNT → Load initial data + current appointment information
+     * Load initial state
      */
-    public function mount()
+    public function mount(): void
     {
-        // $this->peopleId = $peopleId;
-        // $this->canEdit = $canEdit;
-
-        // initialize collections to avoid null issues
-        $this->userServicesOptions = collect();
-        $this->ranksOptions = collect();
-        $this->positionOption = collect();
-        $this->officeLevelOption = collect();
-        $this->zonalEducationOfficeOption = collect();
-        $this->institutionCategoryOption = collect();
-        $this->workingPlaceOption = collect();
+        $this->initializeCollections();
 
         try {
-            $this->employee = People::with('currentAppointment')->where('people_id', $this->peopleId)->first();
+            $this->employee = People::with(['currentAppointment', 'appointment'])->where('people_id', $this->peopleId)->first();
 
-            // Dropdowns (always load even if employee missing)
-            $this->userServicesOptions = Service::all();
+            if (!$this->employee) {
+                return;
+            }
+
+            // Load static options
             $this->officeLevelOption = OfficeLevel::all();
             $this->zonalEducationOfficeOption = ZonalEducationOffice::all();
             $this->institutionCategoryOption = InstitutionCategory::all();
 
-            // if appointment present, load values
-            if ($this->employee && $this->employee->currentAppointment) {
+            if ($this->employee->currentAppointment) {
                 $a = $this->employee->currentAppointment;
+                $mainApp = $this->employee->appointment;
 
-                $this->appointmentDate     = optional($a->appoint_date)->format('Y-m-d');
+                $this->appointmentDate     = $a->appoint_date?->format('Y-m-d');
                 $this->appointmentLetterNo = $a->appointment_letter_no;
-                $this->service             = $a->service_id;
                 $this->serviceRank         = $a->rank_id;
                 $this->position            = $a->position_id;
                 $this->officeLevel         = $a->office_level_id;
                 $this->workingPlace        = $a->workplace_id;
 
-                // Load ranks for the service
-                $this->ranksOptions = ServiceRank::where('service_id', $this->service)->get();
-                $this->positionOption = Position::where('service_id', $this->service)->get();
+                // Load dynamic options based on primary appointment service branch
+                if ($mainApp) {
+                    $this->ranksOptions = ServiceRank::where('service_id', $mainApp->service_id)->get();
+                    $this->positionOption = Position::where('service_id', $mainApp->service_id)->get();
+                }
 
-                // If institution (school), set ZEO + category for initial filtering
+                // Restore context if assigned to a school
                 if ($a->office_level_id === 'OLID006') {
                     $inst = Institution::where('workplace_id', $a->workplace_id)->first();
                     if ($inst) {
@@ -113,224 +104,114 @@ class AppointmentCurrentStatus extends Component
                     }
                 }
             } else {
-                // defaults when there is no appointment
                 $this->appointmentDate = now()->format('Y-m-d');
-                $this->service = null;
-                $this->serviceRank = null;
-                $this->position = null;
-                $this->officeLevel = null;
-                $this->zonalEducationOffice = null;
-                $this->institutionCategory = null;
-                $this->workingPlace = null;
+                $this->appointmentLetterNo = '';
             }
 
-            // Finally load working places based on restored state
             $this->loadWorkingPlaces();
         } catch (Exception $e) {
-            // Fail gracefully
-            session()->flash('error', 'Failed to load appointment data: ' . $e->getMessage());
-            // Keep collections safe
-            $this->userServicesOptions = $this->userServicesOptions ?? collect();
-            $this->ranksOptions = $this->ranksOptions ?? collect();
-            $this->officeLevelOption = $this->officeLevelOption ?? collect();
-            $this->zonalEducationOfficeOption = $this->zonalEducationOfficeOption ?? collect();
-            $this->institutionCategoryOption = $this->institutionCategoryOption ?? collect();
-            $this->workingPlaceOption = $this->workingPlaceOption ?? collect();
+            session()->flash('error', 'Failed to load employment status: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Update service -> refresh ranks list
-     */
-    public function updatedService($value)
+    private function initializeCollections(): void
     {
-        $this->ranksOptions = ServiceRank::where('service_id', $value)->get();
-        $this->positionOption = Position::where('service_id', $value)->get();
-        $this->position = null;
-        $this->serviceRank = null;
+        $this->ranksOptions = collect();
+        $this->positionOption = collect();
+        $this->officeLevelOption = collect();
+        $this->zonalEducationOfficeOption = collect();
+        $this->institutionCategoryOption = collect();
+        $this->workingPlaceOption = collect();
     }
 
     /**
-     * When office level changes
+     * Office Level change -> reset dependent fields
      */
-    public function updatedOfficeLevel($value)
+    public function updatedOfficeLevel(): void
     {
-        // reset dependent fields and options
         $this->zonalEducationOffice = null;
         $this->institutionCategory = null;
         $this->workingPlace = null;
-        $this->workingPlaceOption = collect();
-
-        if ($value === 'OLID006') {
-            // institutions will be loaded by loadWorkingPlaces when ZEO + category are available
-            $this->workingPlaceOption = collect();
-        } else {
-            // normal workplaces
-            $this->workingPlaceOption = Workplaces::where('office_level_id', $value)->get();
-        }
-    }
-
-    /**
-     * ZEO changed -> Filter schools by zone + category
-     */
-    public function updatedZonalEducationOffice($value)
-    {
-        // clear previous workingPlace selection
-        $this->workingPlace = null;
-
-        // loadWorkingPlaces will only populate if both required filters exist for OLID006
         $this->loadWorkingPlaces();
     }
 
-    /**
-     * Category changed -> Filter schools by category + zone
-     */
-    public function updatedInstitutionCategory($value)
+    public function updatedZonalEducationOffice(): void
+    {
+        $this->workingPlace = null;
+        $this->loadWorkingPlaces();
+    }
+
+    public function updatedInstitutionCategory(): void
     {
         $this->workingPlace = null;
         $this->loadWorkingPlaces();
     }
 
     /**
-     * Load workplace options depending on office level, ZEO and category
+     * Dynamic workplace loading
      */
-    private function loadWorkingPlaces()
+    private function loadWorkingPlaces(): void
     {
-        // Ensure workingPlaceOption always a collection
         $this->workingPlaceOption = collect();
 
-        // If officeLevel not set yet, nothing to load
-        if (empty($this->officeLevel)) {
-            return;
-        }
+        if (empty($this->officeLevel)) return;
 
-        // Non-institutional levels: load workplaces by office level
         if ($this->officeLevel !== 'OLID006') {
             $this->workingPlaceOption = Workplaces::where('office_level_id', $this->officeLevel)
-                //->orderBy('office_name') // if column exists; otherwise remove
-                ->get();
+                ->get()
+                ->sortBy(fn($w) => $w->office_name)
+                ->values();
             return;
         }
 
-        // For institutions (OLID006) we require both ZEO and category to be present
-        if (empty($this->zonalEducationOffice) || empty($this->institutionCategory)) {
-            // Do not clear previously-loaded options in this case — keep empty collection
-            return;
+        // For schools (OLID006), require Zone + Category
+        if ($this->zonalEducationOffice && $this->institutionCategory) {
+            $this->workingPlaceOption = Workplaces::where('office_level_id', 'OLID006')
+                ->whereHas('institution', function ($q) {
+                    $q->where('zeo_wp_id', $this->zonalEducationOffice)
+                        ->where('institution_category_id', $this->institutionCategory);
+                })
+                ->get()
+                ->sortBy(fn($w) => $w->institution?->name)
+                ->values();
         }
-
-        // Load filtered institution workplaces
-        $this->workingPlaceOption = Workplaces::where('office_level_id', 'OLID006')
-            ->whereHas('institution', function ($q) {
-                $q->where('zeo_wp_id', $this->zonalEducationOffice)
-                  ->where('institution_category_id', $this->institutionCategory);
-            })
-            ->with(['institution' => function ($q) {
-                $q->orderBy('name', 'asc');
-            }])
-            ->get()
-            ->sortBy(fn($w) => optional($w->institution)->name)
-            ->values();
     }
 
     /**
-     * Save -> Update current job data with error handling
+     * Unified Save via Controller
      */
     public function save()
     {
         $this->validate();
 
-        if (! $this->employee || ! $this->employee->currentAppointment) {
-            session()->flash('error', 'No current appointment found for this person.');
-            return;
-        }
-
-        $appointment = $this->employee->currentAppointment;
-
-        DB::beginTransaction();
         try {
-            $appointment->update([
-                'appoint_date'          => $this->appointmentDate,
+            $controller = new PeopleEmploymentController();
+            $controller->updateCurrentStatusOfAppointment([
+                'appointment_id' => $this->employee->currentAppointment->appointment_id,
+                'appointment_date' => $this->appointmentDate,
                 'appointment_letter_no' => $this->appointmentLetterNo,
-                'service_id'            => $this->service,
-                'rank_id'               => $this->serviceRank,
-                'position_id'           => $this->position,
-                'office_level_id'       => $this->officeLevel,
-                'workplace_id'          => $this->workingPlace,
+                'rank_id' => $this->serviceRank,
+                'office_level_id' => $this->officeLevel,
+                'position_id' => $this->position,
+                'workplace_id' => $this->workingPlace,
             ]);
 
-            DB::commit();
-
-            session()->flash('success', 'Current employment updated successfully.');
+            session()->flash('success', 'Employment status updated successfully.');
             $this->dispatch('close-modal', name: 'current-employment-edit');
 
-            // Optionally refresh internal state
-            $this->mount();
-
-            // navigate back
             return $this->redirect(url()->previous(), navigate: true);
         } catch (Exception $e) {
-            DB::rollBack();
-            // log if you have logger, else session
-            session()->flash('error', 'Failed to update current employment: ' . $e->getMessage());
+            session()->flash('error', 'Update failed: ' . $e->getMessage());
         }
+    }
+
+    public function resetFields(): void
+    {
+        $this->mount();
     }
 
     public function render()
     {
         return view('livewire.employees.appointment-current-status');
-    }
-
-    /**
-     * Reset all fields to the initial values of the DB appointment (works reliably)
-     */
-    public function resetFields()
-    {
-        // Reload from DB and reapply the same logic as mount but minimal
-        $this->employee = People::with('currentAppointment')->where('people_id', $this->peopleId)->first();
-
-        if (! $this->employee || ! $this->employee->currentAppointment) {
-            // safe fallback - clear form
-            $this->appointmentDate = now()->format('Y-m-d');
-            $this->appointmentLetterNo = null;
-            $this->service = null;
-            $this->serviceRank = null;
-            $this->position = null;
-            $this->officeLevel = null;
-            $this->zonalEducationOffice = null;
-            $this->institutionCategory = null;
-            $this->workingPlace = null;
-            $this->workingPlaceOption = collect();
-            return;
-        }
-
-        $a = $this->employee->currentAppointment;
-
-        // Restore primary fields first
-        $this->appointmentDate     = optional($a->appoint_date)->format('Y-m-d');
-        $this->appointmentLetterNo = $a->appointment_letter_no;
-        $this->service             = $a->service_id;
-        $this->serviceRank         = $a->rank_id;
-        $this->position            = $a->position_id;
-        $this->officeLevel         = $a->office_level_id;
-        $this->workingPlace        = $a->workplace_id;
-
-        // restore ranks
-        $this->ranksOptions = ServiceRank::where('service_id', $this->service)->get();
-        $this->positionOption = Position::where('service_id', $this->service)->get();
-
-        // If institution, set ZEO and category BEFORE loading workplaces
-        if ($this->officeLevel === 'OLID006') {
-            $inst = Institution::where('workplace_id', $a->workplace_id)->first();
-            $this->zonalEducationOffice = $inst?->zeo_wp_id;
-            $this->institutionCategory  = $inst?->institution_category_id;
-
-            // Only after both are set, load workplaces
-            $this->loadWorkingPlaces();
-        } else {
-            // Non-institution level: load workplaces directly
-            $this->zonalEducationOffice = null;
-            $this->institutionCategory  = null;
-            $this->workingPlaceOption = Workplaces::where('office_level_id', $this->officeLevel)->get();
-        }
     }
 }

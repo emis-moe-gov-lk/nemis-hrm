@@ -5,6 +5,7 @@ namespace App\Livewire\Institutions\Profile;
 use Livewire\Component;
 use App\Models\Institution;
 use App\Models\EmployerCurrentAppointment;
+use Illuminate\Support\Facades\DB;
 
 class InstitutionsOverview extends Component
 {
@@ -20,14 +21,19 @@ class InstitutionsOverview extends Component
         // Fetch institution (existing logic)
         $institution = Institution::find($this->id);
 
-        // Placeholder random student count (replace later with actual relationship)
-        $this->studentCount = 0;
+        // Fetch real student count from admissions
+        $this->studentCount = \App\Models\InstitutionStudentAdmission::whereHas('class.grade', function($query) {
+            $query->where('institution_id', $this->id)
+                  ->where('academic_year', date('Y'));
+        })
+        ->where('academic_year', date('Y'))
+        ->sum(DB::raw('male_count + female_count'));
 
         // Count staff linked to this institution
         $this->staffCount = EmployerCurrentAppointment::where('workplace_id', $institution->workplace_id)->count();
 
         // Placeholder parent count (less than students)
-        $this->parentCount = 0;
+        $this->parentCount = (int)($this->studentCount * 0.85); // Estimated for now
     }
 
     public function render()

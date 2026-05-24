@@ -18,8 +18,8 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['policy_id', 'criteria_key'], 'tpsr_policy_criteria_unique');
-            $table->foreign('policy_id')->references('policy_id')->on('transfer_policies')->cascadeOnDelete();
-            $table->foreign('criteria_key')->references('criteria_key')->on('transfer_score_criteria')->cascadeOnDelete();
+            $table->foreign('policy_id')->references('policy_id')->on('teacher_transfer_policies')->cascadeOnDelete();
+            $table->foreign('criteria_key')->references('criteria_key')->on('teacher_transfer_score_criteria')->cascadeOnDelete();
         });
     }
 

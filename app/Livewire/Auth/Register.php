@@ -2,17 +2,21 @@
 
 namespace App\Livewire\Auth;
 
+use App\Services\Auth\MfaManager;
+use App\Services\Auth\TurnstileVerificationService;
 use App\Models\User;
 use App\Models\People;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Illuminate\Validation\Rules;
 use App\Rules\UniqueHashedNicUser;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Auth\Events\Registered;
 use App\Helpers\NicHelper;
+use Illuminate\Validation\ValidationException;
 
 #[Layout('components.layouts.auth')]
 class Register extends Component
@@ -23,6 +27,7 @@ class Register extends Component
     public string $contact = '';
     public string $password = '';
     public string $password_confirmation = '';
+    public string $turnstileToken = '';
 
     public function register(): void
     {
@@ -35,6 +40,12 @@ class Register extends Component
             'contact' => ['required', 'regex:/^[0-9]{10}$/', 'unique:users'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
+
+        if (! app(TurnstileVerificationService::class)->verify($this->turnstileToken, request()->ip())) {
+            throw ValidationException::withMessages([
+                'turnstile' => 'Captcha verification failed. Please try again.',
+            ]);
+        }
 
         // Check if NIC exists in people table
         $person = People::where('nic_hash', NicHelper::hash($validated['nic']))->first();
@@ -75,8 +86,31 @@ class Register extends Component
         ]);
 
         event(new Registered($user));
-        Auth::login($user);
 
-        $this->redirect(route('dashboard', absolute: false), navigate: true);
+        $mfaManager = app(MfaManager::class);
+
+        if (! $mfaManager->requiresMfa($user)) {
+            Auth::login($user);
+            Session::regenerate();
+
+            $this->redirect(route('dashboard', absolute: false), navigate: true);
+
+            return;
+        }
+
+        $availableMethods = $mfaManager->enabledMethods($user)->pluck('method')->values()->all();
+        $preferredMethod = $mfaManager->preferredMethod($user);
+
+        Session::put('auth.mfa.pending', [
+            'challenge_id' => (string) Str::uuid(),
+            'user_id' => $user->id,
+            'remember' => false,
+            'available_methods' => $availableMethods,
+            'current_method' => $preferredMethod->method,
+            'sent_methods' => [],
+            'initiated_at' => now()->toIso8601String(),
+        ]);
+
+        $this->redirectRoute('mfa.challenge', navigate: true);
     }
 }

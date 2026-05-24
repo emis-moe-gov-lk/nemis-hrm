@@ -36,12 +36,14 @@ class PrincipalList extends Component
 
         $allowedWorkplaceIds = $workplace->getAllChildWorkplaces();
 
-        // base query: restrict to principal in allowed workplaces
+        // base query: restrict to principals in allowed workplaces
         $peopleQuery = People::query()
             ->active()
+            ->whereHas('appointment', function ($q) {
+                $q->where('service_id', 'SER004');
+            })
             ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds) {
-                $q->where('service_id', 'SER004')
-                    ->whereIn('workplace_id', $allowedWorkplaceIds)
+                $q->whereIn('workplace_id', $allowedWorkplaceIds)
                     ->whereHas('workplace.institution', function ($instQ) {
                         $instQ->where('authority_id', 'AUID01');
                     });
@@ -87,6 +89,7 @@ class PrincipalList extends Component
 
         // Main principal query
         $employees = People::with([
+            'appointment.service',
             'currentAppointment.workplace',
             'currentAppointment.position',
             'currentAppointment.rank',
@@ -98,9 +101,11 @@ class PrincipalList extends Component
             'currentAppointment.workplace.divisional',
             'currentAppointment.workplace.institution',
         ])
+            ->whereHas('appointment', function ($q) {
+                $q->where('service_id', 'SER004');       // principals
+            })
             ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds) {
-                $q->where('service_id', 'SER004')       // principals
-                    ->whereIn('workplace_id', $allowedWorkplaceIds)
+                $q->whereIn('workplace_id', $allowedWorkplaceIds)
                     ->whereHas('workplace.institution', function ($instQ) {
                         $instQ->where('authority_id', 'AUID01');
                     });

@@ -10,7 +10,7 @@
                         {{ __('Institution Categories') }}
                     </flux:heading>
                     <flux:subheading size="lg" class="flex items-center gap-2">
-                        <flux:icon.rectangle-group variant="micro" class="text-slate-400" />
+                        <flux:icon.rectangle-group variant="micro" class="text-slate-500" />
                         {{ __('Define types and functional groupings for all system entities') }}
                     </flux:subheading>
                 </div>
@@ -37,11 +37,11 @@
             {{-- CARD GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 @forelse ($inscategories as $key => $data)
-                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 hover:shadow-2xl hover:shadow-emerald-500/10 hover:border-emerald-500/30 transition-all duration-500">
+                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 hover:shadow-2xl hover:shadow-emerald-500/10 hover:border-emerald-500/30 transition-all duration-500">
                         
                         {{-- Card Header: ID & Status --}}
                         <div class="flex justify-between items-start mb-4">
-                            <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full border border-slate-200 dark:border-slate-700">
+                            <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 rounded-full border border-slate-300 dark:border-slate-700">
                                 {{ $data->institution_category_id }}
                             </span>
                             
@@ -65,19 +65,19 @@
                             <h3 class="text-lg font-black text-slate-900 dark:text-white leading-tight uppercase tracking-tight group-hover:text-emerald-600 transition-colors">
                                 {{ $data->institution_category_name }}
                             </h3>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-3 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
+                            <p class="text-sm text-slate-500 dark:text-slate-500 mt-3 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
                                 {{ $data->description }}
                             </p>
                         </div>
 
                         {{-- Card Footer --}}
-                        <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-700">
                             <div class="flex items-center gap-3">
                                 <div class="flex shrink-0 w-10 h-10 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 transition-colors group-hover:bg-emerald-600 group-hover:text-white">
                                     <flux:icon.tag variant="micro" />
                                 </div>
                                 <div>
-                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">Classification</p>
+                                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-tighter leading-none mb-1">Classification</p>
                                     <p class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-tight">
                                         System Category
                                     </p>
@@ -87,7 +87,7 @@
 
                         {{-- Hover Action Bar --}}
                         <div class="absolute inset-x-0 -bottom-2 flex justify-center opacity-0 group-hover:opacity-100 group-hover:bottom-4 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto">
-                            <div class="flex items-center gap-1 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 p-1.5 rounded-2xl shadow-xl">
+                            <div class="flex items-center gap-1 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-300 dark:border-slate-700 p-1.5 rounded-2xl shadow-xl">
                                 <flux:modal.trigger wire:click="editInsCategory({{ $data->id }})" name="edit-ins-category">
                                     <flux:button size="sm" variant="ghost" icon="pencil-square" class="!rounded-xl hover:!bg-emerald-50 hover:!text-emerald-600 transition-colors" />
                                 </flux:modal.trigger>
@@ -106,9 +106,9 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-24 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-24 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <flux:icon.magnifying-glass size="xl" class="text-slate-300 mb-4" />
-                        <p class="text-slate-400 font-black uppercase tracking-widest text-sm italic">{{ __('No Categories Found') }}</p>
+                        <p class="text-slate-500 font-black uppercase tracking-widest text-sm italic">{{ __('No Categories Found') }}</p>
                     </div>
                 @endforelse
             </div>

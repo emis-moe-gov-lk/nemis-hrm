@@ -7,7 +7,8 @@ use App\Models\TeacherTransferApplication;
 use App\Models\TeacherTransferAppeals;
 use App\Models\TeacherTransferApplicationRecommendation;
 use App\Models\TeacherTransferRecommendationList;
-use App\Models\TransferPolicyStep;
+use App\Models\TeacherTransferPolicyStep;
+use App\Support\Transfer\TransferAccess;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -39,7 +40,7 @@ class TeacherTransferApplicationView extends Component
             'preferences.institution.institution',
             'preferences.zonalOffice.zonal',
             'currentWorkplace.officeLevel',
-            'category',
+            'category.transferSubCategory',
             'teacher.teacherCategory',
             'teacher.teacherType',
             'teacher.medium',
@@ -69,18 +70,12 @@ class TeacherTransferApplicationView extends Component
                 ->get();
         }
 
-        // Security check: only the applicant, or users at the current step's office level can view
-        // In a real app, this should be more robust with permissions
-        // For now, allowing viewing if it is the applicant or if they belong to the correct office level
-        $userWorkplace = Auth::user()->workplace;
-        $isApplicant = Auth::user()->people_id === $this->application->employee_id;
-        $isStepAuthorized = $userWorkplace && $currentStep && $userWorkplace->office_level_id === $currentStep->office_level_id;
-
-        if (!$isApplicant && !$isStepAuthorized) {
-            // abort(403, 'Unauthorized access to this application.');
+        if (!TransferAccess::canViewTeacherTransferApplication(Auth::user(), $this->application)) {
+            abort(403, 'Unauthorized access to this application.');
         }
 
         // Pre-load existing recommendation if any
+        $userWorkplace = Auth::user()->workplace;
         if ($userWorkplace) {
             $existingRec = TeacherTransferApplicationRecommendation::where('transfer_application_id', $this->application->transfer_application_id)
                 ->where('workplace_id', $userWorkplace->workplace_id)
@@ -138,7 +133,7 @@ class TeacherTransferApplicationView extends Component
     public function submitRecommendation()
     {
         if (!$this->canRecommend) {
-            $this->dispatch('notify', ['type' => 'error', 'message' => 'You are not authorized to recommend at this stage.']);
+            $this->dispatch('notify', ['type' => 'error', 'message' => 'You are not authorized to approve this transfer at this stage.']);
             return;
         }
 
@@ -150,6 +145,7 @@ class TeacherTransferApplicationView extends Component
         $currentStep = $this->application->policy->steps
             ->where('step_order', $this->application->current_step)
             ->first();
+        $isInstitutionApproval = $currentStep?->office_level_id === 'OLID006';
 
         $decision = TeacherTransferRecommendationList::where('transfer_recommendation_list_id', $this->recommendationDecision)->firstOrFail();
 
@@ -165,12 +161,22 @@ class TeacherTransferApplicationView extends Component
                     'approved_by' => Auth::user()->people_id,
                     'transfer_recommendation_list_id' => $this->recommendationDecision,
                     'remarks' => $this->recommendationRemarks,
+                    'recommendation_status' => true,
                     'active_status' => true,
                 ]
             );
 
-            // Handle rejection
-            if (Str::contains(strtolower($decision->decision), 'reject')) {
+            // Handle rejection/release refusal.
+            $decisionText = str_replace(["'", "\xE2\x80\x99"], '', strtolower($decision->decision));
+            $isRejectedDecision = Str::contains($decisionText, [
+                'reject',
+                'cannot be released',
+                'cant be released',
+                'can t be released',
+                'not recommended',
+            ]);
+
+            if ($isRejectedDecision) {
                 $this->application->update(['status' => 'rejected']);
             } else {
                 // Advance step
@@ -192,8 +198,13 @@ class TeacherTransferApplicationView extends Component
             DB::commit();
 
             $this->showRecommendationModal = false;
-            $this->dispatch('notify', ['type' => 'success', 'message' => 'Recommendation submitted successfully.']);
-            $this->redirect(route('transfer.teacher-transfer-request'));
+            $this->dispatch('notify', [
+                'type' => 'success',
+                'message' => $isInstitutionApproval
+                    ? 'Institution approval submitted successfully.'
+                    : 'Recommendation submitted successfully.',
+            ]);
+            $this->redirect(TransferAccess::recommendationRedirectRoute(Auth::user()));
         } catch (\Exception $e) {
             DB::rollBack();
             $this->dispatch('notify', ['type' => 'error', 'message' => 'Error: ' . $e->getMessage()]);
@@ -208,14 +219,25 @@ class TeacherTransferApplicationView extends Component
             'submitted' => ['color' => 'indigo', 'label' => 'Submitted'],
             'processing' => ['color' => 'amber', 'label' => 'Processing'],
             'approved' => ['color' => 'emerald', 'label' => 'Approved'],
-            'rejected' => ['color' => 'rose', 'label' => 'Rejected'],
+            'rejected' => ['color' => 'rose', 'label' => 'Not Recomended'],
             default => ['color' => 'slate', 'label' => ucfirst($status)],
         };
     }
 
     public function openRecommendationModal()
     {
+        if (!$this->canRecommend) {
+            $this->dispatch('notify', ['type' => 'error', 'message' => 'You are not authorized to approve this transfer at this stage.']);
+
+            return;
+        }
+
         $this->showRecommendationModal = true;
+    }
+
+    public function closeRecommendationModal(): void
+    {
+        $this->showRecommendationModal = false;
     }
 
     public function getCanSubmitAppealProperty(): bool
@@ -338,7 +360,7 @@ class TeacherTransferApplicationView extends Component
             'preferences.institution.institution',
             'preferences.zonalOffice.zonal',
             'currentWorkplace.officeLevel',
-            'category',
+            'category.transferSubCategory',
             'teacher.teacherCategory',
             'teacher.teacherType',
             'teacher.medium',

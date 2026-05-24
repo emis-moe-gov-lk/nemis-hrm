@@ -5,6 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class TeacherCategory
+ *
+ * @property string $categories_id
+ */
 class TeacherCategory extends Model
 {
     use HasFactory;

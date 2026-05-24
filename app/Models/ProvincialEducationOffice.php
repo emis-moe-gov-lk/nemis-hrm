@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Class ProvincialEducationOffice
+ *
+ * @property string $provincial_education_office_id
+ */
 class ProvincialEducationOffice extends Model
 {
     use HasFactory;

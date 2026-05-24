@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\TransferScoreCriterion;
+use App\Models\TeacherTransferScoreCriterion;
 use Illuminate\Database\Seeder;
 
 class TransferScoreCriteriaSeeder extends Seeder
@@ -19,7 +19,7 @@ class TransferScoreCriteriaSeeder extends Seeder
         ];
 
         foreach ($criteria as $index => [$id, $key, $name, $description]) {
-            TransferScoreCriterion::updateOrCreate(
+            TeacherTransferScoreCriterion::updateOrCreate(
                 ['criteria_key' => $key],
                 [
                     'criteria_id' => $id,

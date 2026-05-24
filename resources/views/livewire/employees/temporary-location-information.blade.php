@@ -1,102 +1,103 @@
-<div>
+<div class="space-y-8">
     <section>
-        {{-- Header matching your unified design --}}
-        <div class="flex items-center justify-between mb-5 px-1">
+        {{-- Section Header --}}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
-                <h2 class="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">Temporary Location</h2>
-                <p class="text-sm text-gray-500">Current residential address</p>
+                <h2 class="text-base font-black tracking-widest text-slate-700 dark:text-zinc-200 uppercase">Temporary Location</h2>
+                <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-[0.2em] mt-0.5">Current Residential Records</p>
             </div>
             @if($canEdit)
                 <flux:modal.trigger name="edit-temporary-location-info">
-                    <flux:button variant="ghost" icon="pencil-square" class="rounded-full">
+                    <flux:button variant="ghost" size="sm" class="rounded-xl border border-slate-300 dark:border-zinc-700 font-bold text-xs px-5 text-slate-600 dark:text-zinc-300 hover:border-teal-400 hover:text-teal-600 transition-all w-fit">
                         Edit Details
                     </flux:button>
                 </flux:modal.trigger>
             @endif
         </div>
 
-        <div class="space-y-4">
-            {{-- Map Logic Fallback for Temporary Address --}}
-            @php
-                // Check if at least the first line of the address exists
-                $hasTemporaryAddress = !empty($employee->t_address_line1);
+        {{-- Map Logic --}}
+        @php
+            $hasTemporaryAddress = !empty($employee->t_address_line1);
+            if ($hasTemporaryAddress) {
+                $tAddressString = implode(', ', array_filter([
+                    $employee->t_address_line1,
+                    $employee->t_address_line2,
+                    $employee->t_address_line3,
+                    $employee->t_postal_code
+                ]));
+                $tMapUrl = "https://www.google.com/maps/search/?api=1&query=" . urlencode($tAddressString);
+            } else {
+                $tMapUrl = null;
+            }
+        @endphp
 
-                if ($hasTemporaryAddress) {
-                    $tAddressString = implode(', ', array_filter([
-                        $employee->t_address_line1,
-                        $employee->t_address_line2,
-                        $employee->t_address_line3,
-                        $employee->t_postal_code
-                    ]));
-                    $tMapUrl = "https://www.google.com/maps/search/?api=1&query=" . urlencode($tAddressString);
-                } else {
-                    $tMapUrl = "javascript:void(0)"; // Prevents page jump or refresh
-                }
-            @endphp
+        {{-- Data Table --}}
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-700 overflow-hidden">
 
-            {{-- Secondary Address Card (Linked to Map) --}}
-            <a href="{{ $tMapUrl }}" target="_blank" 
-               class="block bg-gradient-to-br from-white to-teal-50/30 dark:from-gray-800 dark:to-teal-900/10 p-5 rounded-2xl border border-teal-100 dark:border-gray-700 shadow-sm transition-all hover:shadow-md hover:border-teal-300 group">
-                <div class="flex items-start gap-4">
-                    <div class="p-3 bg-teal-100 dark:bg-teal-900/40 rounded-xl group-hover:scale-105 transition-transform">
-                        <flux:icon.home-modern class="size-6 text-teal-600 dark:text-teal-400" />
+            {{-- Address --}}
+            <div class="flex flex-col sm:flex-row sm:items-start border-b border-dashed border-slate-300 dark:border-zinc-700 px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors gap-1 sm:gap-0">
+                <span class="w-full sm:w-48 sm:shrink-0 text-[11px] font-black text-slate-500 dark:text-zinc-400 uppercase tracking-widest sm:pt-0.5">Residential Address</span>
+                @if($hasTemporaryAddress)
+                    <div>
+                        <p class="text-sm font-semibold text-slate-800 dark:text-zinc-100 leading-relaxed">
+                            {{ $employee->t_address_line1 }}
+                            @if($employee->t_address_line2), {{ $employee->t_address_line2 }}@endif
+                            @if($employee->t_address_line3), {{ $employee->t_address_line3 }}@endif
+                        </p>
+                        <a href="{{ $tMapUrl }}" target="_blank" class="mt-1.5 inline-flex items-center gap-1 text-[10px] font-black text-teal-500 hover:text-teal-700 uppercase tracking-widest transition-colors">
+                            <flux:icon.map-pin variant="micro" class="size-3" />
+                            View on Map
+                        </a>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Residential Address</p>
-                            <flux:icon.arrow-top-right-on-square class="size-3 text-teal-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </div>
-                        
-                        @if($employee->t_address_line1)
-                            <div class="mt-1 text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 leading-relaxed">
-                                {{ $employee->t_address_line1 }}<br>
-                                @if ($employee->t_address_line2) {{ $employee->t_address_line2 }}<br> @endif
-                                @if ($employee->t_address_line3) {{ $employee->t_address_line3 }}<br> @endif
-                                <span class="text-teal-600 dark:text-teal-400 font-bold uppercase text-xs">{{ $employee->t_postal_code }}</span>
-                            </div>
-                        @else
-                            <p class="mt-1 text-sm italic text-gray-400">No temporary address provided.</p>
-                        @endif
-                    </div>
-                </div>
-            </a>
-
-            {{-- Helpful Note --}}
-            <div class="px-4 py-2 bg-gray-50 dark:bg-gray-900/40 rounded-xl border border-gray-100 dark:border-gray-800">
-                <p class="text-[10px] text-gray-500 text-center uppercase tracking-tighter">
-                    Only provide details if different from your <span class="font-bold">Permanent Location</span>.
-                </p>
+                @else
+                    <span class="text-sm text-slate-500 dark:text-zinc-400 italic">No temporary address on record</span>
+                @endif
             </div>
+
+            {{-- Postal Code --}}
+            <div class="flex flex-col sm:flex-row sm:items-center px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors gap-1 sm:gap-0">
+                <span class="w-full sm:w-48 sm:shrink-0 text-[11px] font-black text-slate-500 dark:text-zinc-400 uppercase tracking-widest">Postal Code</span>
+                <span class="text-sm font-mono font-semibold text-slate-800 dark:text-zinc-100">{{ $employee->t_postal_code ?? '—' }}</span>
+            </div>
+
+        </div>
+
+        {{-- Note --}}
+        <div class="flex items-center gap-2 mt-4 px-1">
+            <flux:icon.light-bulb variant="micro" class="size-3.5 text-amber-500 shrink-0" />
+            <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-widest">
+                Only required if different from your <span class="text-slate-600 dark:text-slate-300">Permanent Location</span> records.
+            </p>
         </div>
     </section>
 
     {{-- Edit Modal --}}
     @if($canEdit)
-        <flux:modal wire:model="showModalTemporaryLocationInfo" name="edit-temporary-location-info" class="md:w-130">
-            <div class="space-y-6">
+        <flux:modal wire:model="showModalTemporaryLocationInfo" name="edit-temporary-location-info" class="md:w-150">
+            <div class="space-y-8">
                 <div>
-                    <flux:heading size="lg" badge="Temporary">Residential Update</flux:heading>
-                    <flux:text class="mt-1 text-sm text-gray-500">Update your current living address if you are working away from home.</flux:text>
+                    <h3 class="text-sm font-black tracking-widest text-slate-900 dark:text-white uppercase">Update Residence</h3>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mt-0.5">Temporary residential details</p>
                 </div>
 
-                <form wire:submit.prevent="editTemporaryLocationInfo" class="space-y-4">
-                    <flux:input label="Address Line 1" wire:model.live="tAddressLine1" placeholder="Building / Street" />
-                    <flux:input label="Address Line 2" wire:model.live="tAddressLine2" placeholder="Locality" />
+                <form wire:submit.prevent="editTemporaryLocationInfo" class="space-y-6">
+                    <flux:input label="Address Line 1" wire:model.live="tAddressLine1" placeholder="Building / Street" class="font-bold" />
+                    <flux:input label="Address Line 2" wire:model.live="tAddressLine2" placeholder="Locality" class="font-bold" />
 
-                    <div class="flex gap-4">
-                        <div class="flex-[2]">
-                            <flux:input label="Address Line 3" wire:model.live="tAddressLine3" placeholder="City" />
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-2">
+                            <flux:input label="Address Line 3" wire:model.live="tAddressLine3" placeholder="City" class="font-bold" />
                         </div>
-                        <div class="flex-1">
-                            <flux:input label="Postal Code" wire:model.live="tPostalCode" placeholder="Zip" />
-                        </div>
+                        <flux:input label="Postal Code" wire:model.live="tPostalCode" placeholder="Zip" class="font-bold" />
                     </div>
 
-                    <div class="flex gap-3 pt-4">
+                    <div class="flex gap-4 pt-4">
                         <flux:modal.close>
-                            <flux:button variant="ghost" class="flex-1">Cancel</flux:button>
+                            <flux:button variant="ghost" class="flex-1 font-bold rounded-xl h-12">Cancel</flux:button>
                         </flux:modal.close>
-                        <flux:button type="submit" variant="primary" class="flex-1 shadow-lg shadow-teal-500/20">Save changes</flux:button>
+                        <flux:button type="submit" variant="primary" class="flex-1 font-black rounded-xl h-12 bg-indigo-600 dark:bg-white text-white dark:text-slate-900 hover:scale-[1.02] active:scale-95 transition-all">
+                            Save Changes
+                        </flux:button>
                     </div>
                 </form>
             </div>

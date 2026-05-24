@@ -122,7 +122,7 @@
     <div class="header-info">
         <h2>{{ __('Institution Cadre Summary') }}</h2>
         <p>
-            <strong>Circular:</strong> {{ $circular->circular_no }} ({{ $circular->issued_date }}) | 
+            <strong>Circular:</strong> {{ $circular->circular_no ?? 'N/A' }} ({{ $circular->issued_date ?? 'N/A' }}) | 
             <strong>Authority:</strong> National School
         </p>
     </div>

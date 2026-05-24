@@ -43,7 +43,9 @@ class MoeDmsCadreSummary extends Component
 
         $this->circular = CadreCirculars::active()->first();
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId);
+        $this->rows = $this->circular
+            ? CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId)
+            : [];
 
         $this->authorityOption = Authority::active()->get();
         $this->provinceOption = ProvincialEducationOffice::active()->get();
@@ -56,7 +58,9 @@ class MoeDmsCadreSummary extends Component
         }
         $this->reset(['institution', 'division', 'zonal', 'province']);
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority);
+        $this->rows = $this->circular
+            ? CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority)
+            : [];
     }
 
     public function updatedProvince($value)
@@ -69,7 +73,9 @@ class MoeDmsCadreSummary extends Component
 
         $this->zonalOption = ZonalEducationOffice::where('peo_wp_id',  $this->province)->get();
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, null, null, $this->province);
+        $this->rows = $this->circular
+            ? CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, null, null, $this->province)
+            : [];
     }
 
     public function updatedZonal($value)
@@ -82,7 +88,9 @@ class MoeDmsCadreSummary extends Component
 
         $this->divisionOption = DivisionalEducationOffice::where('zeo_wp_id',  $this->zonal)->get();
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, null, $this->zonal);
+        $this->rows = $this->circular
+            ? CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, null, $this->zonal)
+            : [];
     }
 
     public function updatedDivision($value)
@@ -95,7 +103,9 @@ class MoeDmsCadreSummary extends Component
 
         $this->institutionOption = Institution::where('deo_wp_id', $this->division)->get();
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, $this->division);
+        $this->rows = $this->circular
+            ? CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, null, $this->division)
+            : [];
     }
 
     public function updatedInstitution($value)
@@ -104,7 +114,9 @@ class MoeDmsCadreSummary extends Component
             $this->institution = null;
         }
         
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, $this->institution);
+        $this->rows = $this->circular
+            ? CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, $this->institution)
+            : [];
     }
 
     public function render()

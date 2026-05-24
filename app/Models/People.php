@@ -13,6 +13,32 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * Class People
+ *
+ * @property string $people_id
+ * @property string|null $nic
+ * @property string|null $nic_hash
+ * @property int|null $active_status
+ * @property-read \App\Models\EmployerAppointment|null $appointment
+ * @property-read \App\Models\EmployerCurrentAppointment|null $currentAppointment
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EmployerAppointment[] $myAppointments
+ * @property-read \App\Models\Teacher|null $teacher
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Family[] $familiesAsHusband
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Family[] $familiesAsWife
+ * @property-read \App\Models\Title|null $title
+ * @property-read \App\Models\GenderList|null $gender
+ * @property-read \App\Models\Religion|null $religion
+ * @property-read \App\Models\Ethnicity|null $ethnicity
+ * @property-read \App\Models\CivilStatus|null $civilStatus
+ * @property-read \App\Models\BloodGroup|null $bloodGroup
+ * @property-read \App\Models\DistrictsList|null $district
+ * @property-read \App\Models\GnDivision|null $gnDivision
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\PeopleEducationQualification[] $educationQualifications
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EmployerAppointmentHistory[] $appointmentHistory
+ * @property-read \App\Models\EmployerAttachmentAppointment|null $attachmentAppointment
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\PeopleProfileEditRequest[] $profileEditRequests
+ */
 class People extends Model
 {
     use HasFactory, LogsActivity, Blameable;

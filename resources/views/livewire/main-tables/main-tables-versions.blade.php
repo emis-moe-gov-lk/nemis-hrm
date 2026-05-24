@@ -36,15 +36,15 @@
             {{-- VERSIONS CARDS GRID --}}
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 @forelse ($versions as $key => $data)
-                    <div class="relative flex flex-col bg-white dark:bg-slate-900 border {{ $data->is_latest ? 'border-indigo-500 ring-1 ring-indigo-500/20' : 'border-slate-200 dark:border-slate-800' }} rounded-[2.5rem] p-7 shadow-sm hover:shadow-xl transition-all duration-300">
+                    <div class="relative flex flex-col bg-white dark:bg-slate-900 border {{ $data->is_latest ? 'border-indigo-500 ring-1 ring-indigo-500/20' : 'border-slate-300 dark:border-slate-700' }} rounded-[2.5rem] p-7 shadow-sm hover:shadow-xl transition-all duration-300">
                         
                         {{-- Top Metadata & "Latest" Badge --}}
                         <div class="flex justify-between items-start mb-6">
                             <div class="flex flex-col">
-                                <span class="text-[10px] font-black text-slate-400 tabular-nums tracking-widest uppercase">
+                                <span class="text-[10px] font-black text-slate-500 tabular-nums tracking-widest uppercase">
                                     #{{ $versions->firstItem() + $key }} • {{ $data->version_id }}
                                 </span>
-                                <div class="flex items-center gap-2 mt-1 text-slate-500 dark:text-slate-400">
+                                <div class="flex items-center gap-2 mt-1 text-slate-500 dark:text-slate-500">
                                     <flux:icon.calendar variant="micro" />
                                     <span class="text-xs font-bold">{{ $data->release_date->format('M d, Y') }}</span>
                                 </div>
@@ -69,15 +69,15 @@
                             <h4 class="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">
                                 {{ $data->title }}
                             </h4>
-                            <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                            <p class="text-sm text-slate-600 dark:text-slate-500 line-clamp-3 leading-relaxed">
                                 {{ $data->description }}
                             </p>
                         </div>
 
                         {{-- Actions Footer --}}
-                        <div class="flex gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div class="flex gap-2 pt-4 border-t border-slate-200 dark:border-slate-700">
                             <flux:modal.trigger name="edit-version" wire:click="editVersion({{ $data->id }})" class="flex-1">
-                                <flux:button size="sm" variant="ghost" icon="pencil-square" class="w-full !rounded-xl border border-slate-200 dark:border-slate-700">
+                                <flux:button size="sm" variant="ghost" icon="pencil-square" class="w-full !rounded-xl border border-slate-300 dark:border-slate-700">
                                     {{ __('Edit Details') }}
                                 </flux:button>
                             </flux:modal.trigger>
@@ -95,10 +95,10 @@
                     </div>
                 @empty
                     <div class="col-span-full py-24 text-center">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-[2rem] bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 mb-4 text-slate-300">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-4xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 mb-4 text-slate-300">
                             <flux:icon.cpu-chip size="xl" />
                         </div>
-                        <h3 class="text-lg font-black text-slate-400 uppercase tracking-widest">{{ __('No Deployment History Found') }}</h3>
+                        <h3 class="text-lg font-black text-slate-500 uppercase tracking-widest">{{ __('No Deployment History Found') }}</h3>
                     </div>
                 @endforelse
             </div>
@@ -123,7 +123,7 @@
 
                 <form wire:submit.prevent="addNewVersion" class="space-y-6">
                     @csrf
-                    <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] border border-slate-100 dark:border-slate-800 space-y-4">
+                    <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-4xl border border-slate-200 dark:border-slate-700 space-y-4">
                         <div class="grid grid-cols-2 gap-4">
                             <flux:field>
                                 <flux:input label="Version ID" wire:model.live="versionId" mask="VER999" placeholder="VER001" class="!rounded-xl" />
@@ -176,7 +176,7 @@
 
                 <form wire:submit.prevent="updateVersionList" class="space-y-6">
                     @csrf
-                    <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] border border-slate-100 dark:border-slate-800 space-y-4">
+                    <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-4xl border border-slate-200 dark:border-slate-700 space-y-4">
                         <div class="grid grid-cols-2 gap-4">
                             <flux:field>
                                 <flux:input disabled label="Version ID" wire:model.live="updateVersionId" class="!rounded-xl opacity-70" />

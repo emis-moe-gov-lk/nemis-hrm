@@ -28,6 +28,7 @@ use App\Livewire\MainTables\MainTablesInstitutionTypes;
 use App\Livewire\MainTables\MainTablesOccupationsLists;
 use App\Livewire\MainTables\MainTablesTeachingSubjects;
 use App\Livewire\MainTables\MainTablesTeacherCategories;
+use App\Livewire\MainTables\MainTablesTransferSubCategories;
 use App\Livewire\MainTables\MainTablesInstitutionGenders;
 use App\Livewire\MainTables\MainTablesInstitutionLanguages;
 use App\Livewire\MainTables\MainTablesMediumOfInstructions;
@@ -41,6 +42,7 @@ use App\Livewire\MainTables\MainTablesEducationalQualificationGrades;
 use App\Livewire\MainTables\MainTablesPrincipalRecruitmentCategories;
 use App\Livewire\MainTables\MainTablesEducationAdministratorServiceSubjects;
 use App\Livewire\MainTables\MainTablesEducationAdministratorServiceCategories;
+use App\Livewire\MainTables\MainTablesGrades;
 
 Route::middleware(['auth'])->group(function () {
     // In web.php or api.php
@@ -58,6 +60,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('main-table/ethnicities', MainTablesEthnicities::class)->name('main-tables.ethnicities');
         Route::get('main-table/genders', MainTablesGender::class)->name('main-tables.genders');
         Route::get('main-table/gn-divisions', MainTablesGnDivisions::class)->name('main-tables.gn-divisions');
+        Route::get('main-table/grades-list', MainTablesGrades::class)->name('main-tables.grades-list');
         Route::get('main-table/institution-grade-spans', MainTablesInstitutionGradeSpans::class)->name('main-tables.institution-grade-spans');
         Route::get('main-table/institution-authorities', MainTablesInstitutionAuthorities::class)->name('main-tables.institution-authorities');
         Route::get('main-table/institution-categories', MainTablesInstitutionCategories::class)->name('main-tables.institution-categories');
@@ -79,6 +82,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('main-table/services', MainTablesServices::class)->name('main-tables.services');
         Route::get('main-table/service-ranks', MainTablesServiceRanks::class)->name('main-tables.service-ranks');
         Route::get('main-table/teacher-categories', MainTablesTeacherCategories::class)->name('main-tables.teacher-categories');
+        Route::get('main-table/transfer-categories', MainTablesTransferSubCategories::class)->name('main-tables.transfer-categories');
         Route::get('main-table/teacher-types', MainTablesTeacherTypes::class)->name('main-tables.teacher-types');
         Route::get('main-table/titles', MainTablesTitles::class)->name('main-tables.titles');
         Route::get('main-table/appointed-subjects', MainTablesApointedSubjects::class)->name('main-tables.appointed-subjects');

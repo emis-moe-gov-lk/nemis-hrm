@@ -12,6 +12,7 @@ class Logout
      */
     public function __invoke()
     {
+        Session::forget('auth.mfa.pending');
         Auth::guard('web')->logout();
 
         Session::invalidate();

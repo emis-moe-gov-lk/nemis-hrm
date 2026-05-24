@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Class Service
+ *
+ * @property string $service_id
+ * @property string $name
+ */
 class Service extends Model
 {
     use HasFactory;

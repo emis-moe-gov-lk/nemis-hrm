@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div class="space-y-8">
     <div>
         <flux:heading size="lg">Request Update Profile</flux:heading>
         <flux:text class="mt-2">Make changes to your personal details.</flux:text>

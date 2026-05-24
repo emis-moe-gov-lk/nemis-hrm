@@ -10,6 +10,7 @@ use App\Livewire\Sltes\SltesList;
 use App\Livewire\Users\UserIndex;
 use App\Livewire\Roles\RoleCreate;
 use App\Livewire\Settings\Profile;
+use App\Livewire\Settings\Security;
 use App\Livewire\Users\UserCreate;
 use App\Livewire\Users\UserDelete;
 
@@ -146,6 +147,10 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
+Route::view('/terms-of-use', 'terms-of-use')->name('terms-of-use');
+Route::view('/accessibility', 'accessibility')->name('accessibility');
+
 /*
     |--------------------------------------------------------------------------
     | OIDC Login / Logout
@@ -166,6 +171,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
+    Route::get('settings/security', Security::class)->name('settings.security');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
 
     Route::get('change-log/index', Index::class)->name('change-log.index');
@@ -202,44 +208,50 @@ Route::middleware(['auth'])->group(function () {
     | Institutions Management
     |--------------------------------------------------------------------------
     */
-    Route::get('institutions', InstitutionsIndex::class)
-        ->name('institutions.index')
+    Route::get('find-institutions', InstitutionsIndex::class)
+        ->name('find-institutions.index')
         ->middleware(['permission:institution.list.view']);
+
+    Route::get('find-institutions/{id}/view', InstitutionsBasicProfile::class)
+        ->name('find-institutions.basic.view')
+        ->middleware(['permission:institution.profile.view']);
 
     Route::get('institutions/create', InstitutionsCreate::class)
         ->name('institutions.create')
         ->middleware(['permission:institution.create']);
 
-    Route::get('institutions/{id}/view', InstitutionsBasicProfile::class)
-        ->name('institutions.basic.view')
-        ->middleware(['permission:institution.profile.view']);
 
-    Route::get('institutions/{id}/profile/overview', InstitutionsOverview::class)
-        ->name('institutions.profile.overview')
+
+    Route::get('offices/institutions/{id}/profile/overview', InstitutionsOverview::class)
+        ->name('offices.institutions.profile.overview')
         ->middleware(['permission:institution.profile.overview.view']);
 
-    Route::get('institutions/{id}/profile/profile', InstitutionsProfile::class)
-        ->name('institutions.profile.profile')
+    Route::get('offices/institutions/{id}/profile/profile', InstitutionsProfile::class)
+        ->name('offices.institutions.profile.profile')
         ->middleware(['permission:institution.profile.profile.view|office.institution.profile.profile.view']);
 
-    Route::get('institutions/{id}/profile/staff', InstitutionStaff::class)
-        ->name('institutions.profile.staff')
+    Route::get('offices/institutions/{id}/profile/staff', InstitutionStaff::class)
+        ->name('offices.institutions.profile.staff')
         ->middleware(['permission:institution.profile.staff.view|office.institution.profile.staff.view']);
 
-    Route::get('institutions/{id}/profile/cadre-dms-approved', CadreDMSApprove::class)
-        ->name('institutions.profile.cadre-dms-approved')
+    Route::get('offices/institutions/{id}/profile/cadre-dms-approved', CadreDMSApprove::class)
+        ->name('offices.institutions.profile.cadre-dms-approved')
         ->middleware(['permission:institution.profile.cadre-dms-approved.view|office.institution.profile.cadre-dms-approved.view']);
 
-    Route::get('institutions/{id}/profile/report-module', ReportModule::class)
-        ->name('institutions.profile.report-module')
+    Route::get('offices/institutions/{id}/profile/report-module', ReportModule::class)
+        ->name('offices.institutions.profile.report-module')
+        ->middleware(['permission:institution.profile.report-module.view|office.institution.profile.report-module.view']);
+
+    Route::get('offices/institutions/{id}/profile/student-enrollment', \App\Livewire\Institutions\Profile\StudentEnrollment::class)
+        ->name('offices.institutions.profile.student-enrollment')
         ->middleware(['permission:institution.profile.report-module.view|office.institution.profile.report-module.view']);
 
     Route::get('/pdf/institutions/{id}', [InstitutionsReportController::class, 'teacherList'])
-        ->name('institutions.teacher-list')
+        ->name('offices.institutions.teacher-list')
         ->middleware(['permission:institution.profile.report-module.pdf|office.institution.profile.report-module.pdf']);
 
     Route::get('/pdf/institutions/{id}/basic-profile', [InstitutionsReportController::class, 'basicProfile'])
-        ->name('institutions.basic-profile.pdf')
+        ->name('offices.institutions.basic-profile.pdf')
         ->middleware(['permission:institution.profile.report-module.pdf|office.institution.profile.report-module.pdf']);
 
     /*
@@ -353,7 +365,8 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::get('offices/hierarchy', OfficesIndex::class)
-        ->name('offices.index');
+        ->name('offices.index')
+        ->middleware(['permission:office.overview']);
 
     // DEO Offices
     Route::get('offices/deo/list', DeoOfficesList::class)
@@ -470,4 +483,5 @@ require __DIR__ . '/alerts.php';
 require __DIR__ . '/excelExport.php';
 require __DIR__ . '/nationalSchool.php';
 require __DIR__ . '/transfer.php';
+require __DIR__ . '/employees.php';
 require __DIR__ . '/institutionGroups.php';

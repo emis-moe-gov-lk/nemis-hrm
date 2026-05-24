@@ -28,6 +28,7 @@ class BloodGroupController extends Controller
     public function update(Request $request, $id)
     {
         $bloodGroup = BloodGroup::find($id);
+        /** @var \App\Models\BloodGroup|null $bloodGroup */
 
         if (!$bloodGroup) {
             return response()->json([

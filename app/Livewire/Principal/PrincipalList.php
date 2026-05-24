@@ -40,7 +40,7 @@ class PrincipalList extends Component
         // base query: restrict to principals in allowed workplaces
         $peopleQuery = People::query()
             ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds) {
-                $q->where('service_id', 'SER004')       // Principal service
+                $q->whereHas('appointment', fn($sq) => $sq->where('service_id', 'SER004'))
                     ->whereIn('workplace_id', $allowedWorkplaceIds);
             });
 
@@ -89,7 +89,7 @@ class PrincipalList extends Component
             'currentAppointment.workplace',
             'currentAppointment.position',
             'currentAppointment.rank',
-            'currentAppointment.service',
+            'currentAppointment.appointment.service',
             'currentAppointment.workplace.ministry',
             'currentAppointment.workplace.provincialMinistry',
             'currentAppointment.workplace.provincial',
@@ -98,7 +98,7 @@ class PrincipalList extends Component
             'currentAppointment.workplace.institution',
         ])
             ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds) {
-                $q->where('service_id', 'SER004')       // Principal service
+                $q->whereHas('appointment', fn($sq) => $sq->where('service_id', 'SER004'))
                     ->whereIn('workplace_id', $allowedWorkplaceIds);
             })
             ->paginate(10);

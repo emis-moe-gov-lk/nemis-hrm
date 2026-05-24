@@ -33,7 +33,9 @@ class DeoDmsCadreSummary extends Component
 
         $this->circular = CadreCirculars::active()->first();
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId);
+        $this->rows = $this->circular
+            ? CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId)
+            : [];
 
         $this->authorityOption = Authority::active()->get();
 
@@ -47,7 +49,9 @@ class DeoDmsCadreSummary extends Component
         
         $this->institutionOption = Institution::where('authority_id', $value)->where('deo_wp_id', $this->workplaceId)->get();
 
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority);
+        $this->rows = $this->circular
+            ? CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority)
+            : [];
     }
 
     public function updatedInstitution($value)
@@ -56,7 +60,9 @@ class DeoDmsCadreSummary extends Component
             $this->institution = null;
         }
         
-        $this->rows = CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, $this->institution);
+        $this->rows = $this->circular
+            ? CadreDMSApproved::institutionCadreVsEmployers($this->circular->circular_id, $this->workplaceId, $this->authority, $this->institution)
+            : [];
     }
 
     public function render()

@@ -3,6 +3,9 @@
 namespace App\Livewire\Principal\Profile;
 
 use Livewire\Component;
+use App\Models\People;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class VerifyProfileForm extends Component
 {

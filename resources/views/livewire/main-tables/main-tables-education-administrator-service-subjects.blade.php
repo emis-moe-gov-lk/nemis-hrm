@@ -56,12 +56,12 @@
             {{-- SUBJECT CARDS GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 @forelse ($sleasSubjects as $key => $data)
-                    <div class="relative group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-7 shadow-sm hover:shadow-2xl hover:border-indigo-400 dark:hover:border-indigo-800 transition-all duration-300 flex flex-col justify-between overflow-hidden">
+                    <div class="relative group bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-7 shadow-sm hover:shadow-2xl hover:border-indigo-400 dark:hover:border-indigo-800 transition-all duration-300 flex flex-col justify-between overflow-hidden">
                         
                         {{-- ID & Status Bar --}}
                         <div class="flex justify-between items-start mb-6 relative z-10">
                             <div class="flex flex-col">
-                                <span class="text-[10px] font-black text-slate-400 tabular-nums tracking-[0.2em] uppercase mb-1.5">
+                                <span class="text-[10px] font-black text-slate-500 tabular-nums tracking-[0.2em] uppercase mb-1.5">
                                     REF #{{ str_pad($sleasSubjects->firstItem() + $key, 2, '0', STR_PAD_LEFT) }}
                                 </span>
                                 <div class="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-mono text-xs font-bold ring-1 ring-slate-200 dark:ring-slate-700">
@@ -69,7 +69,7 @@
                                 </div>
                             </div>
                             
-                            <div class="flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-100 dark:border-slate-700 shadow-sm">
+                            <div class="flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">
                                 <div class="size-2 rounded-full {{ $data->active_status ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-slate-300' }}"></div>
                                 <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">
                                     {{ $data->active_status ? 'Live' : 'Hidden' }}
@@ -87,7 +87,7 @@
                         {{-- Actions --}}
                         <div class="flex gap-2 relative z-10">
                             <flux:modal.trigger wire:click="editSleasSubject({{ $data->id }})" class="flex-1">
-                                <flux:button size="sm" variant="ghost" icon="pencil-square" class="w-full !rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-xs uppercase tracking-wider">
+                                <flux:button size="sm" variant="ghost" icon="pencil-square" class="w-full !rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-indigo-700 font-bold text-xs uppercase tracking-wider">
                                     {{ __('Edit') }}
                                 </flux:button>
                             </flux:modal.trigger>
@@ -109,11 +109,11 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-32 text-center bg-slate-50/50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-32 text-center bg-slate-50/50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <div class="inline-flex items-center justify-center w-24 h-24 rounded-[2.5rem] bg-white dark:bg-slate-800 shadow-xl mb-6 text-slate-300">
                             <flux:icon.magnifying-glass size="xl" />
                         </div>
-                        <h3 class="text-xl font-black text-slate-400 uppercase tracking-[0.3em]">{{ __('No Subjects Registered') }}</h3>
+                        <h3 class="text-xl font-black text-slate-500 uppercase tracking-[0.3em]">{{ __('No Subjects Registered') }}</h3>
                         <p class="text-slate-500 mt-2 italic text-sm">Click "Add new Subject" to get started</p>
                     </div>
                 @endforelse

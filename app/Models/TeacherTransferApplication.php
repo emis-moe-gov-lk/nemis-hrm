@@ -9,6 +9,17 @@ use App\Traits\Blameable;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
+/**
+ * Class TeacherTransferApplication
+ *
+ * @property string $transfer_application_id
+ * @property string $employee_id
+ * @property string|null $appointment_id
+ * @property-read \App\Models\EmployerAppointment|null $appointment
+ * @property-read \App\Models\People|null $employee
+ * @property-read \App\Models\Workplaces|null $currentWorkplace
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TeacherTransferApplicationPreferences[] $preferences
+ */
 class TeacherTransferApplication extends Model
 {
     use HasFactory, Blameable, LogsActivity;
@@ -38,6 +49,7 @@ class TeacherTransferApplication extends Model
         'has_disciplinary_actions',
         'disciplinary_actions_details',
         'transfer_category',
+        'transfer_sub_category_id',
         'target_province',
         'is_declared',
         'created_by',
@@ -83,7 +95,7 @@ class TeacherTransferApplication extends Model
 
     public function policy()
     {
-        return $this->belongsTo(TransferPolicy::class, 'policy_id', 'policy_id');
+        return $this->belongsTo(TeacherTransferPolicy::class, 'policy_id', 'policy_id');
     }
 
     public function appointment()
@@ -127,7 +139,14 @@ class TeacherTransferApplication extends Model
 
     public function boardRecommendation()
     {
-        return $this->hasOne(TeacherTransferBoardRecommendation::class, 'transfer_application_id', 'transfer_application_id');
+        return $this->hasOne(TeacherTransferBoardRecommendation::class, 'transfer_application_id', 'transfer_application_id')
+            ->latestOfMany();
+    }
+
+    public function boardRecommendations()
+    {
+        return $this->hasMany(TeacherTransferBoardRecommendation::class, 'transfer_application_id', 'transfer_application_id')
+            ->orderByDesc('id');
     }
 
     public function appeals()
@@ -149,7 +168,12 @@ class TeacherTransferApplication extends Model
 
     public function category()
     {
-        return $this->belongsTo(TransferCategory::class, 'transfer_category', 'transfer_category_id');
+        return $this->belongsTo(TeacherTransferCategory::class, 'transfer_category', 'transfer_category_id');
+    }
+
+    public function transferSubCategory()
+    {
+        return $this->belongsTo(TeacherTransferSubCategory::class, 'transfer_sub_category_id', 'transfer_sub_category_id');
     }
 
     public function teacher()
@@ -218,6 +242,14 @@ class TeacherTransferApplication extends Model
         $diff = $this->current_workplace_join_date->diff($this->policy->application_end_date);
 
         return "{$diff->y} Years, {$diff->m} Months";
+    }
+
+    public function getDisplayCategoryNameAttribute(): string
+    {
+        return $this->transferSubCategory?->name
+            ?? $this->category?->transferSubCategory?->name
+            ?? $this->category?->transfer_category_name
+            ?? __('N/A');
     }
 
     public function getActivitylogOptions(): LogOptions

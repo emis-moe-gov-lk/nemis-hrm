@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ResetPasswordMail;
 use App\Helpers\NicHelper;
+use App\Support\Auth\PasswordGenerator;
 
 class UserIndex extends Component
 {
@@ -142,7 +143,7 @@ class UserIndex extends Component
         try {
             $user = User::findOrFail($userId);
 
-            $newPassword = 'User@' . rand(1000, 9999);
+            $newPassword = PasswordGenerator::compliant();
             $user->password = Hash::make($newPassword);
             $user->save();
 

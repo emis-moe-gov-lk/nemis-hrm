@@ -10,6 +10,11 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * Class EmployerAppointmentHistory
+ *
+ * @property string $id
+ */
 class EmployerAppointmentHistory extends Model
 {
     use HasFactory, LogsActivity, Blameable;

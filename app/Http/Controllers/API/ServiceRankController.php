@@ -61,6 +61,7 @@ class ServiceRankController extends Controller
     public function update(Request $request, $id)
     {
         $rank = ServiceRank::find($id);
+        /** @var \App\Models\ServiceRank|null $rank */
 
         if (!$rank) {
             return response()->json([

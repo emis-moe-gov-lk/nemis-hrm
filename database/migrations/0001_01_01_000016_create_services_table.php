@@ -16,7 +16,7 @@ return new class extends Migration
             $table->char('service_id', 10)->unique()->comment('e.g., POS001, POS002');
             $table->string('service_name')->unique()->comment('e.g., Teacher, Principal, Admin Officer');
             $table->string('description')->nullable();
-            $table->unsignedSmallInteger('rank')->nullable();
+            $table->unsignedSmallInteger('rank')->nullable()->comment('e.g., 1, 2, 3');
             $table->boolean('is_gov_service')->default(true)->comment('true: Gov Service, false: System Service');
             $table->boolean('active_status')->default(true)->comment('true: Active, false: Inactive');
             $table->timestamps();

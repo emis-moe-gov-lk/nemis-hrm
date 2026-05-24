@@ -21,7 +21,7 @@
                     </flux:heading>
                     <div class="flex items-center gap-2">
                         <div class="h-1.5 w-8 bg-indigo-500 rounded-full"></div>
-                        <flux:subheading size="lg" class="!font-bold text-slate-400 uppercase tracking-widest text-[11px]">
+                        <flux:subheading size="lg" class="!font-bold text-slate-500 uppercase tracking-widest text-[11px]">
                             {{ __('Organizational Hierarchy & Ranking') }}
                         </flux:subheading>
                     </div>
@@ -49,11 +49,11 @@
             {{-- CARD GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8 px-4">
                 @forelse ($office_levels as $key => $data)
-                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[3rem] p-8 hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.5)] hover:border-indigo-500/50 transition-all duration-500">
+                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[3rem] p-8 hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.5)] hover:border-indigo-500/50 transition-all duration-500">
                         
                         {{-- Card Header: ID & Status --}}
                         <div class="flex justify-between items-start mb-8">
-                            <span class="text-[10px] font-black uppercase tracking-widest px-4 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full border border-slate-200 dark:border-slate-700">
+                            <span class="text-[10px] font-black uppercase tracking-widest px-4 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 rounded-full border border-slate-300 dark:border-slate-700">
                                 {{ $data->office_level_id }}
                             </span>
                             
@@ -71,13 +71,13 @@
                                 {{ $data->office_level_name }}
                             </h3>
                             <div class="flex items-center gap-2 mt-2">
-                                <flux:icon.adjustments-horizontal variant="micro" class="text-slate-400" />
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Hierarchy Rank: {{ $data->office_level_rank }}</span>
+                                <flux:icon.adjustments-horizontal variant="micro" class="text-slate-500" />
+                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Hierarchy Rank: {{ $data->office_level_rank }}</span>
                             </div>
                         </div>
 
                         {{-- Action Area --}}
-                        <div class="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div class="mt-auto pt-6 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
                              <div class="flex items-center gap-2 text-slate-300 font-bold text-xs uppercase tracking-widest">
                                 <flux:icon.hashtag variant="micro" />
                                 <span>{{ $office_levels->firstItem() + $key }}</span>
@@ -100,11 +100,11 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-32 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/40 rounded-[4rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-32 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/40 rounded-[4rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
                             <flux:icon.home-modern size="xl" class="text-slate-300" />
                         </div>
-                        <p class="text-slate-400 font-black uppercase tracking-[0.3em] text-sm">{{ __('No Office Levels Found') }}</p>
+                        <p class="text-slate-500 font-black uppercase tracking-[0.3em] text-sm">{{ __('No Office Levels Found') }}</p>
                     </div>
                 @endforelse
             </div>
@@ -156,7 +156,7 @@
         <flux:modal wire:model="showModelEditOfficeLevel" name="edit-office-level" class="w-full max-w-lg rounded-[3rem] p-12">
             <div class="space-y-8">
                 <div class="flex items-center gap-5">
-                    <div class="w-16 h-16 bg-slate-900 dark:bg-white rounded-[1.5rem] flex items-center justify-center text-white dark:text-slate-900 shadow-2xl">
+                    <div class="w-16 h-16 bg-indigo-600 dark:bg-white rounded-[1.5rem] flex items-center justify-center text-white dark:text-slate-900 shadow-2xl">
                         <flux:icon.pencil-square size="lg" />
                     </div>
                     <div>

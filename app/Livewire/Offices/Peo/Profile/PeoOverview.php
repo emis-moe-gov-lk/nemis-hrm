@@ -67,6 +67,24 @@ class PeoOverview extends Component
         $this->divisionCount    = count($deoIds);
         $this->institutionCount = count($institutionIds);
 
+        // Calculate Student Population for current year within this PEO
+        if (!empty($institutionIds)) {
+            $this->studentCount = \App\Models\InstitutionStudentAdmission::where('academic_year', date('Y'))
+                ->whereHas('class.grade', function($query) use ($peo) {
+                    $query->whereIn('institution_id', function($subQuery) use ($peo) {
+                        $subQuery->select('id')->from('institutions')
+                            ->whereIn('deo_wp_id', function($deoQuery) use ($peo) {
+                                $deoQuery->select('workplace_id')->from('divisional_education_offices')
+                                    ->whereIn('zeo_wp_id', function($zeoQuery) use ($peo) {
+                                        $zeoQuery->select('workplace_id')->from('zonal_education_offices')
+                                            ->where('peo_wp_id', $peo->workplace_id);
+                                    });
+                            });
+                    });
+                })
+                ->sum(\Illuminate\Support\Facades\DB::raw('male_count + female_count'));
+        }
+
         /** -----------------------------------------
          *  Service-wise staff count
          * ----------------------------------------*/
@@ -75,8 +93,8 @@ class PeoOverview extends Component
                 // ->orderBy('service_name')
                 ->each(function ($service) use ($allWorkplaceIds) {
                     $staffCount = \App\Models\People::whereHas('currentAppointment', function ($q) use ($service, $allWorkplaceIds) {
-                        $q->where('service_id', $service->service_id)
-                          ->whereIn('workplace_id', $allWorkplaceIds);
+                        $q->whereIn('workplace_id', $allWorkplaceIds)
+                          ->whereHas('appointment', fn($sq) => $sq->where('service_id', $service->service_id));
                     })->active()->count();
 
                     $this->serviceCounts[] = [

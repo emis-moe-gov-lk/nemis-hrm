@@ -16,7 +16,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['policy_id', 'achievement_level'], 'tpas_policy_level_unique');
-            $table->foreign('policy_id')->references('policy_id')->on('transfer_policies')->cascadeOnDelete();
+            $table->foreign('policy_id')->references('policy_id')->on('teacher_transfer_policies')->cascadeOnDelete();
         });
     }
 

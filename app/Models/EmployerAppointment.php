@@ -11,15 +11,25 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * Class EmployerAppointment
+ *
+ * @property string $appointment_id
+ * @property string $employee_id
+ * @property string|null $workplace_id
+ * @property-read \App\Models\People|null $employee
+ * @property-read \App\Models\Workplaces|null $workplace
+ * @property-read \App\Models\Service|null $service
+ */
 class EmployerAppointment extends Model
 {
     use HasFactory, LogsActivity, Blameable;
 
     protected $table = 'employer_appointments'; // optional, Laravel can infer from class name
 
-    protected $primaryKey = 'id'; // if you want to use appointment_id as PK
-    public $incrementing = false;             // because appointment_id is a char
-    protected $keyType = 'string';
+    protected $primaryKey = 'id';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'appointment_id',
@@ -206,6 +216,21 @@ class EmployerAppointment extends Model
     public function appointmentHistory()
     {
         return $this->hasMany(EmployerAppointmentHistory::class, 'appointment_id', 'appointment_id');
+    }
+
+    public function rankHistory()
+    {
+        return $this->hasMany(EmployerAppointmentRankHistory::class, 'appointment_id', 'appointment_id');
+    }
+
+    public function workplaceHistory()
+    {
+        return $this->hasMany(EmployerAppointmentWorkplaceHistory::class, 'appointment_id', 'appointment_id');
+    }
+
+    public function positionHistory()
+    {
+        return $this->hasMany(EmployerAppointmentPositionHistory::class, 'appointment_id', 'appointment_id');
     }
 
 

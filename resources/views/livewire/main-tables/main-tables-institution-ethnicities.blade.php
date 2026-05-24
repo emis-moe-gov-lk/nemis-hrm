@@ -10,7 +10,7 @@
                         {{ __('Institution Ethnicities') }}
                     </flux:heading>
                     <flux:subheading size="lg" class="flex items-center gap-2">
-                        <flux:icon.users variant="micro" class="text-slate-400" />
+                        <flux:icon.users variant="micro" class="text-slate-500" />
                         {{ __('Define and organize ethnic background categories') }}
                     </flux:subheading>
                 </div>
@@ -37,11 +37,11 @@
             {{-- CARD GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 @forelse ($institutionethnicities as $key => $data)
-                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500/30 transition-all duration-500">
+                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500/30 transition-all duration-500">
                         
                         {{-- Card Header: ID & Status --}}
                         <div class="flex justify-between items-start mb-4">
-                            <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full border border-slate-200 dark:border-slate-700">
+                            <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 rounded-full border border-slate-300 dark:border-slate-700">
                                 {{ $data->ethnicity_id }}
                             </span>
                             
@@ -67,18 +67,18 @@
                             </h3>
                             <div class="mt-2 flex items-center gap-2">
                                 <div class="h-1 w-8 bg-indigo-100 dark:bg-indigo-900 rounded-full"></div>
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Demographic Data</span>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Demographic Data</span>
                             </div>
                         </div>
 
                         {{-- Card Footer --}}
-                        <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-700">
                             <div class="flex items-center gap-3">
                                 <div class="flex shrink-0 w-10 h-10 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
                                     <flux:icon.identification variant="micro" />
                                 </div>
                                 <div>
-                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">Index Reference</p>
+                                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-tighter leading-none mb-1">Index Reference</p>
                                     <p class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-tight">
                                         Row #{{ $institutionethnicities->firstItem() + $key }}
                                     </p>
@@ -88,7 +88,7 @@
 
                         {{-- Hover Action Bar (Floating Glassmorphism) --}}
                         <div class="absolute inset-x-0 -bottom-2 flex justify-center opacity-0 group-hover:opacity-100 group-hover:bottom-4 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto">
-                            <div class="flex items-center gap-1 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 p-1.5 rounded-2xl shadow-xl">
+                            <div class="flex items-center gap-1 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-300 dark:border-slate-700 p-1.5 rounded-2xl shadow-xl">
                                 <flux:modal.trigger wire:click="editInstitutionEthnicities({{ $data->id }})" name="edit-institution-ethnicities">
                                     <flux:button size="sm" variant="ghost" icon="pencil-square" class="!rounded-xl hover:!bg-indigo-50 hover:!text-indigo-600 transition-colors" />
                                 </flux:modal.trigger>
@@ -107,9 +107,9 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-24 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-24 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <flux:icon.magnifying-glass size="xl" class="text-slate-300 mb-4" />
-                        <p class="text-slate-400 font-black uppercase tracking-widest text-sm italic">{{ __('No Ethnicities Registered') }}</p>
+                        <p class="text-slate-500 font-black uppercase tracking-widest text-sm italic">{{ __('No Ethnicities Registered') }}</p>
                     </div>
                 @endforelse
             </div>

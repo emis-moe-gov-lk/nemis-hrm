@@ -5,6 +5,7 @@ namespace App\Livewire\Teacher;
 use App\Helpers\NicHelper;
 use App\Models\People;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -26,7 +27,9 @@ class TeacherOverview extends Component
         }
 
         // load logged user's workplace
-        $logged = Auth::user()->load('workplace');
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $logged = $user->load('workplace');
         $workplace = $logged->workplace;
 
         if (!$workplace) {
@@ -39,9 +42,11 @@ class TeacherOverview extends Component
         // base query: restrict to teachers in allowed workplaces
         $peopleQuery = People::query()
             ->active()
+            ->whereHas('appointment', function ($q) {
+                $q->where('service_id', 'SER001');
+            })
             ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds) {
-                $q->where('service_id', 'SER001')
-                    ->whereIn('workplace_id', $allowedWorkplaceIds);
+                $q->whereIn('workplace_id', $allowedWorkplaceIds);
             });
 
         // If input looks like a valid NIC -> do exact NIC hash lookup
@@ -96,7 +101,7 @@ class TeacherOverview extends Component
                 'route' => route('teacher.attachments'),
             ],
             [
-                'label' => 'Transfer Portal',
+                'label' => 'Changing Workplace',
                 'icon' => 'arrows-right-left',
                 'color' => 'amber',
                 'bg' => 'bg-amber-50/50',
@@ -105,8 +110,8 @@ class TeacherOverview extends Component
                 'hover_shadow' => 'group-hover:shadow-amber-200/50',
                 'hover_border' => 'group-hover:border-amber-200',
                 'accent' => 'bg-amber-500',
-                'desc' => 'Secure portal for managing teacher transfer applications.',
-                'route' => route('transfer.index-module'),
+                'desc' => 'Manage transfer requests and approvals.',
+                'route' => route('employees.changing-workplace'),
             ],
             [
                 'label' => 'Leave Operations',
@@ -136,7 +141,7 @@ class TeacherOverview extends Component
                 'permission' => 'teacher.promotion.view',
             ],
             [
-                'label' => 'Pension, Retired or Resigned System',
+                'label' => 'Pension or Termination System',
                 'icon' => 'banknotes',
                 'color' => 'purple',
                 'bg' => 'bg-purple-50/50',

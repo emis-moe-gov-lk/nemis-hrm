@@ -9,7 +9,7 @@
                         {{ __('Teacher Categories') }}
                     </flux:heading>
                     <flux:subheading size="lg" class="flex items-center gap-2">
-                        <flux:icon.tag variant="micro" class="text-slate-400" />
+                        <flux:icon.tag variant="micro" class="text-slate-500" />
                         {{ __('Define and organize professional staff groupings') }}
                     </flux:subheading>
                 </div>
@@ -36,16 +36,16 @@
             {{-- CARD GRID --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse ($teacherCategories as $key => $data)
-                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 shadow-sm hover:shadow-2xl hover:border-indigo-500/30 transition-all duration-300 flex flex-col">
+                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 shadow-sm hover:shadow-2xl hover:border-indigo-500/30 transition-all duration-300 flex flex-col">
                         
                         {{-- Top Row: Index & Status --}}
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-100 dark:border-slate-700 font-black text-xs text-slate-400">
+                                <div class="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 font-black text-xs text-slate-500">
                                     {{ $teacherCategories->firstItem() + $key }}
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 leading-none">System ID</span>
+                                    <span class="text-[9px] font-black uppercase tracking-[0.15em] text-slate-500 leading-none">System ID</span>
                                     <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 mt-1 uppercase leading-none">{{ $data->categories_id }}</span>
                                 </div>
                             </div>
@@ -63,13 +63,13 @@
 
                         {{-- Description --}}
                         <div class="flex-grow mb-6">
-                            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
+                            <p class="text-sm text-slate-500 dark:text-slate-500 leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
                                 {{ $data->description ?? __('No description provided.') }}
                             </p>
                         </div>
 
                         {{-- Actions Area --}}
-                        <div class="flex items-center gap-2 pt-4 border-t border-slate-50 dark:border-slate-800">
+                        <div class="flex items-center gap-2 pt-4 border-t border-slate-200 dark:border-slate-700">
                             <flux:modal.trigger wire:click="editTeacherCategory({{ $data->id }})" name="edit-teacher-category">
                                 <flux:button variant="ghost" icon="pencil-square" class="flex-1 !rounded-xl !text-slate-500 hover:!text-indigo-600">
                                     {{ __('Edit') }}
@@ -89,10 +89,10 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-24 text-center bg-slate-50/50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-24 text-center bg-slate-50/50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <flux:icon.tag size="xl" class="mx-auto text-slate-200 mb-4" />
-                        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest">{{ __('No Categories Found') }}</h3>
-                        <p class="text-xs text-slate-400 mt-2 italic">{{ __('Start by clicking "Add New Category" above') }}</p>
+                        <h3 class="text-sm font-black text-slate-500 uppercase tracking-widest">{{ __('No Categories Found') }}</h3>
+                        <p class="text-xs text-slate-500 mt-2 italic">{{ __('Start by clicking "Add New Category" above') }}</p>
                     </div>
                 @endforelse
             </div>

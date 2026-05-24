@@ -1,36 +1,48 @@
+@props([
+'institutionId',
+'institution',
+'wide' => false,
+])
+
 <div class="flex items-start max-md:flex-col">
     <div class="me-10 w-full pb-4 md:w-[220px]">
         <flux:navlist>
-            <flux:navlist.item :href="route('institutions.profile.overview', $institutionId)"
-                :current="request()->routeIs('institutions.profile.overview')" wire:navigate>{{ __('Overview') }}
+            <flux:navlist.item :href="route('offices.institutions.profile.overview', $institutionId)"
+                :current="request()->routeIs('offices.institutions.profile.overview')" wire:navigate>{{ __('Overview') }}
             </flux:navlist.item>
             @can('office.institution.profile.profile.view')
-            <flux:navlist.item :href="route('institutions.profile.profile', $institutionId)"
-                :current="request()->routeIs('institutions.profile.profile')" wire:navigate>{{ __('Profile') }}
+            <flux:navlist.item :href="route('offices.institutions.profile.profile', $institutionId)"
+                :current="request()->routeIs('offices.institutions.profile.profile')" wire:navigate>{{ __('Profile') }}
             </flux:navlist.item>
             @endcan
 
+            <flux:navlist.item :href="route('offices.institutions.profile.student-enrollment', $institutionId)"
+                :current="request()->routeIs('offices.institutions.profile.student-enrollment')" wire:navigate>{{ __('Students') }}
+            </flux:navlist.item>
+
             @can('office.institution.profile.staff.view')
-            <flux:navlist.item :href="route('institutions.profile.staff', $institutionId)"
-                :current="request()->routeIs('institutions.profile.staff')" wire:navigate>{{ __('Staff') }}
+            <flux:navlist.item :href="route('offices.institutions.profile.staff', $institutionId)"
+                :current="request()->routeIs('offices.institutions.profile.staff')" wire:navigate>{{ __('Staff') }}
             </flux:navlist.item>
             @endcan
 
 
 
             @can('office.institution.profile.cadre-dms-approved.view')
-            <flux:navlist.item :href="route('institutions.profile.cadre-dms-approved', $institutionId)"
-                :current="request()->routeIs('institutions.profile.cadre-dms-approved')" wire:navigate>{{ __('DMS Approved Cadre') }}
+            <flux:navlist.item :href="route('offices.institutions.profile.cadre-dms-approved', $institutionId)"
+                :current="request()->routeIs('offices.institutions.profile.cadre-dms-approved')" wire:navigate>{{ __('DMS Approved Cadre') }}
             </flux:navlist.item>
             @endcan
 
-            <flux:navlist.item :href="route('institutions.institution-transfer-requests', $institutionId)"
-                :current="request()->routeIs('institutions.institution-transfer-requests')" wire:navigate>{{ __('Transfer requests') }}
+            @if(\App\Support\Transfer\TransferAccess::canViewInstitutionRequests(auth()->user(), $institution))
+            <flux:navlist.item :href="route('offices.institutions.institution-transfer-requests', $institutionId)"
+                :current="request()->routeIs('offices.institutions.institution-transfer-requests')" wire:navigate>{{ __('Transfer requests') }}
             </flux:navlist.item>
+            @endif
 
             @can('office.institution.profile.report-module.view')
-            <flux:navlist.item :href="route('institutions.profile.report-module', $institutionId)"
-                :current="request()->routeIs('institutions.profile.report-module')" wire:navigate>{{ __('Reports') }}
+            <flux:navlist.item :href="route('offices.institutions.profile.report-module', $institutionId)"
+                :current="request()->routeIs('offices.institutions.profile.report-module')" wire:navigate>{{ __('Reports') }}
             </flux:navlist.item>
             @endcan
 
@@ -42,7 +54,7 @@
     <flux:separator class="md:hidden" />
 
     <div class="flex-1 self-stretch max-md:pt-2">
-        <div class="w-full max-w-5xl">
+        <div @class(['w-full', 'max-w-5xl'=> ! $wide, 'max-w-none' => $wide])>
             <div>
                 <x-institutions.institution-profile-card :institution="$institution" />
             </div>
@@ -73,7 +85,9 @@
                 @endif
             </div>
 
-            {{ $slot }}
+            <div class="mt-5">
+                {{ $slot }}
+            </div>
         </div>
     </div>
 </div>

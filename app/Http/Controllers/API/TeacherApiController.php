@@ -37,6 +37,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ZonalEducationOffice;
 use Illuminate\Support\Facades\Hash;
 use App\Models\EmployerCurrentAppointment;
+use App\Support\Auth\PasswordGenerator;
 use App\Models\DivisionalSecretariatOffice;
 
 use Illuminate\Validation\ValidationException;
@@ -279,7 +280,6 @@ class TeacherApiController extends Controller
                 'appointment_id' => $appointmentId,
                 'employee_id' => $people->people_id,
                 'appoint_date' => $validated['currentAppointmentDate'],
-                'service_id' => $validated['currentAppointmentService'],
                 'rank_id' => $validated['currentAppointmentRank'],
                 'office_level_id' => 'OLID006',
                 'position_id' => $validated['currentAppointmentPosition'],
@@ -289,6 +289,8 @@ class TeacherApiController extends Controller
             // ==============================
             // SYSTEM USER
             // ==============================
+            $password = PasswordGenerator::compliant();
+
             $user = User::create([
                 'nic' => $nic,
                 'nic_hash' => NicHelper::hash($nic),
@@ -296,7 +298,7 @@ class TeacherApiController extends Controller
                 'name' => $people->name_with_initials,
                 'email' => strtolower($validated['email']),
                 'contact' => $validated['contact'],
-                'password' => Hash::make('password@123'),
+                'password' => Hash::make($password),
             ]);
 
             $user->assignRole('teacher');
@@ -307,7 +309,7 @@ class TeacherApiController extends Controller
                 'status' => 'success',
                 'message' => 'Teacher created successfully',
                 'people_id' => $people->people_id,
-                'default_password' => 'password@123',
+                'default_password' => $password,
             ], 201);
         }
         // ==============================

@@ -36,12 +36,12 @@
             {{-- CATEGORY CARDS GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 @forelse ($sleasCategories as $key => $data)
-                    <div class="relative group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 shadow-sm hover:shadow-xl hover:border-blue-400 dark:hover:border-blue-800 transition-all duration-300">
+                    <div class="relative group bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-4xl p-6 shadow-sm hover:shadow-xl hover:border-blue-400 dark:hover:border-blue-800 transition-all duration-300">
                         
                         {{-- Top Header: ID & Status --}}
                         <div class="flex justify-between items-start mb-6">
                             <div class="flex flex-col">
-                                <span class="text-[10px] font-black text-slate-400 tabular-nums tracking-widest uppercase mb-1">
+                                <span class="text-[10px] font-black text-slate-500 tabular-nums tracking-widest uppercase mb-1">
                                     #{{ $sleasCategories->firstItem() + $key }}
                                 </span>
                                 <div class="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 font-mono text-xs font-bold">
@@ -62,9 +62,9 @@
                         </div>
 
                         {{-- Action Buttons --}}
-                        <div class="flex gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div class="flex gap-2 pt-4 border-t border-slate-200 dark:border-slate-700">
                             <flux:modal.trigger wire:click="editSleasCategory({{ $data->id }})" class="flex-1">
-                                <flux:button size="sm" variant="ghost" icon="pencil-square" class="w-full !rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
+                                <flux:button size="sm" variant="ghost" icon="pencil-square" class="w-full !rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-indigo-700">
                                     {{ __('Edit') }}
                                 </flux:button>
                             </flux:modal.trigger>
@@ -87,10 +87,10 @@
                     </div>
                 @empty
                     <div class="col-span-full py-24 text-center">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-[2rem] bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 mb-4 text-slate-300">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-4xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 mb-4 text-slate-300">
                             <flux:icon.academic-cap size="xl" />
                         </div>
-                        <h3 class="text-lg font-black text-slate-400 uppercase tracking-widest">{{ __('No Categories Found') }}</h3>
+                        <h3 class="text-lg font-black text-slate-500 uppercase tracking-widest">{{ __('No Categories Found') }}</h3>
                     </div>
                 @endforelse
             </div>

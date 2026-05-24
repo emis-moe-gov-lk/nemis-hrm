@@ -1,15 +1,13 @@
 <section class="w-full">
-    <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">{{ __('Provincial Department of Education') }}</flux:heading>
-        <flux:subheading size="lg" class="mb-6">
-            {{ __('Statistics about provincial education structure and staff distribution.') }}
-        </flux:subheading>
-        <flux:separator variant="subtle" />
-    </div>
-
     <x-offices.peo.peo-layout :officeId="$id">
 
         <div class="antialiased min-h-screen">
+            <div class="relative mb-6 mx-4 w-full">
+                <flux:heading size="xl" level="1">{{ __('Profile') }}</flux:heading>
+                <flux:subheading size="lg" class="mb-6">
+                    {{ __('Basic information about the Provincial Education Office.') }}
+                </flux:subheading>
+            </div>
 
             {{-- Main Card --}}
             <div class="max-w-5xl bg-white dark:bg-gray-800 p-6 rounded-b-lg">

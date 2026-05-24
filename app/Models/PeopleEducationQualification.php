@@ -8,6 +8,11 @@ use App\Traits\Blameable;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
+/**
+ * Class PeopleEducationQualification
+ *
+ * @property string $id
+ */
 class PeopleEducationQualification extends Model
 {
     use HasFactory, LogsActivity, Blameable;

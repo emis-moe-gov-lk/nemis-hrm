@@ -7,13 +7,17 @@ use Livewire\Component;
 use App\Models\Position;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Container\Facades\Log;
+use Illuminate\Support\Facades\Log;
 
 class MainTablesPositions extends Component
 {
-    public $showModelNewPosition = false;
+    public bool $showModelNewPosition = false;
     public $serviceOption = [];
-    public $positionId, $serviceId, $positionName, $positionDescription;
+    public ?string $positionId = null;
+    public ?string $serviceId = null;
+    public ?string $positionName = null;
+    public ?string $positionDescription = null;
+    public ?int $positionOrder = null;
 
     protected function rules()
     {
@@ -29,6 +33,7 @@ class MainTablesPositions extends Component
 
                 ],
                 'updateServiceId' => 'required|string|max:10',
+                'updatePositionOrder' => 'required|integer|min:0',
                 'updatePositionName' => ['required', 'string', 'max:255',],
                 'updatePositionDescription' => 'nullable|string|max:500',
             ];
@@ -43,6 +48,7 @@ class MainTablesPositions extends Component
                 'unique:positions,position_id',
             ],
             'serviceId' => 'required|string|max:10',
+            'positionOrder' => 'required|integer|min:0',
             'positionName' => 'required|string|max:255',
             'positionDescription' => 'nullable|string|max:500',
         ];
@@ -63,6 +69,7 @@ class MainTablesPositions extends Component
             Position::create([
                 'position_id' => $this->positionId,
                 'service_id' => $this->serviceId,
+                'position_order' => $this->positionOrder,
                 'position_name' => $this->positionName,
                 'description' => $this->positionDescription,
 
@@ -74,7 +81,7 @@ class MainTablesPositions extends Component
             $this->showModelNewPosition = false;
 
             // ✅ Reset form fields (but keep modal control variable)
-            $this->reset(['positionId', 'serviceId', 'positionName', 'positionDescription']);
+            $this->reset(['positionId', 'serviceId', 'positionOrder', 'positionName', 'positionDescription']);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
@@ -124,9 +131,13 @@ class MainTablesPositions extends Component
         }
     }
 
-    public $showModelEditPosition = false;
-    public $updatePositionId, $updateServiceId, $updatePositionName, $updatePositionDescription;
-    public $editPositionId;
+    public bool $showModelEditPosition = false;
+    public ?string $updatePositionId = null;
+    public ?string $updateServiceId = null;
+    public ?string $updatePositionName = null;
+    public ?string $updatePositionDescription = null;
+    public ?int $updatePositionOrder = null;
+    public ?int $editPositionId = null;
 
     public function editPosition($id)
     {
@@ -136,6 +147,7 @@ class MainTablesPositions extends Component
 
         $this->updatePositionId = $position->position_id;
         $this->updateServiceId = $position->service_id;
+        $this->updatePositionOrder = $position->position_order;
         $this->updatePositionName = $position->position_name;
         $this->updatePositionDescription = $position->description;
 
@@ -156,6 +168,7 @@ class MainTablesPositions extends Component
 
                 ],
                 'updateServiceId' => 'required|string|max:10',
+                'updatePositionOrder' => 'required|integer|min:0',
                 'updatePositionName' => ['required', 'string', 'max:255', Rule::unique('positions', 'position_name')->ignore($this->editPositionId),],
                 'updatePositionDescription' => 'nullable|string|max:500',
             ]);
@@ -163,6 +176,7 @@ class MainTablesPositions extends Component
             Position::where('id', $this->editPositionId)->update([
                 'position_id' => $this->updatePositionId,
                 'service_id' => $this->updateServiceId,
+                'position_order' => $this->updatePositionOrder,
                 'position_name' => $this->updatePositionName,
                 'description' => $this->updatePositionDescription,
             ]);
@@ -172,7 +186,7 @@ class MainTablesPositions extends Component
 
             session()->flash('message', '✅ Position information updated successfully!');
 
-            $this->reset(['updatePositionId', 'updateServiceId', 'updatePositionName', 'updatePositionDescription', 'editPositionId']);
+            $this->reset(['updatePositionId', 'updateServiceId', 'updatePositionOrder', 'updatePositionName', 'updatePositionDescription', 'editPositionId']);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();

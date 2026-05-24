@@ -1,9 +1,9 @@
-<div>
-    <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">{{ __('Create Ministry of Education Office') }}</flux:heading>
-        <flux:subheading size="lg" class="mb-6">{{ __('Create Ministry of Education Office profile and account') }}
-        </flux:subheading>
-        <flux:separator variant="subtle" />
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <x-page-header
+        title="Create Ministry of Education"
+        subtitle="Create Ministry of Education profile and account"
+        icon="building-office-2"
+    />
 
         <form wire:submit.prevent="save" class="mt-6 max-w-xl space-y-6">
 
@@ -120,6 +120,5 @@
                 {{ session('success') }}
             </div>
         @endif
-
     </div>
 </div>

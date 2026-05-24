@@ -50,13 +50,13 @@ class CadreDMSApproved extends Model
     // Circular (cadre_circulars.circular_id)
     public function circular()
     {
-        return $this->belongsTo(CadreCircular::class, 'circular_id', 'circular_id');
+        return $this->belongsTo(CadreCirculars::class, 'circular_id', 'circular_id');
     }
 
     // Workplace (workplaces.workplace_id)
     public function workplace()
     {
-        return $this->belongsTo(Workplace::class, 'workplace_id', 'workplace_id');
+        return $this->belongsTo(Workplaces::class, 'workplace_id', 'workplace_id');
     }
 
     // Subject (subject_lists.subject_id)

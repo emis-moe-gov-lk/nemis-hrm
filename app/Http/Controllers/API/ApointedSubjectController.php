@@ -42,6 +42,7 @@ class ApointedSubjectController extends Controller
 
         // Find the subject
         $subject = ApointedSubject::find($id);
+        /** @var \App\Models\ApointedSubject|null $subject */
 
         if (!$subject) {
             return response()->json([

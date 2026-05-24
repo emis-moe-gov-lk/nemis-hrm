@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * Class DivisionalEducationOffice
+ *
+ * @property string $divisional_education_office_id
+ */
 class DivisionalEducationOffice extends Model
 {
     use HasFactory;

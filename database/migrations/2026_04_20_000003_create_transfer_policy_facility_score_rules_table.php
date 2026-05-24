@@ -17,8 +17,8 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['policy_id', 'criteria_key', 'facilities_id'], 'tpfsr_policy_criteria_facility_unique');
-            $table->foreign('policy_id')->references('policy_id')->on('transfer_policies')->cascadeOnDelete();
-            $table->foreign('criteria_key')->references('criteria_key')->on('transfer_score_criteria')->cascadeOnDelete();
+            $table->foreign('policy_id')->references('policy_id')->on('teacher_transfer_policies')->cascadeOnDelete();
+            $table->foreign('criteria_key')->references('criteria_key')->on('teacher_transfer_score_criteria')->cascadeOnDelete();
             $table->foreign('facilities_id')->references('facilities_id')->on('institutional_facilities')->cascadeOnDelete();
         });
     }

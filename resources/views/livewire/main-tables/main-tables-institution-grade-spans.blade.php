@@ -10,7 +10,7 @@
                         {{ __('Grade Spans') }}
                     </flux:heading>
                     <flux:subheading size="lg" class="flex items-center gap-2">
-                        <flux:icon.academic-cap variant="micro" class="text-slate-400" />
+                        <flux:icon.academic-cap variant="micro" class="text-slate-500" />
                         {{ __('Define and monitor educational level ranges within the institution') }}
                     </flux:subheading>
                 </div>
@@ -37,11 +37,11 @@
             {{-- CARD GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 @forelse ($insgradespans as $key => $data)
-                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500/30 transition-all duration-500">
+                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500/30 transition-all duration-500">
                         
                         {{-- Card Header: ID & Status --}}
                         <div class="flex justify-between items-start mb-6">
-                            <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full border border-slate-200 dark:border-slate-700">
+                            <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 rounded-full border border-slate-300 dark:border-slate-700">
                                 {{ $data->grade_span_id }}
                             </span>
                             
@@ -60,8 +60,8 @@
                             </h3>
                             
                             {{-- Visual Range Indicator --}}
-                            <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                <div class="flex justify-between text-[10px] font-black uppercase text-slate-400 mb-2">
+                            <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
+                                <div class="flex justify-between text-[10px] font-black uppercase text-slate-500 mb-2">
                                     <span>Start: {{ $data->start_grade }}</span>
                                     <span>End: {{ $data->end_grade }}</span>
                                 </div>
@@ -72,17 +72,17 @@
                         </div>
 
                         {{-- Card Footer --}}
-                        <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
                              <div class="flex items-center gap-2">
                                 <flux:icon.hashtag variant="micro" class="text-slate-300" />
-                                <span class="text-xs font-bold text-slate-400">Order #{{ $insgradespans->firstItem() + $key }}</span>
+                                <span class="text-xs font-bold text-slate-500">Order #{{ $insgradespans->firstItem() + $key }}</span>
                              </div>
                              <flux:icon.arrow-right variant="micro" class="text-slate-200 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
                         </div>
 
                         {{-- Hover Action Bar --}}
                         <div class="absolute inset-x-0 -bottom-2 flex justify-center opacity-0 group-hover:opacity-100 group-hover:bottom-4 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto">
-                            <div class="flex items-center gap-1 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 p-1.5 rounded-2xl shadow-xl">
+                            <div class="flex items-center gap-1 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-300 dark:border-slate-700 p-1.5 rounded-2xl shadow-xl">
                                 <flux:modal.trigger wire:click="editInsGradeSpans({{ $data->id }})" name="edit-ins-grade-spans">
                                     <flux:button size="sm" variant="ghost" icon="pencil-square" class="!rounded-xl hover:!bg-indigo-50 hover:!text-indigo-600 transition-colors" />
                                 </flux:modal.trigger>
@@ -101,9 +101,9 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-24 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-24 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <flux:icon.document-magnifying-glass size="xl" class="text-slate-300 mb-4" />
-                        <p class="text-slate-400 font-black uppercase tracking-widest text-sm italic">{{ __('No Grade Spans Found') }}</p>
+                        <p class="text-slate-500 font-black uppercase tracking-widest text-sm italic">{{ __('No Grade Spans Found') }}</p>
                     </div>
                 @endforelse
             </div>

@@ -1,30 +1,28 @@
-<div class="max-w-7xl mx-left px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-    {{-- Modern Header --}}
-    <header class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div class="space-y-1">
-            <flux:heading size="xl" level="1" class="!font-black tracking-tight text-slate-900 dark:text-white">
-                {{ __('Provincial Education Offices') }}
-                 <flux:badge variant="ghost" size="sm" class="bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400 font-bold border-indigo-100 dark:border-indigo-500/20">
-                    {{ $pmoeWorkplace->office()->name ?? 'PMOE' }}
-                </flux:badge>
-            </flux:heading>
-        </div>
-
-        @can('office.peo.create')
-            <a href="{{ route('offices.peo.create') }}" wire:navigate>
-                <flux:button variant="primary" icon="plus" class="!rounded-xl !px-5 shadow-lg shadow-indigo-500/20 transition-transform hover:scale-[1.02]">
-                    Create Office
-                </flux:button>
-            </a>
-        @endcan
-    </header>
-
-    <flux:separator variant="subtle" />
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <x-page-header
+        title="Provincial Education Offices"
+        subtitle="Manage provincial administrative units under {{ $pmoeWorkplace->office()->name ?? 'PMOE' }}."
+        icon="building-office-2"
+        :breadcrumbs="[
+            'Administrative Hierarchy' => route('offices.index'),
+            'Provincial Education' => route('offices.peo.list')
+        ]"
+    >
+        <x-slot:actions>
+            @can('office.peo.create')
+                <a href="{{ route('offices.peo.create') }}" wire:navigate>
+                    <flux:button variant="primary" icon="plus" class="h-11 bg-indigo-600! hover:bg-indigo-700! text-white! shadow-lg shadow-indigo-200/50 dark:shadow-none border-none">
+                        Create Office
+                    </flux:button>
+                </a>
+            @endcan
+        </x-slot:actions>
+    </x-page-header>
 
     {{-- Horizontal Cards Stack --}}
     <div class="grid grid-cols-1 gap-4">
         @forelse ($provincialEducationOffices as $data)
-            <div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-2 transition-all duration-300 hover:border-indigo-500/40 hover:shadow-2xl hover:shadow-indigo-500/5">
+            <div class="group relative bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-4xl p-2 transition-all duration-300 hover:border-indigo-500/40 hover:shadow-2xl hover:shadow-indigo-500/5">
                 
                 {{-- Inner Flex Container --}}
                 <div class="flex flex-col lg:flex-row lg:items-center gap-4 pr-6">
@@ -34,7 +32,7 @@
                         <a href="{{route('offices.zeo.by-province', $data->id)}}" wire:navigate class="flex items-center gap-4 p-3 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800/40 group-hover:bg-indigo-50/50 dark:group-hover:bg-indigo-500/5 transition-colors">
                             <div class="relative shrink-0">
                                 <div class="h-16 w-16 flex items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-800 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
-                                    <flux:icon.building-office class="size-8 text-slate-500 dark:text-slate-400" />
+                                    <flux:icon.building-office class="size-8 text-slate-500 dark:text-slate-500" />
                                 </div>
                                 
                                 {{-- Status Pulse --}}
@@ -67,7 +65,7 @@
                                 <flux:icon.map-pin variant="micro" class="size-3" />
                                 <span class="text-[9px] font-bold uppercase tracking-widest">Headquarters</span>
                             </div>
-                            <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-1 font-medium italic">
+                            <p class="text-sm text-slate-600 dark:text-slate-500 line-clamp-1 font-medium italic">
                                 {{ $data->address }}
                             </p>
                         </div>
@@ -107,7 +105,7 @@
                 </div>
             </div>
         @empty
-            <div class="flex flex-col items-center justify-center py-32 bg-slate-50 dark:bg-slate-900/30 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+            <div class="flex flex-col items-center justify-center py-32 bg-slate-50 dark:bg-slate-900/30 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                 <div class="relative mb-6">
                     <div class="absolute inset-0 bg-indigo-500 blur-2xl opacity-10 animate-pulse"></div>
                     <flux:icon.magnifying-glass class="size-16 text-slate-300 relative" />

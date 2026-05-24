@@ -2,39 +2,37 @@
 
 namespace App\Livewire\Teacher\Profile;
 
-use Livewire\Component;
 use App\Models\People;
 use App\Models\Teacher;
+use Livewire\Component;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TeacherEmployment extends Component
 {
     use AuthorizesRequests;
     
-    /** @var int */
-    public $id;
-
-    /** @var \App\Models\People|null */
-    public $people;
-
-    /** @var \App\Models\Teacher|null */
-    public $teacherAppointment;
+    public int $id;
+    public ?People $people = null;
+    public ?Teacher $teacherAppointment = null;
 
     /**
      * Component initializer
      */
-    public function mount($id): void
+    public function mount(int $id): void
     {
         $this->id = $id;
 
-        // Load People + Current Appointment Relationship
-        $people = People::with('currentAppointment')->find($id);
-        $this->authorize('viewRestrict', $people);
+        // Load People + Relationships
+        $this->people = People::with(['currentAppointment', 'appointment'])->find($id);
+        
+        if (!$this->people) {
+            abort(404);
+        }
 
-        $this->people = $people;
+        $this->authorize('viewRestrict', $this->people);
 
-        // If appointment exists, load Teacher record once
-        if ($this->people?->currentAppointment?->appointment_id) {
+        // If current appointment exists, load teacher-specific details
+        if ($this->people->currentAppointment) {
             $this->teacherAppointment = Teacher::where(
                 'appointment_id',
                 $this->people->currentAppointment->appointment_id
@@ -42,9 +40,6 @@ class TeacherEmployment extends Component
         }
     }
 
-    /**
-     * Render the Livewire view
-     */
     public function render()
     {
         return view('livewire.teacher.profile.teacher-employment');

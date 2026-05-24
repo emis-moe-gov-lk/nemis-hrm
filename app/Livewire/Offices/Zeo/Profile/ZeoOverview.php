@@ -63,6 +63,18 @@ class ZeoOverview extends Component
         $this->divisionCount    = count($deoWorkplaceIds);
         $this->institutionCount = count($institutionWorkplaceIds);
 
+        // Calculate Student Population for current year within this ZEO
+        if (!empty($deoWorkplaceIds)) {
+            $this->studentCount = \App\Models\InstitutionStudentAdmission::where('academic_year', date('Y'))
+                ->whereHas('class.grade', function($query) use ($deoWorkplaceIds) {
+                    $query->whereIn('institution_id', function($subQuery) use ($deoWorkplaceIds) {
+                        $subQuery->select('id')->from('institutions')
+                            ->whereIn('deo_wp_id', $deoWorkplaceIds);
+                    });
+                })
+                ->sum(\Illuminate\Support\Facades\DB::raw('male_count + female_count'));
+        }
+
         /*
         |--------------------------------------------------------------------------
         | Service-wise staff counts (OPTIMIZED)
@@ -73,8 +85,8 @@ class ZeoOverview extends Component
             ->map(function ($service) use ($allWorkplaceIds) {
 
                 $staffCount = \App\Models\People::whereHas('currentAppointment', function ($q) use ($service, $allWorkplaceIds) {
-                    $q->where('service_id', $service->service_id)
-                      ->whereIn('workplace_id', $allWorkplaceIds);
+                    $q->whereIn('workplace_id', $allWorkplaceIds)
+                      ->whereHas('appointment', fn($sq) => $sq->where('service_id', $service->service_id));
                 })->active()->count();
 
                 return [

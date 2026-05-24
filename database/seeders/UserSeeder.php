@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
                 'name'           => $person->name_with_initials,
                 'email'          => $person->email,
                 'contact'        => $person->phone,
-                'password'       => Hash::make('password123'),
+                'password'       => Hash::make('Password@123'),
                 'profile_picture'=> 'default.png',
                 'remember_token' => Str::random(10),
                 'active_status'  => '1',

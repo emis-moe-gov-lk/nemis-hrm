@@ -37,11 +37,11 @@
             {{-- GENDER CARDS GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 @forelse ($genderList as $key => $data)
-                    <div class="relative group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 shadow-sm hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-800 transition-all duration-300">
+                    <div class="relative group bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 shadow-sm hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-800 transition-all duration-300">
                         
                         {{-- Top Metadata --}}
                         <div class="flex justify-between items-center mb-5">
-                            <span class="text-[10px] font-black text-slate-400 tabular-nums tracking-widest uppercase">
+                            <span class="text-[10px] font-black text-slate-500 tabular-nums tracking-widest uppercase">
                                 #{{ $genderList->firstItem() + $key }}
                             </span>
                             <flux:badge size="sm" variant="pill" color="{{ $data->active_status ? 'green' : 'red' }}" class="!font-black uppercase tracking-widest text-[9px]">
@@ -55,15 +55,15 @@
                                 {{ $data->gender_name }}
                             </h3>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter italic">Unique ID:</span>
-                                <span class="text-[11px] font-mono font-bold text-slate-600 dark:text-slate-400">{{ $data->gender_id }}</span>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter italic">Unique ID:</span>
+                                <span class="text-[11px] font-mono font-bold text-slate-600 dark:text-slate-500">{{ $data->gender_id }}</span>
                             </div>
                         </div>
 
                         {{-- Actions Footer --}}
                         <div class="flex gap-2 mt-auto">
                             <flux:modal.trigger name="edit-gender" wire:click="editGenderList({{ $data->id }})" class="flex-1">
-                                <flux:button size="sm" variant="ghost" icon="pencil-square" class="w-full !rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
+                                <flux:button size="sm" variant="ghost" icon="pencil-square" class="w-full !rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-indigo-700">
                                     {{ __('Edit') }}
                                 </flux:button>
                             </flux:modal.trigger>
@@ -81,10 +81,10 @@
                     </div>
                 @empty
                     <div class="col-span-full py-24 text-center">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-[2rem] bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 mb-4 text-slate-300">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-4xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 mb-4 text-slate-300">
                             <flux:icon.identification size="xl" />
                         </div>
-                        <h3 class="text-lg font-black text-slate-400 uppercase tracking-widest">{{ __('No Gender Records Found') }}</h3>
+                        <h3 class="text-lg font-black text-slate-500 uppercase tracking-widest">{{ __('No Gender Records Found') }}</h3>
                     </div>
                 @endforelse
             </div>
@@ -110,7 +110,7 @@
 
                 <form wire:submit.prevent="addNewGender" class="space-y-6">
                     @csrf
-                    <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] border border-slate-100 dark:border-slate-800 space-y-5">
+                    <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-4xl border border-slate-200 dark:border-slate-700 space-y-5">
                         <flux:field>
                             <flux:input label="Gender ID" wire:model.live="genderId" mask="G99" placeholder="G01" class="!rounded-xl" />
                         </flux:field>
@@ -145,7 +145,7 @@
 
                 <form wire:submit.prevent="updateGenderList" class="space-y-6">
                     @csrf
-                    <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] border border-slate-100 dark:border-slate-800 space-y-5">
+                    <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-4xl border border-slate-200 dark:border-slate-700 space-y-5">
                         <flux:field>
                             <flux:input disabled label="Gender ID" wire:model.live="updateGenderId" mask="G99" class="!rounded-xl bg-slate-100/50 dark:bg-slate-900/50" />
                         </flux:field>

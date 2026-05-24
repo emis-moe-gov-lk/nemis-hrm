@@ -9,7 +9,7 @@
                         {{ __('Service Ranks') }}
                     </flux:heading>
                     <flux:subheading size="lg" class="flex items-center gap-2">
-                        <flux:icon.adjustments-vertical variant="micro" class="text-slate-400" />
+                        <flux:icon.adjustments-vertical variant="micro" class="text-slate-500" />
                         {{ __('Manage seniority levels and rank designations') }}
                     </flux:subheading>
                 </div>
@@ -36,7 +36,7 @@
             {{-- CARD GRID --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse ($service_ranks as $key => $data)
-                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 shadow-sm hover:shadow-2xl hover:border-indigo-500/30 transition-all duration-300 flex flex-col">
+                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 shadow-sm hover:shadow-2xl hover:border-indigo-500/30 transition-all duration-300 flex flex-col">
                         
                         {{-- Top Row: Rank Badge & Status --}}
                         <div class="flex justify-between items-start mb-4">
@@ -45,7 +45,7 @@
                                     {{ $service_ranks->firstItem() + $key }}
                                 </div>
                                 <div class="flex flex-col">
-                                    <span class="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 leading-none">Rank ID</span>
+                                    <span class="text-[9px] font-black uppercase tracking-[0.15em] text-slate-500 leading-none">Rank ID</span>
                                     <span class="text-xs font-bold text-slate-900 dark:text-white mt-1 uppercase leading-none">{{ $data->rank_id }}</span>
                                 </div>
                             </div>
@@ -56,7 +56,7 @@
 
                         {{-- Service Parent Tag --}}
                         <div class="mb-2">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-500 border border-slate-300 dark:border-slate-700">
                                 {{ $data->service->service_name }}
                             </span>
                         </div>
@@ -70,13 +70,13 @@
 
                         {{-- Description --}}
                         <div class="flex-grow mb-6">
-                            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3">
+                            <p class="text-sm text-slate-500 dark:text-slate-500 leading-relaxed line-clamp-3">
                                 {{ $data->description ?? __('No seniority details defined.') }}
                             </p>
                         </div>
 
                         {{-- Actions Area --}}
-                        <div class="flex items-center gap-2 pt-4 border-t border-slate-50 dark:border-slate-800">
+                        <div class="flex items-center gap-2 pt-4 border-t border-slate-200 dark:border-slate-700">
                             <flux:modal.trigger wire:click="editServiceRank({{ $data->id }})" name="edit-service-rank">
                                 <flux:button variant="ghost" icon="pencil-square" class="flex-1 !rounded-xl !text-slate-500 hover:!text-indigo-600">
                                     {{ __('Modify') }}
@@ -96,9 +96,9 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-24 text-center bg-slate-50/50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-24 text-center bg-slate-50/50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <flux:icon.adjustments-vertical size="xl" class="mx-auto text-slate-200 mb-4" />
-                        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest">{{ __('No Ranks Registered') }}</h3>
+                        <h3 class="text-sm font-black text-slate-500 uppercase tracking-widest">{{ __('No Ranks Registered') }}</h3>
                     </div>
                 @endforelse
             </div>

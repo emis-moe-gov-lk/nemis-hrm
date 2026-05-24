@@ -9,6 +9,34 @@ class TeacherTransferRecommendationListSeeder extends Seeder
 {
     public function run(): void
     {
+        TeacherTransferRecommendationList::where('office_level_id', 'OLID006')
+            ->whereIn('decision', [
+                "This teacher can\u{2019}t be released",
+                "This teacher can't be released",
+            ])
+            ->update([
+                'decision' => 'Transfer is not recommended for this teacher.',
+                'active_status' => true,
+            ]);
+
+        $zonalDecisionRenames = [
+            'There are/are not disciplinary or audit queries against this teacher'
+                => 'There are / are not disciplinary actions or audit queries against this teacher',
+            'This teacher is/is not qualified for the transfer.'
+                => 'This teacher is/is not Recomemded for the transfer.',
+            'This teacher can be released with/without a successor'
+                => 'This teacher can be Transferd with/without a successor',
+        ];
+
+        foreach ($zonalDecisionRenames as $oldDecision => $newDecision) {
+            TeacherTransferRecommendationList::where('office_level_id', 'OLID004')
+                ->where('decision', $oldDecision)
+                ->update([
+                    'decision' => $newDecision,
+                    'active_status' => true,
+                ]);
+        }
+
         $recommendations = [
 
             [
@@ -28,7 +56,7 @@ class TeacherTransferRecommendationListSeeder extends Seeder
 
             [
                 'office_level_id' => 'OLID006',
-                'decision' => 'This teacher can’t be released',
+                'decision' => 'Transfer is not recommended for this teacher.',
             ],
 
             [
@@ -38,17 +66,17 @@ class TeacherTransferRecommendationListSeeder extends Seeder
 
             [
                 'office_level_id' => 'OLID004',
-                'decision' => 'There are/are not disciplinary or audit queries against this teacher',
+                'decision' => 'There are / are not disciplinary actions or audit queries against this teacher',
             ],
 
             [
                 'office_level_id' => 'OLID004',
-                'decision' => 'This teacher is/is not qualified for the transfer.',
+                'decision' => 'This teacher is/is not Recomemded for the transfer.',
             ],
 
             [
                 'office_level_id' => 'OLID004',
-                'decision' => 'This teacher can be released with/without a successor',
+                'decision' => 'This teacher can be Transferd with/without a successor',
             ],
 
             [

@@ -5,6 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Workplaces
+ *
+ * @property string $workplace_id
+ * @property string|null $office_level_id
+ * @property string|null $parent_workplace_id
+ * @property-read \App\Models\Workplaces|null $parent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Workplaces[] $children
+ * @property-read \App\Models\Institution|null $institution
+ * @property-read \App\Models\ZonalEducationOffice|null $zonal
+ * @property-read \App\Models\OfficeLevel|null $officeLevel
+ * @property-read \App\Models\InstitutionGroup[]|\Illuminate\Database\Eloquent\Collection $institutionGroups
+ * @property-read \App\Models\MinistryOfEducationOffice|null $ministry
+ * @property-read \App\Models\ProvincialMinistryOfEducationOffice|null $provincialMinistry
+ * @property-read \App\Models\ProvincialEducationOffice|null $provincial
+ * @property-read \App\Models\DivisionalEducationOffice|null $divisional
+ */
 class Workplaces extends Model
 {
     use HasFactory;
@@ -18,6 +35,8 @@ class Workplaces extends Model
     protected $fillable = [
         'workplace_id',
         'office_level_id',
+        'office_level_rank',
+        'office_level_name',
         'parent_workplace_id'
     ];
 
@@ -213,5 +232,13 @@ class Workplaces extends Model
             ->unique()
             ->values()
             ->all();
+    }
+
+    /**
+     * Scope a query to only include active workplaces.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('active_status', 1);
     }
 }

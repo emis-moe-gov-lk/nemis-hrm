@@ -1,141 +1,130 @@
-<div>
+<div class="space-y-8">
     <section>
-        {{-- Header: Shifted to a more minimal style --}}
-        <div class="flex items-center justify-between mb-5 px-1">
+        {{-- Section Header --}}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
-                <h2 class="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">Personal Profile</h2>
-                <p class="text-sm text-gray-500">Identity and cultural details</p>
+                <h2 class="text-base font-black tracking-widest text-slate-700 dark:text-zinc-200 uppercase">Personal Profile</h2>
+                <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-[0.2em] mt-0.5">Identity & Cultural Background</p>
             </div>
             @if($canEdit)
                 <flux:modal.trigger name="edit-profile-personal-info">
-                    <flux:button variant="ghost" icon="pencil-square" class="rounded-full">
+                    <flux:button variant="ghost" size="sm" class="rounded-xl border border-slate-300 dark:border-zinc-700 font-bold text-xs px-5 text-slate-600 dark:text-zinc-300 hover:border-indigo-400 hover:text-indigo-600 transition-all w-fit">
                         Edit Details
                     </flux:button>
                 </flux:modal.trigger>
             @endif
         </div>
 
-        <div class="space-y-4">
-            {{-- Primary Identity Card --}}
-            <div class="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-800 p-5 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                <div class="flex flex-col gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                            <flux:icon.user class="size-5 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Legal Full Name</p>
-                            <p class="text-base font-semibold text-gray-900 dark:text-gray-100">{{ $employee->full_name }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="h-px bg-gray-100 dark:bg-gray-700 w-full"></div>
+        {{-- Data Table --}}
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-700 overflow-hidden">
 
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                            <flux:icon.identification class="size-5 text-purple-600 dark:text-purple-400" />
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Display Name</p>
-                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $employee->name_with_initials }}</p>
-                        </div>
-                    </div>
-                </div>
+            {{-- Full Name --}}
+            <div class="flex flex-col sm:flex-row sm:items-start border-b border-dashed border-slate-300 dark:border-zinc-700 px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors group gap-1 sm:gap-0">
+                <span class="w-full sm:w-48 sm:shrink-0 text-[11px] font-black text-slate-500 dark:text-zinc-400 uppercase tracking-widest sm:pt-0.5">Full Name</span>
+                <span class="text-sm font-semibold text-slate-800 dark:text-zinc-100 leading-relaxed">{{ $employee->full_name }}</span>
             </div>
 
-            {{-- Secondary Info Grid: 2 columns on mobile --}}
-            <div class="grid grid-cols-2 gap-3">
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Birth Date</p>
-                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $employee->date_of_birth }}</p>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Gender</p>
-                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $employee->gender->gender_name }}</p>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Religion</p>
-                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $employee->religion->religion_name }}</p>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Ethnicity</p>
-                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $employee->ethnicity->ethnicity_name }}</p>
-                </div>
-
-                <div class="col-span-2 bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase">Civil Status</p>
-                        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $employee->civilStatus->civil_status_name }}</p>
-                    </div>
-                    <flux:icon.heart class="size-5 text-pink-500/50" />
-                </div>
+            {{-- Name with Initials --}}
+            <div class="flex flex-col sm:flex-row sm:items-start border-b border-dashed border-slate-300 dark:border-zinc-700 px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors group gap-1 sm:gap-0">
+                <span class="w-full sm:w-48 sm:shrink-0 text-[11px] font-black text-slate-500 dark:text-zinc-400 uppercase tracking-widest sm:pt-0.5">Name with Initials</span>
+                <span class="text-sm font-semibold text-slate-800 dark:text-zinc-100 leading-relaxed">{{ $employee->name_with_initials }}</span>
             </div>
+
+            {{-- Date of Birth --}}
+            <div class="flex flex-col sm:flex-row sm:items-center border-b border-dashed border-slate-300 dark:border-zinc-700 px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors group gap-1 sm:gap-0">
+                <span class="w-full sm:w-48 sm:shrink-0 text-[11px] font-black text-slate-500 dark:text-zinc-400 uppercase tracking-widest">Date of Birth</span>
+                <span class="text-sm font-semibold text-slate-800 dark:text-zinc-100">{{ \Carbon\Carbon::parse($employee->date_of_birth)->format('Y-m-d') }}</span>
+            </div>
+
+            {{-- Gender --}}
+            <div class="flex flex-col sm:flex-row sm:items-center border-b border-dashed border-slate-300 dark:border-zinc-700 px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors group gap-1 sm:gap-0">
+                <span class="w-full sm:w-48 sm:shrink-0 text-[11px] font-black text-slate-500 dark:text-zinc-400 uppercase tracking-widest">Gender</span>
+                <span class="text-sm font-semibold text-slate-800 dark:text-zinc-100">{{ $employee->gender->gender_name }}</span>
+            </div>
+
+            {{-- Religion --}}
+            <div class="flex flex-col sm:flex-row sm:items-center border-b border-dashed border-slate-300 dark:border-zinc-700 px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors group gap-1 sm:gap-0">
+                <span class="w-full sm:w-48 sm:shrink-0 text-[11px] font-black text-slate-500 dark:text-zinc-400 uppercase tracking-widest">Religion</span>
+                <span class="text-sm font-semibold text-slate-800 dark:text-zinc-100">{{ $employee->religion->religion_name }}</span>
+            </div>
+
+            {{-- Ethnicity --}}
+            <div class="flex flex-col sm:flex-row sm:items-center border-b border-dashed border-slate-300 dark:border-zinc-700 px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors group gap-1 sm:gap-0">
+                <span class="w-full sm:w-48 sm:shrink-0 text-[11px] font-black text-slate-500 dark:text-zinc-400 uppercase tracking-widest">Ethnicity</span>
+                <span class="text-sm font-semibold text-slate-800 dark:text-zinc-100">{{ $employee->ethnicity->ethnicity_name }}</span>
+            </div>
+
+            {{-- Civil Status --}}
+            <div class="flex flex-col sm:flex-row sm:items-center px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-colors group gap-1 sm:gap-0">
+                <span class="w-full sm:w-48 sm:shrink-0 text-[11px] font-black text-slate-500 dark:text-zinc-400 uppercase tracking-widest">Civil Status</span>
+                <span class="text-sm font-semibold text-slate-800 dark:text-zinc-100">{{ $employee->civilStatus->civil_status_name }}</span>
+            </div>
+
         </div>
     </section>
 
-    {{-- Mobile-First Modal (Bottom Sheet Style on Mobile) --}}
+    {{-- Edit Modal --}}
     @if($canEdit)
-        <flux:modal wire:model="showModalPersonalInfo" name="edit-profile-personal-info" class="md:w-125">
-            <div class="space-y-6">
-                <flux:heading size="lg" badge="Action Required">Update Info</flux:heading>
+        <flux:modal wire:model="showModalPersonalInfo" name="edit-profile-personal-info" class="md:w-150">
+            <div class="space-y-8">
+                <div>
+                    <h3 class="text-sm font-black tracking-widest text-slate-900 dark:text-white uppercase">Update Profile</h3>
+                    <p class="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mt-0.5">Personal & Identity Records</p>
+                </div>
 
-                <form wire:submit.prevent="editPersonalInfo" class="grid grid-cols-1 gap-y-5">
+                <form wire:submit.prevent="editPersonalInfo" class="grid grid-cols-1 gap-y-6">
                     @csrf
                     
-                    <flux:input label="NIC Number" icon="identification" wire:model.live="nic" />
-
-                    <div class="flex gap-3">
-                        <div class="w-1/3">
-                            <flux:select label="Title" wire:model.live="title">
-                                @foreach ($titleOptions as $data)
-                                    <option value="{{ $data->title_id }}">{{ $data->title_name }}</option>
-                                @endforeach
-                            </flux:select>
-                        </div>
-                        <div class="w-2/3">
-                            <flux:input label="Full Name" wire:model.live="fullName" />
-                        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <flux:input label="NIC Number" icon="identification" wire:model.live="nic" class="font-bold" />
+                        <flux:select label="Title" wire:model.live="title" class="font-bold">
+                            @foreach ($titleOptions as $data)
+                                <option value="{{ $data->title_id }}">{{ $data->title_name }}</option>
+                            @endforeach
+                        </flux:select>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <flux:select label="Gender" wire:model.live="gender">
+                    <flux:input label="Full Name" wire:model.live="fullName" class="font-bold" />
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <flux:select label="Gender" wire:model.live="gender" class="font-bold">
                             @foreach ($genderOptions as $data)
                                 <option value="{{ $data->gender_id }}">{{ $data->gender_name }}</option>
                             @endforeach
                         </flux:select>
-                        <flux:input type="date" label="Birthday" wire:model.live="birthday" />
+                        <flux:input type="date" label="Birthday" wire:model.live="birthday" class="font-bold" />
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <flux:select label="Ethnicity" wire:model.live="ethnicity">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <flux:select label="Ethnicity" wire:model.live="ethnicity" class="font-bold">
                             @foreach ($ethnicityOptions as $data)
                                 <option value="{{ $data->ethnicity_id }}">{{ $data->ethnicity_name }}</option>
                             @endforeach
                         </flux:select>
-                        <flux:select label="Religion" wire:model.live="religion">
+                        <flux:select label="Religion" wire:model.live="religion" class="font-bold">
                             @foreach ($religionOptions as $data)
                                 <option value="{{ $data->religion_id }}">{{ $data->religion_name }}</option>
                             @endforeach
                         </flux:select>
                     </div>
 
-                    <flux:select label="Civil Status" wire:model.live="civilStatus">
+                    <flux:select label="Civil Status" wire:model.live="civilStatus" class="font-bold">
                         @foreach ($civilStatusOptions as $data)
                             <option value="{{ $data->civil_status_id }}">{{ $data->civil_status_name }}</option>
                         @endforeach
                     </flux:select>
 
-                    <div class="flex gap-3 pt-2">
+                    <div class="flex gap-4 pt-4">
                         <flux:modal.close>
-                            <flux:button variant="ghost" class="flex-1">Cancel</flux:button>
+                            <flux:button variant="ghost" class="flex-1 font-bold rounded-xl h-12">Cancel</flux:button>
                         </flux:modal.close>
-                        <flux:button type="submit" variant="primary" class="flex-1">Save Changes</flux:button>
+                        <flux:button type="submit" variant="primary" class="flex-1 font-black rounded-xl h-12 bg-indigo-600 dark:bg-white text-white dark:text-slate-900 hover:scale-[1.02] active:scale-95 transition-all">
+                            Save Profile Changes
+                        </flux:button>
                     </div>
                 </form>
             </div>
         </flux:modal>
     @endif
+
 </div>

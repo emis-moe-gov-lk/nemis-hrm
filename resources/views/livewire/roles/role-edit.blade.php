@@ -1,27 +1,22 @@
-<div class="max-w-6xl mx-left px-4 sm:px-6 lg:px-8 py-10">
-    {{-- Header Section --}}
-    <header class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-indigo-600 mb-2">
-                <flux:icon.shield-check variant="micro" />
-                {{ __('Role Authorization') }}
-            </div>
-            <flux:heading size="xl" level="1" class="!font-black tracking-tight text-slate-900 dark:text-white">
-                {{ __('Edit Role Permissions') }}
-            </flux:heading>
-            <flux:subheading>
-                {{ __('Modifying roles will immediately affect all users currently assigned to this profile.') }}
-            </flux:subheading>
-        </div>
-        
-        <flux:button icon="arrow-uturn-left" variant="ghost" size="sm" href="{{ route('roles.index') }}" wire:navigate>
-            {{ __('Back to Roles') }}
-        </flux:button>
-    </header>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <x-page-header
+        title="Edit Role Permissions"
+        subtitle="Modifying roles will immediately affect all users currently assigned to this profile."
+        icon="shield-check"
+        :breadcrumbs="[
+            'Registry' => '#',
+            'Roles' => route('roles.index'),
+            'Edit' => '#'
+        ]"
+    >
+        <x-slot:actions>
+            <flux:button icon="arrow-uturn-left" variant="ghost" size="sm" href="{{ route('roles.index') }}" wire:navigate>
+                {{ __('Back to Roles') }}
+            </flux:button>
+        </x-slot:actions>
+    </x-page-header>
 
-    <flux:separator variant="subtle" class="mb-10" />
-
-    <form wire:submit.prevent="updateRole" class="space-y-12">
+    <form wire:submit.prevent="updateRole" class="space-y-8">
         
         {{-- Section 1: Role Naming --}}
         <section class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -64,13 +59,13 @@
                         @endphp
 
                         @foreach ($groupedPermissions as $prefix => $permissions)
-                            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] overflow-hidden shadow-sm transition-all hover:border-indigo-500/30">
+                            <div class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-4xl overflow-hidden shadow-sm transition-all hover:border-indigo-500/30">
                                 {{-- Module Header --}}
-                                <div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                                <div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                                     <span class="text-[11px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
                                         {{ $prefix }}
                                     </span>
-                                    <span class="text-[10px] font-bold text-slate-400">
+                                    <span class="text-[10px] font-bold text-slate-500">
                                         {{ $permissions->count() }} {{ __('Capabilities') }}
                                     </span>
                                 </div>
@@ -83,7 +78,7 @@
                                                 value="{{ $item->name }}" 
                                                 class="transition-transform group-hover:scale-110"
                                             />
-                                            <span class="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors capitalize">
+                                            <span class="text-sm text-slate-600 dark:text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white transition-colors capitalize">
                                                 {{ str_replace(['.', $prefix], [' ', ''], $item->name) }}
                                             </span>
                                         </label>
@@ -97,7 +92,7 @@
         </section>
 
         {{-- Fixed Action Bar --}}
-        <div class="sticky bottom-6 z-10 flex items-center justify-end gap-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl">
+        <div class="sticky bottom-6 z-10 flex items-center justify-end gap-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-4 rounded-3xl border border-slate-300 dark:border-slate-700 shadow-2xl">
             <flux:button variant="ghost" href="{{ route('roles.index') }}" wire:navigate>{{ __('Cancel') }}</flux:button>
             <flux:button type="submit" variant="primary" icon="check-circle" class="px-12">
                 {{ __('Update Role') }}

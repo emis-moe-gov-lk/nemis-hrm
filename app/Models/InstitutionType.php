@@ -5,6 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class InstitutionType
+ *
+ * @property string $type_id
+ * @property string $name
+ */
 class InstitutionType extends Model
 {
     use HasFactory;

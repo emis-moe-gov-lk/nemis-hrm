@@ -73,25 +73,32 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['permission:teacher.profile.pdf.view']);
 
     Route::get('teacher/overview', TeacherOverview::class)
-        ->name('teacher.overview');
+        ->name('teacher.overview')
+        ->middleware(['permission:teacher.overview.view']);
 
     Route::get('teacher/leave-operations', LeaveOperations::class)
-        ->name('teacher.leave-operations');
+        ->name('teacher.leave-operations')
+        ->middleware(['permission:teacher.leave-operations.view']);
 
     Route::get('teacher/attachments', TeacherAttachments::class)
-        ->name('teacher.attachments');
+        ->name('teacher.attachments')
+        ->middleware(['permission:teacher.attachments.view']);
 
     Route::get('teacher/promotions', Promotions::class)
-        ->name('teacher.promotions');
+        ->name('teacher.promotions')
+        ->middleware(['permission:teacher.promotion.view']);
 
     Route::get('teacher/pension-system', PensionSystem::class)
-        ->name('teacher.pension-system');
+        ->name('teacher.pension-system')
+        ->middleware(['permission:teacher.pension-system.view']);
 
     Route::get('teacher/specializations', Specializations::class)
-        ->name('teacher.specializations');
+        ->name('teacher.specializations')
+        ->middleware(['permission:teacher.specializations.view']);
 
     Route::get('teacher/benefits-and-health', BenefitsAndHealth::class)
-        ->name('teacher.benefits-and-health');
+        ->name('teacher.benefits-and-health')
+        ->middleware(['permission:teacher.benefits-and-health.view']);
 
     /*
     |--------------------------------------------------------------------------

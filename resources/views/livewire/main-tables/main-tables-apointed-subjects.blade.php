@@ -36,7 +36,7 @@
             {{-- 3. Responsive Card Grid --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 lg:px-0">
                 @forelse ($apointed_subjects as $key => $data)
-                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/60 dark:hover:shadow-indigo-500/10 hover:-translate-y-1.5 flex flex-col">
+                    <div class="group relative bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/60 dark:hover:shadow-indigo-500/10 hover:-translate-y-1.5 flex flex-col">
                         
                         {{-- ID & Badge Row --}}
                         <div class="flex justify-between items-start mb-6">
@@ -45,7 +45,7 @@
                                     {{ $apointed_subjects->firstItem() + $key }}
                                 </div>
                                 <div>
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">{{ __('Code') }}</p>
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">{{ __('Code') }}</p>
                                     <p class="text-sm font-bold text-slate-900 dark:text-white">{{ $data->a_subject_id }}</p>
                                 </div>
                             </div>
@@ -58,17 +58,17 @@
                         {{-- Language Content --}}
                         <div class="space-y-4 mb-8">
                             <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-transparent group-hover:border-indigo-100 dark:group-hover:border-indigo-900/30 transition-colors duration-300">
-                                <span class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wider">{{ __('English Name') }}</span>
+                                <span class="block text-[10px] font-bold uppercase text-slate-500 mb-1 tracking-wider">{{ __('English Name') }}</span>
                                 <span class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ $data->name_en }}</span>
                             </div>
                             
                             <div class="grid grid-cols-2 gap-3">
-                                <div class="p-3 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white/50 dark:bg-slate-900/50">
-                                    <span class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wider">{{ __('Sinhala') }}</span>
+                                <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-2xl bg-white/50 dark:bg-slate-900/50">
+                                    <span class="block text-[10px] font-bold uppercase text-slate-500 mb-1 tracking-wider">{{ __('Sinhala') }}</span>
                                     <span class="text-xs font-medium text-slate-600 dark:text-slate-300 line-clamp-1">{{ $data->name_si }}</span>
                                 </div>
-                                <div class="p-3 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white/50 dark:bg-slate-900/50">
-                                    <span class="block text-[10px] font-bold uppercase text-slate-400 mb-1 tracking-wider">{{ __('Tamil') }}</span>
+                                <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-2xl bg-white/50 dark:bg-slate-900/50">
+                                    <span class="block text-[10px] font-bold uppercase text-slate-500 mb-1 tracking-wider">{{ __('Tamil') }}</span>
                                     <span class="text-xs font-medium text-slate-600 dark:text-slate-300 line-clamp-1">{{ $data->name_ta }}</span>
                                 </div>
                             </div>
@@ -95,9 +95,9 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-20 bg-slate-50/50 dark:bg-slate-800/10 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-center">
+                    <div class="col-span-full py-20 bg-slate-50/50 dark:bg-slate-800/10 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center text-center">
                         <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
-                            <flux:icon.document-magnifying-glass class="text-slate-400" size="xl" />
+                            <flux:icon.document-magnifying-glass class="text-slate-500" size="xl" />
                         </div>
                         <flux:heading size="lg" class="!font-black text-slate-900 dark:text-white">{{ __('No Subjects Found') }}</flux:heading>
                         <flux:text class="max-w-xs mx-auto">{{ __('Your subject registry is currently empty. Get started by adding your first subject.') }}</flux:text>

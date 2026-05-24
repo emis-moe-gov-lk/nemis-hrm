@@ -1,3 +1,3 @@
 <div>
-    <h1>attachments</h1>
+    <livewire:employees.employee-attachments serviceID="SER001" />
 </div>

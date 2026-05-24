@@ -24,7 +24,9 @@ class TeacherList extends Component
     public $selectedZone = '';
     public $selectedDivision = '';
     public $selectedInstitution = '';
-    
+
+    private ?array $allowedWorkplaceIdsCache = null;
+
     public $isProvinceLocked = false;
     public $isZoneLocked = false;
     public $isDivisionLocked = false;
@@ -65,7 +67,7 @@ class TeacherList extends Component
         }
     }
 
-    public function updatedSelectedProvince($value)
+    public function updatedSelectedProvince(?string $value)
     {
         $this->reset(['selectedZone', 'selectedDivision', 'selectedInstitution', 'query', 'results', 'divisionOption', 'institutionOption']);
         $this->resetPage();
@@ -77,7 +79,7 @@ class TeacherList extends Component
         }
     }
 
-    public function updatedSelectedZone($value)
+    public function updatedSelectedZone(?string $value)
     {
         $this->reset(['selectedDivision', 'selectedInstitution', 'query', 'results', 'institutionOption']);
         $this->resetPage();
@@ -89,7 +91,7 @@ class TeacherList extends Component
         }
     }
 
-    public function updatedSelectedDivision($value)
+    public function updatedSelectedDivision(?string $value)
     {
         $this->reset(['selectedInstitution', 'query', 'results']);
         $this->resetPage();
@@ -107,36 +109,52 @@ class TeacherList extends Component
         $this->reset(['query', 'results']);
     }
 
-    private function getAllowedWorkplaceIds()
+    private function getAllowedWorkplaceIds(): array
     {
+        if ($this->allowedWorkplaceIdsCache !== null) {
+            return $this->allowedWorkplaceIdsCache;
+        }
+
         $logged = Auth::user()->load('workplace');
         $workplace = $logged->workplace;
 
         if (!$workplace) {
-            return [];
+            return $this->allowedWorkplaceIdsCache = [];
         }
 
         $allowedWorkplaceIds = $workplace->getAllChildWorkplaces();
 
         if (!empty($this->selectedInstitution)) {
-            $inst = Workplaces::where('workplace_id', $this->selectedInstitution)->first();
+            $inst = Workplaces::find($this->selectedInstitution);
             $instIds = $inst ? $inst->getAllChildWorkplaces() : [];
-            $allowedWorkplaceIds = array_intersect($allowedWorkplaceIds, $instIds);
+            $allowedWorkplaceIds = array_values(array_intersect($allowedWorkplaceIds, $instIds));
         } elseif (!empty($this->selectedDivision)) {
-            $div = Workplaces::where('workplace_id', $this->selectedDivision)->first();
+            $div = Workplaces::find($this->selectedDivision);
             $divIds = $div ? $div->getAllChildWorkplaces() : [];
-            $allowedWorkplaceIds = array_intersect($allowedWorkplaceIds, $divIds);
+            $allowedWorkplaceIds = array_values(array_intersect($allowedWorkplaceIds, $divIds));
         } elseif (!empty($this->selectedZone)) {
-            $zone = Workplaces::where('workplace_id', $this->selectedZone)->first();
+            $zone = Workplaces::find($this->selectedZone);
             $zoneIds = $zone ? $zone->getAllChildWorkplaces() : [];
-            $allowedWorkplaceIds = array_intersect($allowedWorkplaceIds, $zoneIds);
+            $allowedWorkplaceIds = array_values(array_intersect($allowedWorkplaceIds, $zoneIds));
         } elseif (!empty($this->selectedProvince)) {
-            $peo = Workplaces::where('workplace_id', $this->selectedProvince)->first();
+            $peo = Workplaces::find($this->selectedProvince);
             $peoIds = $peo ? $peo->getAllChildWorkplaces() : [];
-            $allowedWorkplaceIds = array_intersect($allowedWorkplaceIds, $peoIds);
+            $allowedWorkplaceIds = array_values(array_intersect($allowedWorkplaceIds, $peoIds));
         }
 
-        return $allowedWorkplaceIds;
+        return $this->allowedWorkplaceIdsCache = $allowedWorkplaceIds;
+    }
+
+    private function getTeacherBaseQuery(array $allowedWorkplaceIds)
+    {
+        return People::query()
+            ->select('people.*')
+            ->join('employer_appointments', 'employer_appointments.employee_id', '=', 'people.people_id')
+            ->join('employer_current_appointments', 'employer_current_appointments.employee_id', '=', 'people.people_id')
+            ->where('employer_appointments.service_id', 'SER001')
+            ->whereIn('employer_current_appointments.workplace_id', $allowedWorkplaceIds)
+            ->where('people.active_status', 1)
+            ->distinct('people.people_id');
     }
 
     public function updatedQuery()
@@ -156,37 +174,24 @@ class TeacherList extends Component
             return;
         }
 
-        // base query: restrict to teachers in allowed workplaces
-        $peopleQuery = People::query()
-            ->active()
-            ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds) {
-                $q->where('service_id', 'SER001')
-                    ->whereIn('workplace_id', $allowedWorkplaceIds);
-            });
+        $peopleQuery = $this->getTeacherBaseQuery($allowedWorkplaceIds)->take(10);
 
-        // If input looks like a valid NIC -> do exact NIC hash lookup
         if (NicHelper::isValid($raw)) {
             $normalized = NicHelper::normalize($raw);
             $hash = NicHelper::hash($normalized);
-
-            $peopleQuery->where('nic_hash', $hash);
+            $peopleQuery->where('people.nic_hash', $hash);
         } else {
-            // Otherwise search loose on contact / email / name
             $search = $raw;
             $peopleQuery->where(function ($q) use ($search) {
-                $q->where('phone', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('full_name', 'like', "%{$search}%")
-                    ->orWhere('name_with_initials', 'like', "%{$search}%");
+                $q->where('people.phone', 'like', "%{$search}%")
+                    ->orWhere('people.email', 'like', "%{$search}%")
+                    ->orWhere('people.full_name', 'like', "%{$search}%")
+                    ->orWhere('people.name_with_initials', 'like', "%{$search}%");
             });
         }
 
-        $this->results = $peopleQuery
-            ->limit(10)
-            ->get();
+        $this->results = $peopleQuery->get();
     }
-
-
 
     public function render()
     {
@@ -199,23 +204,19 @@ class TeacherList extends Component
         }
 
         // Main teacher query
-        $employees = People::with([
-            'currentAppointment.workplace',
-            'currentAppointment.position',
-            'currentAppointment.rank',
-            'currentAppointment.service',
-            'currentAppointment.workplace.ministry',
-            'currentAppointment.workplace.provincialMinistry',
-            'currentAppointment.workplace.provincial',
-            'currentAppointment.workplace.zonal',
-            'currentAppointment.workplace.divisional',
-            'currentAppointment.workplace.institution',
-        ])
-            ->whereHas('currentAppointment', function ($q) use ($allowedWorkplaceIds) {
-                $q->where('service_id', 'SER001')       // Teachers
-                    ->whereIn('workplace_id', $allowedWorkplaceIds);
-            })
-            ->active()
+        $employees = $this->getTeacherBaseQuery($allowedWorkplaceIds)
+            ->with([
+                'appointment.service',
+                'currentAppointment.workplace',
+                'currentAppointment.position',
+                'currentAppointment.rank',
+                'currentAppointment.workplace.ministry',
+                'currentAppointment.workplace.provincialMinistry',
+                'currentAppointment.workplace.provincial',
+                'currentAppointment.workplace.zonal',
+                'currentAppointment.workplace.divisional',
+                'currentAppointment.workplace.institution',
+            ])
             ->paginate(20);
 
         return view('livewire.teacher.teacher-list', compact('employees'));

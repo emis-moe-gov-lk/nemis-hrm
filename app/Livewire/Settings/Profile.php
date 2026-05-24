@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Settings;
 
+use App\Services\Auth\MfaManager;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -52,12 +53,24 @@ class Profile extends Component
         ]);
 
         $user->fill($validated);
+        $emailChanged = $user->isDirty('email');
+        $contactChanged = $user->isDirty('contact');
 
-        if ($user->isDirty('email')) {
+        if ($emailChanged) {
             $user->email_verified_at = null;
         }
 
         $user->save();
+
+        $mfaManager = app(MfaManager::class);
+
+        if ($emailChanged) {
+            $mfaManager->ensureCurrentStateAfterEmailChange($user);
+        }
+
+        if ($contactChanged) {
+            $mfaManager->ensureCurrentStateAfterContactChange($user);
+        }
 
         $this->dispatch('profile-updated', name: $user->name);
     }

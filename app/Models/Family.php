@@ -4,11 +4,17 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\Blameable;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
+/**
+ * Class Family
+ *
+ * @property string $family_id
+ */
 class Family extends Model
 {
     use HasFactory, LogsActivity, Blameable;
@@ -62,12 +68,12 @@ class Family extends Model
     }
 
     // If you want to filter active institutions by default
-    public function scopeActive($query)
+    public function scopeActive(Builder $query)
     {
         return $query->where('active_status', 1);
     }
 
-    public function getMarriedDateAttribute($value)
+    public function getMarriedDateAttribute(?string $value)
     {
         return Carbon::parse($value)->format('Y-m-d');
     }

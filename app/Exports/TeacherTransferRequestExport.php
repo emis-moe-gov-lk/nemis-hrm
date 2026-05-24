@@ -12,12 +12,14 @@ class TeacherTransferRequestExport implements FromCollection, WithHeadings, With
 {
     protected $filterPolicy;
     protected $filterCategory;
+    protected $filterSubCategory;
     protected $filterZone;
 
-    public function __construct($filterPolicy, $filterCategory, $filterZone)
+    public function __construct($filterPolicy, $filterCategory, $filterSubCategory, $filterZone)
     {
         $this->filterPolicy = $filterPolicy;
         $this->filterCategory = $filterCategory;
+        $this->filterSubCategory = $filterSubCategory;
         $this->filterZone = $filterZone;
     }
 
@@ -28,7 +30,8 @@ class TeacherTransferRequestExport implements FromCollection, WithHeadings, With
             'targetProvince', 
             'reason', 
             'employee.title', 
-            'category',
+            'category.transferSubCategory',
+            'transferSubCategory',
             'currentWorkplace'
         ]);
 
@@ -45,6 +48,10 @@ class TeacherTransferRequestExport implements FromCollection, WithHeadings, With
 
             if ($this->filterCategory) {
                 $query->where('transfer_category', $this->filterCategory);
+            }
+
+            if ($this->filterSubCategory) {
+                $query->where('transfer_sub_category_id', $this->filterSubCategory);
             }
 
             if ($this->filterZone) {
@@ -67,7 +74,7 @@ class TeacherTransferRequestExport implements FromCollection, WithHeadings, With
         return [
             'Submission Date',
             'Transfer Policy',
-            'Transfer Category',
+            'Category',
             'Applicant Name',
             'Applicant Employee ID',
             'Applicant NIC',
@@ -101,7 +108,7 @@ class TeacherTransferRequestExport implements FromCollection, WithHeadings, With
         return [
             $app->created_at ? $app->created_at->format('Y-m-d') : 'N/A',
             $app->policy->title ?? 'N/A',
-            $app->category->transfer_category_name ?? 'N/A',
+            $app->transferSubCategory->name ?? $app->category->transferSubCategory->name ?? $app->category->transfer_category_name ?? 'N/A',
             ($app->employee->title->title_name ?? '') . ' ' . ($app->employee->full_name ?? 'N/A'),
             $app->employee_id ?? 'N/A',
             $app->employee->nic ?? 'N/A',

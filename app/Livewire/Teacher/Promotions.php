@@ -57,10 +57,12 @@ class Promotions extends Component
 
     public function promoteTeacher($id)
     {
-        $this->teacher = People::whereHas('currentAppointment', function ($q) {
-            $q->where('service_id', 'SER001')
-                ->whereIn('workplace_id', $this->allowedWorkplaceIds);
+        $this->teacher = People::whereHas('appointment', function ($q) {
+            $q->where('service_id', 'SER001');
         })
+            ->whereHas('currentAppointment', function ($q) {
+                $q->whereIn('workplace_id', $this->allowedWorkplaceIds);
+            })
             ->where('id', $id)
             ->active()
             ->first();
@@ -94,7 +96,7 @@ class Promotions extends Component
             'appointment_letter_no' => $this->teacher->currentAppointment->appointment_letter_no,
             'appoint_date' => $this->teacher->currentAppointment->appoint_date,
             'end_date' => $this->promotion_effect_date,
-            'service_id' => $this->teacher->currentAppointment->service_id,
+            'service_id' => $this->teacher->currentAppointment->appointment->service_id,
             'rank_id' => $this->teacher->currentAppointment->rank_id,
             'position_id' => $this->teacher->currentAppointment->position_id,
             'office_level_id' => $this->teacher->currentAppointment->office_level_id,
@@ -126,9 +128,11 @@ class Promotions extends Component
             'currentAppointment.position',
             'currentAppointment.workplace'
         ])
+            ->whereHas('appointment', function ($q) {
+                $q->where('service_id', 'SER001');
+            })
             ->whereHas('currentAppointment', function ($q) {
-                $q->where('service_id', 'SER001')
-                    ->whereIn('workplace_id', $this->allowedWorkplaceIds);
+                $q->whereIn('workplace_id', $this->allowedWorkplaceIds);
             })
             ->active();
 

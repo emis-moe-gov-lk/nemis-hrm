@@ -10,7 +10,7 @@
                         {{ __('Institution Types') }}
                     </flux:heading>
                     <flux:subheading size="lg" class="flex items-center gap-2">
-                        <flux:icon.building-office-2 variant="micro" class="text-slate-400" />
+                        <flux:icon.building-office-2 variant="micro" class="text-slate-500" />
                         {{ __('Manage categories and classifications for system institutions') }}
                     </flux:subheading>
                 </div>
@@ -37,11 +37,11 @@
             {{-- CARD GRID --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 @forelse ($institution_types as $key => $data)
-                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500/30 transition-all duration-500">
+                    <div class="group relative flex flex-col bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-[2.5rem] p-6 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500/30 transition-all duration-500">
                         
                         {{-- Card Top Row: ID & Status --}}
                         <div class="flex justify-between items-start mb-6">
-                            <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full border border-slate-200 dark:border-slate-700">
+                            <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 rounded-full border border-slate-300 dark:border-slate-700">
                                 {{ $data->institution_types_id }}
                             </span>
                             
@@ -61,16 +61,16 @@
                             <h3 class="text-lg font-black text-slate-900 dark:text-white leading-tight uppercase tracking-tight group-hover:text-indigo-600 transition-colors">
                                 {{ $data->institution_types_name }}
                             </h3>
-                            <p class="mt-3 text-xs text-slate-500 dark:text-slate-400 line-clamp-2 px-2">
+                            <p class="mt-3 text-xs text-slate-500 dark:text-slate-500 line-clamp-2 px-2">
                                 {{ $data->description ?? 'No description provided.' }}
                             </p>
                         </div>
 
                         {{-- Card Footer/Actions --}}
-                        <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
                              <div class="flex items-center gap-2">
                                 <flux:icon.hashtag variant="micro" class="text-slate-300" />
-                                <span class="text-xs font-bold text-slate-400">#{{ $institution_types->firstItem() + $key }}</span>
+                                <span class="text-xs font-bold text-slate-500">#{{ $institution_types->firstItem() + $key }}</span>
                              </div>
                              
                              <div class="flex items-center gap-1">
@@ -90,9 +90,9 @@
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-24 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div class="col-span-full py-24 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-300 dark:border-slate-700">
                         <flux:icon.building-office-2 size="xl" class="text-slate-300 mb-4" />
-                        <p class="text-slate-400 font-black uppercase tracking-widest text-sm italic">{{ __('No Institution Types Found') }}</p>
+                        <p class="text-slate-500 font-black uppercase tracking-widest text-sm italic">{{ __('No Institution Types Found') }}</p>
                     </div>
                 @endforelse
             </div>

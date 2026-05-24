@@ -11,8 +11,8 @@ class MainTablesServices extends Component
     public $showModelNewService = false; // control modal visibility
     public $showModelEditService = false; // control modal visibility
 
-    public $service_id, $service_name, $description;
-    public $update_service_id, $update_service_name, $update_description;
+    public $service_id, $service_name, $description, $rank;
+    public $update_service_id, $update_service_name, $update_description, $update_rank;
 
     public $editServiceId;
 
@@ -24,6 +24,7 @@ class MainTablesServices extends Component
         $this->update_service_id = $service->service_id;
         $this->update_service_name = $service->service_name;
         $this->update_description = $service->description;
+        $this->update_rank = $service->rank;
 
         $this->showModelEditService = true; // ensure modal is open
     }
@@ -43,12 +44,14 @@ class MainTablesServices extends Component
                 'max:255',
                 Rule::unique('services', 'service_name')->ignore($this->editServiceId),
             ],
+            'update_rank' => 'required|integer|min:0',
             'update_description' => 'nullable|string|max:500',
         ]);
 
         Service::where('id', $this->editServiceId)->update([
             'service_id' => $this->update_service_id,
             'service_name' => $this->update_service_name,
+            'rank' => $this->update_rank,
             'description' => $this->update_description,
         ]);
 
@@ -56,7 +59,7 @@ class MainTablesServices extends Component
 
         session()->flash('message', '✅ Service updated successfully!');
 
-        $this->reset(['update_service_id', 'update_service_name', 'update_description', 'editServiceId']);
+        $this->reset(['update_service_id', 'update_service_name', 'update_rank', 'update_description', 'editServiceId']);
     }
 
 
@@ -77,6 +80,7 @@ class MainTablesServices extends Component
                     'max:255',
                     Rule::unique('services', 'service_name')->ignore($this->editServiceId),
                 ],
+                'update_rank' => 'required|integer|min:0',
                 'update_description' => 'nullable|string|max:500',
             ];
         }
@@ -89,6 +93,7 @@ class MainTablesServices extends Component
                 'unique:services,service_id'
             ],
             'service_name' => 'required|string|max:255|unique:services,service_name',
+            'rank' => 'required|integer|min:0',
             'description' => 'nullable|string|max:500',
         ];
     }
@@ -110,7 +115,7 @@ class MainTablesServices extends Component
         // ✅ Close the modal
         $this->showModelNewService = false;
 
-        $this->reset(['service_id', 'service_name', 'description']);
+        $this->reset(['service_id', 'service_name', 'rank', 'description']);
     }
 
     public function deleteService($id)

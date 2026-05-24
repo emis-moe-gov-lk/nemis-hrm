@@ -9,6 +9,8 @@ use App\Models\ZonalEducationOffice;
 use App\Models\TeacherTransferApplication;
 use App\Models\TeacherTransferApplicationRecommendation;
 use App\Models\TeacherTransferRecommendationList;
+use App\Support\Transfer\TransferAccess;
+use App\Support\Transfer\TransferSubCategoryRules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -22,15 +24,17 @@ class TeachersTransferRequests extends Component
     // Modal State
     public $showRecommendationModal = false;
     public $selectedApplication;
-    public $recommendationDecision;
+    public ?string $recommendationDecision = null;
     public $recommendationRemarks;
     public $recommendationOptions = [];
+    public string $requestScope = 'approval_required';
 
     public function mount($id)
     {
         $this->id = $id;
         $this->zeo = ZonalEducationOffice::findOrFail($this->id);
         $this->office = Workplaces::where('workplace_id', $this->zeo->workplace_id)->firstOrFail();
+        abort_unless(TransferAccess::canViewZonalRequests(Auth::user(), $this->office), 403);
         
         // Fetch Zonal Level (OLID004) Recommendation Options
         $this->recommendationOptions = TeacherTransferRecommendationList::where('office_level_id', 'OLID004')
@@ -40,7 +44,26 @@ class TeachersTransferRequests extends Component
 
     public function openRecommendationModal($applicationId)
     {
-        $this->selectedApplication = TeacherTransferApplication::with(['employee', 'currentWorkplace', 'policy.steps'])->findOrFail($applicationId);
+        abort_unless(TransferAccess::canViewZonalRequests(Auth::user(), $this->office), 403);
+
+        $this->selectedApplication = TeacherTransferApplication::with([
+            'employee',
+            'currentWorkplace',
+            'policy.steps',
+            'category.transferSubCategory',
+            'transferSubCategory',
+        ])->findOrFail($applicationId);
+        abort_unless(in_array($this->selectedApplication->current_workplace, $this->office->getAllChildWorkplaces(), true), 403);
+
+        if ($this->isIntraZoneApplication($this->selectedApplication)) {
+            $this->selectedApplication = null;
+            $this->dispatch('notify', [
+                'type' => 'info',
+                'message' => 'Intra Zone applications are handled by the zonal transfer board and do not require zonal approval.',
+            ]);
+
+            return;
+        }
         
         // Check for existing recommendation at this zonal office
         $existing = TeacherTransferApplicationRecommendation::where('transfer_application_id', $this->selectedApplication->transfer_application_id)
@@ -51,7 +74,7 @@ class TeachersTransferRequests extends Component
             $this->recommendationDecision = $existing->transfer_recommendation_list_id;
             $this->recommendationRemarks = $existing->remarks;
         } else {
-            $this->recommendationDecision = '';
+            $this->recommendationDecision = null;
             $this->recommendationRemarks = '';
         }
 
@@ -66,8 +89,25 @@ class TeachersTransferRequests extends Component
 
     public function submitRecommendation()
     {
+        abort_unless(
+            $this->selectedApplication
+                && TransferAccess::canViewZonalRequests(Auth::user(), $this->office)
+                && in_array($this->selectedApplication->current_workplace, $this->office->getAllChildWorkplaces(), true),
+            403
+        );
+
+        if ($this->isIntraZoneApplication($this->selectedApplication)) {
+            $this->closeRecommendationModal();
+            $this->dispatch('notify', [
+                'type' => 'info',
+                'message' => 'Intra Zone applications are board-handled and cannot be approved from this queue.',
+            ]);
+
+            return;
+        }
+
         $this->validate([
-            'recommendationDecision' => 'required',
+            'recommendationDecision' => 'required|exists:teacher_transfer_recommendation_lists,transfer_recommendation_list_id',
             'recommendationRemarks' => 'nullable|string|max:500',
         ]);
 
@@ -91,7 +131,7 @@ class TeachersTransferRequests extends Component
             );
 
             // Handle rejection or advance step
-            if (Str::contains(strtolower($decision->decision), 'reject') || Str::contains(strtolower($decision->decision), 'not qualified')) {
+            if (Str::contains(strtolower($decision->decision), ['reject', 'not qualified', 'not recomemded', 'not recommended'])) {
                 $this->selectedApplication->update(['status' => 'rejected']);
             } else {
                 // Advance to next step (e.g. Provincial)
@@ -121,6 +161,18 @@ class TeachersTransferRequests extends Component
         }
     }
 
+    public function isIntraZoneApplication(?TeacherTransferApplication $application): bool
+    {
+        if (! $application) {
+            return false;
+        }
+
+        $code = $application->transferSubCategory?->code
+            ?? $application->category?->transferSubCategory?->code;
+
+        return $code === TransferSubCategoryRules::CODE_INTER_ZONE;
+    }
+
     public function render()
     {
         // Discover all schools in this zone
@@ -130,17 +182,30 @@ class TeachersTransferRequests extends Component
             'employee', 
             'currentWorkplace', 
             'policy.steps', 
-            'category', 
+            'category.transferSubCategory',
+            'transferSubCategory',
             'teacher.appointmentSubject', 
             'teacher.mainSubject', 
             'teacher.secondarySubject',
             'recommendations' => function($query) {
                 $query->where('workplace_id', $this->office->workplace_id);
-            }
-        ])
+            },
+            'recommendations.recommendation',
+            'recommendations.approver',
+            ])
             ->whereIn('current_workplace', $childWorkplaces)
             ->where('status', '!=', 'draft') // Only show processed/processing ones
-            ->get();
+            ->get()
+            ->filter(function (TeacherTransferApplication $application) {
+                $isIntraZone = $this->isIntraZoneApplication($application);
+
+                return match ($this->requestScope) {
+                    'intra_zone' => $isIntraZone,
+                    'all' => true,
+                    default => ! $isIntraZone,
+                };
+            })
+            ->values();
 
         return view('livewire.offices.zeo.transfer.teachers-transfer-requests', [
             'transferRequests' => $transferRequests,
