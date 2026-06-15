@@ -1,3 +1,18 @@
+# -----------------------
+# 1. Node build stage
+# -----------------------
+FROM node:20 AS node_builder
+
+WORKDIR /app
+COPY . .
+
+RUN npm install
+RUN npm run build
+
+
+# -----------------------
+# 2. PHP runtime stage
+# -----------------------
 FROM php:8.4-fpm
 
 # Install system dependencies
@@ -28,3 +43,8 @@ RUN composer install --no-interaction --no-dev --optimize-autoloader || true
 EXPOSE 9000
 
 CMD ["php-fpm"]
+
+
+
+
+
