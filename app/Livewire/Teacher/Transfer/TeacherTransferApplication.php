@@ -23,6 +23,7 @@ use App\Models\TeacherTransferCategory;
 use App\Models\TeacherTransferSubCategory;
 use App\Support\Transfer\TransferAccess;
 use App\Support\Transfer\TransferSubCategoryRules;
+use Illuminate\Validation\ValidationException;
 
 class TeacherTransferApplication extends Component
 {
@@ -510,6 +511,8 @@ class TeacherTransferApplication extends Component
             session()->flash('success', __('Application saved as draft successfully.'));
 
             return $this->redirectToPolicyRequests();
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             report($e);
             session()->flash('error', __('Unable to save the transfer application right now.'));
@@ -602,6 +605,7 @@ class TeacherTransferApplication extends Component
 
             if ($this->isEditMode) {
                 $application = TeacherTransferApplicationModel::where('transfer_application_id', $this->applicationId)->firstOrFail();
+                $data['update_cnt'] = DB::raw('update_cnt + 1');
                 $application->update($data);
                 $application->preferences()->delete();
             } else {
@@ -954,20 +958,35 @@ class TeacherTransferApplication extends Component
         $selectedSubCategory = $this->selectedSubCategoryData();
 
         if (!$selectedSubCategory) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'transferSubCategoryId' => __('Select a valid category.'),
             ]);
         }
 
         if (!$selectedCategory || ($selectedCategory['sub_category_id'] ?? null) !== $this->transferSubCategoryId) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'transferSubCategoryId' => __('Select a valid category for this policy.'),
+            ]);
+        }
+
+        $duplicateExists = TeacherTransferApplicationModel::query()
+            ->where('employee_id', $this->employeeId)
+            ->where('transfer_category', $this->transferCategoryId)
+            ->when(
+                $this->isEditMode && filled($this->applicationId),
+                fn ($query) => $query->where('transfer_application_id', '!=', $this->applicationId)
+            )
+            ->exists();
+
+        if ($duplicateExists) {
+            throw ValidationException::withMessages([
+                'transferSubCategoryId' => __('This employee already has a transfer application for the selected transfer category.'),
             ]);
         }
 
         if (($selectedSubCategory['code'] ?? null) === TransferSubCategoryRules::CODE_ANOTHER_PROVINCE
             && $this->selectedProvinceId === $this->currentProvinceId) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'selectedProvinceId' => __('Select a destination province outside your current province.'),
             ]);
         }
@@ -985,7 +1004,7 @@ class TeacherTransferApplication extends Component
                     continue;
                 }
 
-                throw \Illuminate\Validation\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                     "selectedZones.{$index}" => __('For "To Another Zone", your current working zone cannot be selected as a preference.'),
                 ]);
             }

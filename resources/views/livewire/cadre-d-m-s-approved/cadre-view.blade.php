@@ -7,6 +7,14 @@
     >
         <x-slot:actions>
             @if ($activeCircular)
+                <flux:button
+                    wire:click="downloadPdf"
+                    icon="printer"
+                    variant="primary"
+                    class="h-11 bg-emerald-600! hover:bg-emerald-700! text-white! shadow-lg shadow-emerald-200 border-none">
+                    {{ __('Download PDF') }}
+                </flux:button>
+
                 @can('cadre-dms-approved.add')
                     <flux:button
                         href="{{ route('cadre-dms-approved.add', [$id, $activeCircular->id]) }}"

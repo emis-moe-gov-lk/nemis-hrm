@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 
 class SystemSetting extends Model
@@ -20,13 +21,16 @@ class SystemSetting extends Model
 
     public static function bool(string $key, bool $default = false): bool
     {
-        if (! Schema::hasTable('system_settings')) {
-            return $default;
-        }
+        $value = Cache::remember("system_setting:{$key}", 86400, function () use ($key) {
+            try {
+                $setting = static::query()->whereKey($key)->first();
+                return $setting ? $setting->value : '__NULL__';
+            } catch (\Illuminate\Database\QueryException $e) {
+                return '__NULL__';
+            }
+        });
 
-        $value = static::query()->whereKey($key)->value('value');
-
-        if ($value === null) {
+        if ($value === '__NULL__') {
             return $default;
         }
 
@@ -39,5 +43,7 @@ class SystemSetting extends Model
             ['key' => $key],
             ['value' => $value ? '1' : '0'],
         );
+
+        Cache::forget("system_setting:{$key}");
     }
 }

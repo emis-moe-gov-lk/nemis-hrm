@@ -62,7 +62,7 @@ class EmployerAppointment extends Model
     protected $casts = [
         'first_appointment_date' => 'date',
         'retirement_date' => 'date',
-        'resign_date' => 'date',
+        'termination_date' => 'date',
     ];
 
     protected static function boot()
@@ -176,8 +176,8 @@ class EmployerAppointment extends Model
             return null;
         }
 
-        // Use resign_date if it exists and is not empty, otherwise use current date
-        $endDate = $this->resign_date ? Carbon::parse($this->resign_date) : Carbon::now();
+        // Use termination_date if it exists and is not empty, otherwise use current date
+        $endDate = $this->termination_date ? Carbon::parse($this->termination_date) : Carbon::now();
         $startDate = Carbon::parse($this->first_appointment_date);
 
         // Get the exact difference

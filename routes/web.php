@@ -163,7 +163,12 @@ Route::post('/oidc-login', [OIDCLoginController::class, 'logout'])->name('oidc.l
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
-    Route::get('sms-test', [SMSController::class, 'mobileSMSTest'])->name('sms.test');
+    Route::get('sms-test', [SMSController::class, 'mobileSMSTest'])->name('sms.test.original');
+    Route::get('sms/test', [SMSController::class, 'testForm'])->name('sms.test.form')->middleware(['permission:testSms']);
+    Route::post('sms/test', [SMSController::class, 'sendSmsTest'])->name('sms.test.send')->middleware(['permission:testSms']);
+    
+    Route::get('mail/test', [\App\Http\Controllers\MailTestController::class, 'testForm'])->name('mail.test.form')->middleware(['permission:testMail']);
+    Route::post('mail/test', [\App\Http\Controllers\MailTestController::class, 'sendMailTest'])->name('mail.test.send')->middleware(['permission:testMail']);
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -485,3 +490,4 @@ require __DIR__ . '/nationalSchool.php';
 require __DIR__ . '/transfer.php';
 require __DIR__ . '/employees.php';
 require __DIR__ . '/institutionGroups.php';
+require __DIR__ . '/people.php';

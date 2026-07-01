@@ -72,8 +72,11 @@
             <flux:icon.magnifying-glass variant="mini" /> Search Registry
         </flux:heading>
 
-        <flux:input wire:model.live.debounce.300ms="query" placeholder="Type name or NIC..."
-            class="rounded-xl! shadow-sm" clearable />
+        <div class="flex gap-2">
+            <flux:input wire:model="query" wire:keydown.enter="search" placeholder="Type name or NIC..."
+                class="flex-1 rounded-xl! shadow-sm" clearable />
+            <flux:button wire:click="search" variant="primary" icon="magnifying-glass" class="rounded-xl!"></flux:button>
+        </div>
 
         <div class="space-y-3 mt-6">
             @if(!empty($query))

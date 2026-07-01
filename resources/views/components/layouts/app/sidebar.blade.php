@@ -20,6 +20,7 @@
           // auto-open group by current route
           if (@js(request()->routeIs('offices.*'))) this.openGroup = 'offices';
           if (@js(request()->routeIs('teacher.*','principal.*','sleas.*','slas.*','sltes.*','sltas.*','slacs.*','dos.*','mso.*', 'employees.*'))) this.openGroup = 'employees';
+          if (@js(request()->routeIs('sms.test.*', 'mail.test.*'))) this.openGroup = 'settings';
         }
       }"
     x-init="init()">
@@ -139,23 +140,11 @@
                     </a>
                     @endcan
 
-                    {{-- Alerts --}}
-                    @can('alerts.overview.view')
-                    <a href="{{ route('alerts.overview') }}" wire:navigate
-                        class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
-                       {{ request()->routeIs('alerts.*') ? $activePill : $inactivePill }}">
-                        <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('alerts.*') ? $iconActive : $iconInactive }}">
-                            <flux:icon.bell variant="micro" />
-                        </span>
-                        <span class="text-[13px] font-semibold">Alerts</span>
-                    </a>
-                    @endcan
-
                     <div class="my-2 px-1">
                         <div class="h-px bg-slate-100 dark:bg-zinc-800"></div>
                     </div>
 
-                    @role('super admin')
+                     @role('super admin')
                     <a href="{{ route('roles.index') }}" wire:navigate
                         class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
                            {{ request()->routeIs('roles.*') ? $activePill : $inactivePill }}">
@@ -175,6 +164,30 @@
                     </a>
                     @endrole
 
+                    {{-- Alerts --}}
+                    @can('alerts.overview.view')
+                    <a href="{{ route('alerts.overview') }}" wire:navigate
+                        class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
+                       {{ request()->routeIs('alerts.*') ? $activePill : $inactivePill }}">
+                        <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('alerts.*') ? $iconActive : $iconInactive }}">
+                            <flux:icon.bell variant="micro" />
+                        </span>
+                        <span class="text-[13px] font-semibold">Alerts</span>
+                    </a>
+                    @endcan
+
+                    {{-- Peoples --}}
+                    @can('peoples.list.view')
+                    <a href="{{ route('peoples.list') }}" wire:navigate
+                        class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
+                           {{ request()->routeIs('peoples.*') ? $activePill : $inactivePill }}">
+                        <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('peoples.*') ? $iconActive : $iconInactive }}">
+                            <flux:icon.user-group variant="micro" />
+                        </span>
+                        <span class="text-[13px] font-semibold">Peoples</span>
+                    </a>
+                    @endcan
+
                     @can('user.list.view')
                     <a href="{{ route('users.index') }}" wire:navigate
                         class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
@@ -185,6 +198,10 @@
                         <span class="text-[13px] font-semibold">Users</span>
                     </a>
                     @endcan
+
+                    <div class="my-2 px-1">
+                        <div class="h-px bg-slate-100 dark:bg-zinc-800"></div>
+                    </div>
 
                     @can('cadre-dms-approved.index.view')
                     <a href="{{ route('cadre-dms-approved.index') }}" wire:navigate
@@ -266,6 +283,42 @@
                         <span class="text-[13px] font-semibold">Employees</span>
                     </a>
                     @endcan
+
+                    <div class="my-2 px-1">
+                        <div class="h-px bg-slate-100 dark:bg-zinc-800"></div>
+                    </div>
+                    <div class="mt-4 px-1">
+                        <button type="button" @click="toggleGroup('settings')" class="w-full flex items-center justify-between px-2 py-2 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800/50">
+                            <span class="text-[11px] font-extrabold tracking-widest uppercase">System Settings</span>
+                            <svg class="h-4 w-4 transition-transform duration-200" :class="openGroup === 'settings' ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div x-show="openGroup === 'settings'" class="mt-1 space-y-1" x-collapse x-cloak>
+                        @can('testSms')
+                        <a href="{{ route('sms.test.form') }}" wire:navigate
+                            class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
+                               {{ request()->routeIs('sms.test.*') ? $activePill : $inactivePill }}">
+                            <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('sms.test.*') ? $iconActive : $iconInactive }}">
+                                <flux:icon.device-phone-mobile variant="micro" />
+                            </span>
+                            <span class="text-[13px] font-semibold">Test SMS</span>
+                        </a>
+                        @endcan
+
+                        @can('testMail')
+                        <a href="{{ route('mail.test.form') }}" wire:navigate
+                            class="group flex items-center gap-3 rounded-xl px-3 py-2 transition
+                               {{ request()->routeIs('mail.test.*') ? $activePill : $inactivePill }}">
+                            <span class="grid place-items-center h-5 w-5 rounded-lg {{ request()->routeIs('mail.test.*') ? $iconActive : $iconInactive }}">
+                                <flux:icon.envelope variant="micro" />
+                            </span>
+                            <span class="text-[13px] font-semibold">Test Email</span>
+                        </a>
+                        @endcan
+                    </div>
                 </nav>
             </div>
 

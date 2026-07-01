@@ -24,8 +24,11 @@ class SendLoginOtpEmailJob implements ShouldQueue
 
     public function handle(): void
     {
-        Mail::to($this->user->email)->send(new LoginOtpMail($this->user, $this->code));
-
+        try {
+            Mail::to($this->user->email)->send(new LoginOtpMail($this->user, $this->code));
+        } catch (\Throwable $e) {
+            Log::warning('Failed to send login OTP email: ' . $e->getMessage());
+        }
         Log::info('mfa.email.dispatched', [
             'user_id' => $this->user->id,
         ]);

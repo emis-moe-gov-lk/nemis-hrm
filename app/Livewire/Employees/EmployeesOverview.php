@@ -7,7 +7,9 @@ use App\Models\People;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
 
+#[Layout('components.layouts.app.sidebar')]
 class EmployeesOverview extends Component
 {
     use WithPagination;
@@ -15,7 +17,14 @@ class EmployeesOverview extends Component
     public $query = '';
     public $results = [];
 
-    public function updatedQuery()
+    public function updatedQuery(string $value)
+    {
+        if (trim($value) === '') {
+            $this->results = [];
+        }
+    }
+
+    public function search()
     {
         $raw = trim($this->query);
 
@@ -24,8 +33,9 @@ class EmployeesOverview extends Component
             return;
         }
 
-        $logged = Auth::user()->load('workplace');
-        $workplace = $logged->workplace;
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        $workplace = $user?->workplace;
 
         if (!$workplace) {
             $this->results = [];
@@ -60,6 +70,7 @@ class EmployeesOverview extends Component
             ->limit(10)
             ->get();
     }
+
 
     public function getProfileRoute(People $person)
     {
@@ -204,7 +215,6 @@ class EmployeesOverview extends Component
             ],
         ];
 
-        return view('livewire.employees.employees-overview', compact('items'))
-            ->layout('components.layouts.app.sidebar');
+        return view('livewire.employees.employees-overview', compact('items'));
     }
 }

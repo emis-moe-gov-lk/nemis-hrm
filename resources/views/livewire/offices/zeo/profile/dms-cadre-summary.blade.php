@@ -10,7 +10,20 @@
 
         @if($circular)
         <div class="flex justify-end w-full mb-6">
-            <div class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl shadow-sm w-full sm:w-fit">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl shadow-sm w-full sm:w-fit">
+                <flux:button
+                    wire:click="downloadPdf"
+                    wire:loading.attr="disabled"
+                    wire:target="downloadPdf"
+                    icon="printer"
+                    variant="primary"
+                    class="h-10 justify-center bg-blue-600! hover:bg-blue-700! text-white! border-none shadow-sm">
+                    <span wire:loading.remove wire:target="downloadPdf">{{ __('Download PDF') }}</span>
+                    <span wire:loading wire:target="downloadPdf">{{ __('Preparing...') }}</span>
+                </flux:button>
+
+                <flux:separator vertical class="hidden sm:block h-8" />
+
                 <div class="flex-1 sm:flex-none text-right">
                     <span class="text-[9px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider block mb-0.5">{{ __('Circular') }}</span>
                     <span class="text-sm font-extrabold text-blue-600 dark:text-blue-400 tracking-tight">{{ $circular->circular_no }}</span>
@@ -75,6 +88,38 @@
         $grandDiff = collect($rows)->sum('diff');
         @endphp
 
+        @if($rows)
+        <div class="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                <div class="flex items-center justify-between gap-3">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">{{ __('Approved') }}</span>
+                    <span class="rounded-full bg-blue-50 px-2 py-1 text-[10px] font-black text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">{{ __('Cadre') }}</span>
+                </div>
+                <div class="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-white">{{ number_format($grandApproved) }}</div>
+            </div>
+
+            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                <div class="flex items-center justify-between gap-3">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">{{ __('Filled') }}</span>
+                    <span class="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-black text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">{{ __('Staff') }}</span>
+                </div>
+                <div class="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-white">{{ number_format($grandFilled) }}</div>
+            </div>
+
+            <div class="rounded-2xl border {{ $grandDiff < 0 ? 'border-red-200 bg-red-50/60 dark:border-red-500/20 dark:bg-red-500/10' : ($grandDiff > 0 ? 'border-blue-200 bg-blue-50/60 dark:border-blue-500/20 dark:bg-blue-500/10' : 'border-emerald-200 bg-emerald-50/60 dark:border-emerald-500/20 dark:bg-emerald-500/10') }} p-4 shadow-sm">
+                <div class="flex items-center justify-between gap-3">
+                    <span class="text-[10px] font-black uppercase tracking-widest {{ $grandDiff < 0 ? 'text-red-600 dark:text-red-400' : ($grandDiff > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-emerald-600 dark:text-emerald-400') }}">{{ __('Gap') }}</span>
+                    <span class="rounded-full bg-white px-2 py-1 text-[10px] font-black dark:bg-slate-900 {{ $grandDiff < 0 ? 'text-red-700 dark:text-red-400' : ($grandDiff > 0 ? 'text-blue-700 dark:text-blue-400' : 'text-emerald-700 dark:text-emerald-400') }}">
+                        {{ $grandDiff < 0 ? __('Deficit') : ($grandDiff > 0 ? __('Excess') : __('Balanced')) }}
+                    </span>
+                </div>
+                <div class="mt-2 text-3xl font-black tracking-tight {{ $grandDiff < 0 ? 'text-red-700 dark:text-red-400' : ($grandDiff > 0 ? 'text-blue-700 dark:text-blue-400' : 'text-emerald-700 dark:text-emerald-400') }}">
+                    {{ $grandDiff > 0 ? '+' . number_format($grandDiff) : number_format($grandDiff) }}
+                </div>
+            </div>
+        </div>
+        @endif
+
         {{-- 2. MOBILE VIEW (Enhanced Card Layout) --}}
         <div class="md:hidden space-y-8">
             @forelse($groupedRows as $typeId => $items)
@@ -136,22 +181,24 @@
 
             {{-- MOBILE GRAND TOTAL --}}
             @if($rows)
-            <div class="p-6 bg-indigo-600 dark:bg-slate-950/80 rounded-[2.5rem] text-white shadow-2xl mt-10 relative overflow-hidden ring-1 ring-white/10 dark:ring-white/5">
-                <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl font-black"></div>
-                <div class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-500 mb-6 border-b border-slate-800 dark:border-slate-700/50 pb-3">{{ __('Grand Summary') }}</div>
+            <div class="p-5 bg-white rounded-3xl text-slate-900 shadow-sm border border-slate-200 mt-8 dark:bg-slate-900 dark:text-white dark:border-slate-700">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{{ __('Grand Summary') }}</span>
+                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-black uppercase text-slate-600 dark:bg-slate-800 dark:text-slate-400">{{ __('Finalized') }}</span>
+                </div>
                 <div class="grid grid-cols-3 gap-6 text-center relative z-10">
                     <div>
                         <div class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase mb-1">{{ __('Approved') }}</div>
-                        <div class="text-2xl font-black tracking-tighter text-white">{{ $grandApproved }}</div>
+                        <div class="text-2xl font-black tracking-tighter text-slate-900 dark:text-white">{{ number_format($grandApproved) }}</div>
                     </div>
                     <div>
                         <div class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase mb-1">{{ __('Filled') }}</div>
-                        <div class="text-2xl font-black text-slate-300 dark:text-slate-500 tracking-tighter">{{ $grandFilled }}</div>
+                        <div class="text-2xl font-black text-slate-700 dark:text-slate-300 tracking-tighter">{{ number_format($grandFilled) }}</div>
                     </div>
                     <div>
                         <div class="text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase mb-1">{{ __('Gap') }}</div>
-                        <div class="text-2xl font-black tracking-tighter {{ $grandDiff < 0 ? 'text-red-400' : ($grandDiff > 0 ? 'text-blue-400' : 'text-white') }}">
-                            {{ $grandDiff > 0 ? '+' . $grandDiff : $grandDiff }}
+                        <div class="text-2xl font-black tracking-tighter {{ $grandDiff < 0 ? 'text-red-600 dark:text-red-400' : ($grandDiff > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-emerald-600 dark:text-emerald-400') }}">
+                            {{ $grandDiff > 0 ? '+' . number_format($grandDiff) : number_format($grandDiff) }}
                         </div>
                     </div>
                 </div>
@@ -218,22 +265,23 @@
                 </tbody>
 
                 @if($rows)
-                <tfoot class="bg-indigo-600 dark:bg-slate-950/80 text-white border-t-4 border-slate-800 dark:border-slate-900">
+                <tfoot class="bg-slate-50 border-t border-slate-200 dark:bg-slate-800/50 dark:border-slate-700">
                     <tr>
-                        <td class="px-6 py-8 text-xs font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-500">
-                            {{ __('Grand Summary') }}
+                        <td class="px-6 py-5">
+                            <div class="text-xs font-black uppercase tracking-[0.2em] text-slate-600 dark:text-slate-300">{{ __('Grand Summary') }}</div>
+                            <div class="mt-1 text-[10px] font-bold uppercase text-slate-400">{{ __('All selected institutions') }}</div>
                         </td>
-                        <td class="px-4 py-8 text-right text-2xl font-black tracking-tighter text-white">
-                            {{ $grandApproved }}
+                        <td class="px-4 py-5 text-right text-xl font-black tracking-tight text-slate-900 dark:text-white">
+                            {{ number_format($grandApproved) }}
                         </td>
-                        <td class="px-4 py-8 text-right text-2xl font-black text-slate-500 dark:text-slate-500 tracking-tighter">
-                            {{ $grandFilled }}
+                        <td class="px-4 py-5 text-right text-xl font-black text-slate-700 dark:text-slate-300 tracking-tight">
+                            {{ number_format($grandFilled) }}
                         </td>
-                        <td class="px-4 py-8 text-right text-2xl font-black tracking-tighter {{ $grandDiff < 0 ? 'text-red-400' : ($grandDiff > 0 ? 'text-blue-400' : 'text-white') }}">
-                            {{ $grandDiff > 0 ? '+' . $grandDiff : $grandDiff }}
+                        <td class="px-4 py-5 text-right text-xl font-black tracking-tight {{ $grandDiff < 0 ? 'text-red-600 dark:text-red-400' : ($grandDiff > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-emerald-600 dark:text-emerald-400') }}">
+                            {{ $grandDiff > 0 ? '+' . number_format($grandDiff) : number_format($grandDiff) }}
                         </td>
-                        <td class="px-6 py-8 text-center">
-                            <span class="px-3 py-1.5 rounded-lg bg-slate-800 dark:bg-slate-800/80 text-[10px] font-black uppercase text-slate-500 dark:text-slate-500 tracking-widest border border-slate-700 dark:border-slate-700/50">
+                        <td class="px-6 py-5 text-center">
+                            <span class="inline-flex items-center rounded-full bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-slate-600 ring-1 ring-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:ring-slate-700">
                                 {{ __('Finalized') }}
                             </span>
                         </td>

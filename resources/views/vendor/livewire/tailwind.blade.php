@@ -33,30 +33,34 @@ $scrollIntoViewJsSnippet = ($scrollTo !== false)
         </div>
 
         {{-- Pages --}}
-        <div class="hidden md:-mt-px md:flex md:justify-center overflow-x-auto hide-scrollbar max-w-[60%]">
-            @foreach ($elements as $element)
-            {{-- "Three Dots" Separator --}}
-            @if (is_string($element))
-            <span class="inline-flex items-center border-t-2 border-transparent px-2 pt-4 text-sm font-medium text-slate-500">
-                {{ $element }}
-            </span>
-            @endif
+        <div class="hidden md:-mt-px md:flex md:flex-1 md:justify-center min-w-0">
+            <div class="overflow-x-auto hide-scrollbar max-w-full">
+                <div class="flex justify-start">
+                    @foreach ($elements as $element)
+                    {{-- "Three Dots" Separator --}}
+                    @if (is_string($element))
+                    <span class="inline-flex items-center border-t-2 border-transparent px-2 pt-4 text-sm font-medium text-slate-500">
+                        {{ $element }}
+                    </span>
+                    @endif
 
-            {{-- Array Of Links --}}
-            @if (is_array($element))
-            @foreach ($element as $page => $url)
-            @if ($page == $paginator->currentPage())
-            <span class="inline-flex items-center border-t-2 border-indigo-500 px-3 pt-4 text-sm font-bold text-indigo-600 dark:text-indigo-400" aria-current="page">
-                {{ $page }}
-            </span>
-            @else
-            <button type="button" wire:click="gotoPage({{ $page }}, '{{ $paginator->getPageName() }}')" x-on:click="{{ $scrollIntoViewJsSnippet }}" class="inline-flex items-center border-t-2 border-transparent px-3 pt-4 text-sm font-medium text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-500 dark:hover:border-slate-600 dark:hover:text-slate-200 transition-colors focus:outline-none">
-                {{ $page }}
-            </button>
-            @endif
-            @endforeach
-            @endif
-            @endforeach
+                    {{-- Array Of Links --}}
+                    @if (is_array($element))
+                    @foreach ($element as $page => $url)
+                    @if ($page == $paginator->currentPage())
+                    <span class="inline-flex items-center border-t-2 border-indigo-500 px-3 pt-4 text-sm font-bold text-indigo-600 dark:text-indigo-400" aria-current="page">
+                        {{ $page }}
+                    </span>
+                    @else
+                    <button type="button" wire:click="gotoPage({{ $page }}, '{{ $paginator->getPageName() }}')" x-on:click="{{ $scrollIntoViewJsSnippet }}" class="inline-flex items-center border-t-2 border-transparent px-3 pt-4 text-sm font-medium text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-500 dark:hover:border-slate-600 dark:hover:text-slate-200 transition-colors focus:outline-none">
+                        {{ $page }}
+                    </button>
+                    @endif
+                    @endforeach
+                    @endif
+                    @endforeach
+                </div>
+            </div>
         </div>
 
         {{-- Next Button --}}

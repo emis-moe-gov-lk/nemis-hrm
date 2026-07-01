@@ -24,6 +24,7 @@ class UserIndex extends Component
 
     public function render()
     {
+        /** @var \App\Models\User $loggedUser */
         $loggedUser = Auth::user();
         $users = User::query()->with(['roles', 'currentAppointment']);
 
@@ -147,7 +148,11 @@ class UserIndex extends Component
             $user->password = Hash::make($newPassword);
             $user->save();
 
-            Mail::to($user->email)->send(new ResetPasswordMail($newPassword));
+            try {
+                Mail::to($user->email)->send(new ResetPasswordMail($newPassword));
+            } catch (\Throwable $e) {
+                Log::warning('Failed to send reset password email: ' . $e->getMessage());
+            }
 
             session()->flash('success', "Password reset successfully! PW: {$newPassword}");
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {

@@ -71,17 +71,23 @@ class DashboardController extends Controller
 
         // Counts
         $institutionCount = Cache::remember('dashboard:institution-count', 300, fn() => Institution::active()->count());
-        $teachersCount = Cache::remember('dashboard:teachers-count', 300, fn() => People::whereHas('currentAppointment', function ($q) {
-            $q->whereHas('appointment', fn($sq) => $sq->where('service_id', 'SER001'));
-        })->active()->count());
 
-        $principalsCount = Cache::remember('dashboard:principals-count', 300, fn() => People::whereHas('currentAppointment', function ($q) {
-            $q->whereHas('appointment', fn($sq) => $sq->where('service_id', 'SER004'));
-        })->active()->count());
+        $staffCounts = Cache::remember('dashboard:staff-counts', 300, function () {
+            return DB::table('people')
+                ->join('employer_current_appointments', 'people.people_id', '=', 'employer_current_appointments.employee_id')
+                ->join('employer_appointments', 'employer_current_appointments.appointment_id', '=', 'employer_appointments.appointment_id')
+                ->where('people.active_status', 1)
+                ->select([
+                    DB::raw("SUM(CASE WHEN employer_appointments.service_id = 'SER001' THEN 1 ELSE 0 END) as teachers_count"),
+                    DB::raw("SUM(CASE WHEN employer_appointments.service_id = 'SER004' THEN 1 ELSE 0 END) as principals_count"),
+                    DB::raw("SUM(CASE WHEN employer_appointments.service_id NOT IN ('SER001', 'SER004') THEN 1 ELSE 0 END) as other_count"),
+                ])
+                ->first();
+        });
 
-        $otherStaffCount = Cache::remember('dashboard:other-staff-count', 300, fn() => People::whereHas('currentAppointment', function ($q) {
-            $q->whereHas('appointment', fn($sq) => $sq->whereNotIn('service_id', ['SER001', 'SER004']));
-        })->active()->count());
+        $teachersCount = $staffCounts->teachers_count ?? 0;
+        $principalsCount = $staffCounts->principals_count ?? 0;
+        $otherStaffCount = $staffCounts->other_count ?? 0;
 
         $zonalOfficeCount = Cache::remember('dashboard:zonal-office-count', 300, fn() => ZonalEducationOffice::count());
         $divisionalOfficeCount = Cache::remember('dashboard:divisional-office-count', 300, fn() => DivisionalEducationOffice::count());
@@ -319,13 +325,22 @@ class DashboardController extends Controller
             ->join('employer_appointments', 'employer_current_appointments.appointment_id', '=', 'employer_appointments.appointment_id')
             ->join('people', 'employer_current_appointments.employee_id', '=', 'people.people_id')
             ->leftJoin('institutions', 'employer_current_appointments.workplace_id', '=', 'institutions.workplace_id')
-            ->join('districts_lists', DB::raw('COALESCE(institutions.district_id, people.district_id)'), '=', 'districts_lists.district_id')
-            ->join('provinces_lists', 'districts_lists.province_id', '=', 'provinces_lists.province_id')
+            ->leftJoin('districts_lists as dl_inst', 'institutions.district_id', '=', 'dl_inst.district_id')
+            ->leftJoin('provinces_lists as pl_inst', 'dl_inst.province_id', '=', 'pl_inst.province_id')
+            ->leftJoin('districts_lists as dl_people', 'people.district_id', '=', 'dl_people.district_id')
+            ->leftJoin('provinces_lists as pl_people', 'dl_people.province_id', '=', 'pl_people.province_id')
             ->where('employer_appointments.service_id', 'SER001')
             ->where('people.active_status', 1)
             ->where('employer_appointments.active_status', 1)
-            ->select('provinces_lists.province_name as name', DB::raw('COUNT(employer_current_appointments.id) as total'))
-            ->groupBy('provinces_lists.province_name')
+            ->where(function ($q) {
+                $q->whereNotNull('dl_inst.province_id')
+                  ->orWhereNotNull('dl_people.province_id');
+            })
+            ->select(
+                DB::raw('COALESCE(pl_inst.province_name, pl_people.province_name) as name'),
+                DB::raw('COUNT(employer_current_appointments.id) as total')
+            )
+            ->groupBy(DB::raw('COALESCE(pl_inst.province_name, pl_people.province_name)'))
             ->get());
 
         $studentByProv = Cache::remember('dashboard:student-by-prov:' . date('Y'), 300, fn() => DB::table('institution_student_admissions')

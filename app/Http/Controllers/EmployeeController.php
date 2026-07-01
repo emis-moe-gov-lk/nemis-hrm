@@ -231,7 +231,7 @@ class EmployeeController extends Controller
             // Send password mail
             try {
                 Mail::to($user->email)->send(new SendUserPassword($password));
-            } catch (Exception $e) {
+            } catch (\Throwable $e) {
                 Log::warning('Failed to send registration email: ' . $e->getMessage());
             }
 

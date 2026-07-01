@@ -60,6 +60,13 @@
                     @endforeach
                 </flux:select>
 
+                <flux:select wire:model.live="perPage" class="w-full sm:w-32 rounded-xl!" placeholder="{{ __('Per Page') }}">
+                    <option value="10">{{ __('10 / page') }}</option>
+                    <option value="25">{{ __('25 / page') }}</option>
+                    <option value="50">{{ __('50 / page') }}</option>
+                    <option value="100">{{ __('100 / page') }}</option>
+                </flux:select>
+
                 <div class="hidden sm:block w-px h-8 bg-slate-200 dark:bg-zinc-700 mx-2"></div>
 
                 <flux:button wire:click="exportExcel" variant="ghost" icon="arrow-down-tray" class="w-full sm:w-auto rounded-xl! text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
@@ -70,45 +77,45 @@
 
         {{-- Table --}}
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse whitespace-nowrap">
+            <table class="w-full table-fixed text-left border-collapse">
                 <thead>
                     <tr class="border-b border-slate-200 dark:border-zinc-700 bg-slate-50/80 dark:bg-zinc-800/50">
-                        <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">{{ __('Transfer Type') }}</th>
+                        <th class="w-[17%] px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">{{ __('Transfer Type') }}</th>
                         @if(auth()->user()->hasRole('super admin') || auth()->user()->workplace_id)
-                        <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">{{ __('Applicant') }}</th>
+                        <th class="w-[25%] px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">{{ __('Applicant') }}</th>
                         @endif
-                        <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">{{ __('Target Province') }}</th>
-                        <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">{{ __('Submitted') }}</th>
-                        <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">{{ __('Status') }}</th>
-                        <th class="px-6 py-4 text-right text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">{{ __('Actions') }}</th>
+                        <th class="w-[16%] px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">{{ __('Target Province') }}</th>
+                        <th class="w-[12%] px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">{{ __('Submitted') }}</th>
+                        <th class="w-[11%] px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">{{ __('Status') }}</th>
+                        <th class="w-[19%] px-4 py-4 text-right text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-zinc-400">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-zinc-800">
                     @forelse($applications as $app)
                     @php $badge = $this->statusBadge($app->status); @endphp
                     <tr class="group hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-all duration-300">
-                        <td class="px-6 py-4">
-                            <div class="flex flex-col gap-1">
-                                <span class="font-bold text-slate-900 dark:text-white truncate max-w-[250px] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        <td class="px-4 py-4">
+                            <div class="flex min-w-0 flex-col gap-1">
+                                <span class="block max-w-full truncate font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                                     {{ $app->policy->title ?? 'N/A' }}
                                 </span>
-                                <span class="text-xs font-medium text-slate-500 dark:text-zinc-400 bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md w-fit">
+                                <span class="block max-w-full truncate text-xs font-medium text-slate-500 dark:text-zinc-400 bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md w-fit">
                                     {{ $app->display_category_name }}
                                 </span>
                             </div>
                         </td>
 
                         @if(auth()->user()->hasRole('super admin') || auth()->user()->workplace_id)
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
+                        <td class="px-4 py-4">
+                            <div class="flex min-w-0 items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xs shrink-0">
-                                    {{ substr($app->employee->full_name ?? 'U', 0, 1) }}
+                                    {{ substr($app->employee->name_with_initials ?? $app->employee->full_name ?? 'U', 0, 1) }}
                                 </div>
-                                <div class="flex flex-col">
-                                    <span class="text-sm font-bold text-slate-900 dark:text-white">
-                                        {{ ($app->employee->title->title_name ?? '') . ' ' . ($app->employee->full_name ?? '') }}
+                                <div class="flex min-w-0 flex-col">
+                                    <span class="block max-w-full truncate text-sm font-bold text-slate-900 dark:text-white">
+                                        {{ trim(($app->employee->title->title_name ?? '') . ' ' . ($app->employee->name_with_initials ?? $app->employee->full_name ?? '')) }}
                                     </span>
-                                    <span class="text-[10px] text-slate-400 dark:text-zinc-500 font-mono uppercase tracking-wider">
+                                    <span class="block max-w-full truncate text-[10px] text-slate-400 dark:text-zinc-500 font-mono uppercase tracking-wider">
                                         {{ $app->employee_id }} • {{ $app->employee->nic ?? '' }}
                                     </span>
                                 </div>
@@ -116,37 +123,62 @@
                         </td>
                         @endif
 
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-2">
+                        <td class="px-4 py-4">
+                            <div class="flex min-w-0 items-center gap-2">
                                 <flux:icon name="map-pin" variant="micro" class="w-4 h-4 text-slate-400 dark:text-zinc-500 shrink-0" />
-                                <span class="text-sm font-medium text-slate-700 dark:text-zinc-300">
+                                <span class="block max-w-full truncate text-sm font-medium text-slate-700 dark:text-zinc-300">
                                     {{ $app->targetProvince->short_name ?? 'N/A' }}
                                 </span>
                             </div>
                         </td>
 
-                        <td class="px-6 py-4">
-                            <span class="text-sm font-medium text-slate-600 dark:text-zinc-400">
+                        <td class="px-4 py-4">
+                            <span class="block truncate text-sm font-medium text-slate-600 dark:text-zinc-400">
                                 {{ $app->created_at?->format('M d, Y') }}
                             </span>
                         </td>
 
-                        <td class="px-6 py-4">
+                        <td class="px-4 py-4">
                             <flux:badge :color="$badge['color']" size="sm" inset="top bottom" class="font-bold tracking-wide">
                                 {{ $badge['label'] }}
                             </flux:badge>
                         </td>
 
-                        <td class="px-6 py-4 text-right">
-                            <flux:button href="{{ route('transfer.teacher-transfer-application.view', $app->transfer_application_id) }}" variant="filled" size="sm" class="rounded-xl! opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-sm translate-y-1 group-hover:translate-y-0 hidden md:inline-flex">
-                                {{ __('View Details') }}
-                            </flux:button>
-                            <flux:button href="{{ route('transfer.teacher-transfer-application.view', $app->transfer_application_id) }}" variant="ghost" size="sm" icon="eye" class="group-hover:hidden md:hidden text-slate-400" />
+                        <td class="px-4 py-4">
+                            <div class="flex items-center justify-end gap-2">
+                                <flux:button href="{{ route('transfer.teacher-transfer-application.view', $app->transfer_application_id) }}" variant="filled" size="sm" class="rounded-xl! shadow-sm hidden md:inline-flex">
+                                    {{ __('View Details') }}
+                                </flux:button>
+
+                                @if($canDeleteRequests)
+                                    <flux:button
+                                        wire:click="confirmDeleteApplication('{{ $app->transfer_application_id }}')"
+                                        variant="ghost"
+                                        size="sm"
+                                        icon="trash"
+                                        class="rounded-xl! text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hidden md:inline-flex"
+                                    >
+                                        {{ __('Delete') }}
+                                    </flux:button>
+                                @endif
+
+                                <flux:button href="{{ route('transfer.teacher-transfer-application.view', $app->transfer_application_id) }}" variant="ghost" size="sm" icon="eye" class="md:hidden text-slate-400" />
+
+                                @if($canDeleteRequests)
+                                    <flux:button
+                                        wire:click="confirmDeleteApplication('{{ $app->transfer_application_id }}')"
+                                        variant="ghost"
+                                        size="sm"
+                                        icon="trash"
+                                        class="md:hidden text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                                    />
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="{{ (auth()->user()->hasRole('super admin') || auth()->user()->workplace_id) ? 7 : 6 }}" class="px-6 py-32">
+                        <td colspan="{{ (auth()->user()->hasRole('super admin') || auth()->user()->workplace_id) ? 6 : 5 }}" class="px-6 py-32">
                             <div class="flex flex-col items-center justify-center text-center">
                                 <div class="w-24 h-24 mb-6 relative">
                                     <div class="absolute inset-0 bg-indigo-100 dark:bg-indigo-900/20 rounded-full blur-xl scale-150"></div>
@@ -175,4 +207,44 @@
         {{ $applications->links() }}
     </div>
     @endif
+
+    <flux:modal wire:model="showDeleteModal" name="delete-transfer-request-confirmation" class="md:w-[460px]">
+        <form wire:submit="verifyPasswordAndDelete" class="space-y-6">
+            <div>
+                <flux:heading size="lg" class="font-black tracking-tight">{{ __('Delete Transfer Request') }}</flux:heading>
+                <flux:subheading>
+                    {{ __('Enter your current login password to permanently delete this transfer request.') }}
+                </flux:subheading>
+            </div>
+
+            <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300">
+                {{ __('This action cannot be undone.') }}
+                @if($deleteApplicationLabel)
+                    <span class="font-black">{{ $deleteApplicationLabel }}</span>
+                @endif
+            </div>
+
+            <flux:input
+                viewable
+                wire:model="deletePassword"
+                type="password"
+                label="{{ __('Current Password') }}"
+                placeholder="{{ __('Enter your password') }}"
+                class="rounded-xl!"
+                required />
+
+            <div class="flex gap-2">
+                <flux:spacer />
+                <flux:modal.close>
+                    <flux:button wire:click="cancelDeleteConfirmation" type="button" variant="ghost" class="rounded-xl!">
+                        {{ __('Cancel') }}
+                    </flux:button>
+                </flux:modal.close>
+                <flux:button type="submit" variant="danger" icon="trash" class="rounded-xl!">
+                    <span wire:loading.remove wire:target="verifyPasswordAndDelete">{{ __('Delete') }}</span>
+                    <span wire:loading wire:target="verifyPasswordAndDelete">{{ __('Deleting...') }}</span>
+                </flux:button>
+            </div>
+        </form>
+    </flux:modal>
 </div>

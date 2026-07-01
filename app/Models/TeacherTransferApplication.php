@@ -56,6 +56,7 @@ class TeacherTransferApplication extends Model
         'updated_by',
         'status',
         'current_step',
+        'update_cnt',
     ];
 
     protected $casts = [
@@ -64,6 +65,7 @@ class TeacherTransferApplication extends Model
         'has_disciplinary_actions' => 'boolean',
         'is_declared' => 'boolean',
         'current_step' => 'integer',
+        'update_cnt' => 'integer',
     ];
 
     protected static function booted()
