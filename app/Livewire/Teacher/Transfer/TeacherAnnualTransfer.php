@@ -28,7 +28,10 @@ class TeacherAnnualTransfer extends Component
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $currentAnnualPolicy = TeacherTransferPolicy::active()
+        $currentAnnualPolicy = TransferAccess::applyPolicyViewScope(
+            TeacherTransferPolicy::active(),
+            Auth::user()
+        )
             ->where('transfer_type', 'annual')
             ->orderByDesc('policy_year')
             ->first();

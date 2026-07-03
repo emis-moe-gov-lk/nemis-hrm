@@ -280,6 +280,10 @@
                         <flux:textarea wire:model="transferReason" label="{{ __('Detailed Reason') }}" rows="4" placeholder="{{ __('Provide a detailed explanation for your transfer request. Minimum 20 characters.') }}" :invalid="$errors->has('transferReason')" />
                     </div>
                     @endif
+
+                    <div class="md:col-span-2">
+                        <flux:textarea wire:model="additionalNotes" label="{{ __('Additional Notes') }}" rows="4" placeholder="{{ __('Enter any additional information for the transfer review...') }}" :invalid="$errors->has('additionalNotes')" />
+                    </div>
                 </div>
                 <div class="mt-6">
                     <p class="text-xs text-slate-500">{{ __('Please attach relevant supporting documents below if applying under Medical or Humanitarian grounds.') }}</p>
@@ -581,6 +585,12 @@
                         <div class="md:col-span-2">
                             <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Detailed Reason') }}</p>
                             <p class="font-medium text-slate-900 dark:text-zinc-100 wrap-break-word">{{ $transferReason }}</p>
+                        </div>
+                        @endif
+                        @if(filled($additionalNotes))
+                        <div class="md:col-span-2">
+                            <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">{{ __('Additional Notes') }}</p>
+                            <p class="font-medium text-slate-900 dark:text-zinc-100 whitespace-pre-line wrap-break-word">{{ $additionalNotes }}</p>
                         </div>
                         @endif
                         <div>

@@ -63,7 +63,12 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <flux:field>
-                        <flux:input label="{{ __('Policy Year') }}" type="number" wire:model.live="policyYear" placeholder="e.g. 2026" min="2020" step="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" :invalid="$errors->has('policyYear')" />
+                        <flux:select label="{{ __('Policy Year') }}" wire:model="policyYear" :invalid="$errors->has('policyYear')">
+                            <option value="">{{ __('Select policy year...') }}</option>
+                            @foreach(range(now()->year + 5, 2020) as $year)
+                                <option value="{{ $year }}">{{ $year }}</option>
+                            @endforeach
+                        </flux:select>
                     </flux:field>
 
                     <flux:field>
@@ -256,15 +261,15 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <flux:field>
-                        <flux:input label="{{ __('Min. Service in Current School (Years)') }}" type="number" wire:model.live="minServiceCurrentSchool" placeholder="5" min="0" step="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" :invalid="$errors->has('minServiceCurrentSchool')" />
+                        <flux:input label="{{ __('Min. Service in Current School (Years)') }}" type="number" wire:model.blur="minServiceCurrentSchool" placeholder="5" min="0" step="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" :invalid="$errors->has('minServiceCurrentSchool')" />
                     </flux:field>
 
                     <flux:field>
-                        <flux:input label="{{ __('Min. Total Service (Years)') }}" type="number" wire:model.live="minServiceTotal" placeholder="10" min="0" step="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" :invalid="$errors->has('minServiceTotal')" />
+                        <flux:input label="{{ __('Min. Total Service (Years)') }}" type="number" wire:model.blur="minServiceTotal" placeholder="10" min="0" step="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" :invalid="$errors->has('minServiceTotal')" />
                     </flux:field>
 
                     <flux:field>
-                        <flux:input label="{{ __('Maximum School Preferences') }}" type="number" wire:model.live="maxPreferences" placeholder="5" min="1" max="10" step="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" :invalid="$errors->has('maxPreferences')" />
+                        <flux:input label="{{ __('Maximum School Preferences') }}" type="number" wire:model.blur="maxPreferences" placeholder="5" min="1" max="10" step="1" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" :invalid="$errors->has('maxPreferences')" />
                     </flux:field>
                 </div>
             </section>

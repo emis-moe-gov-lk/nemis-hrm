@@ -48,6 +48,7 @@ class TeacherTransferApplication extends Model
         'reason_category',
         'has_disciplinary_actions',
         'disciplinary_actions_details',
+        'additional_notes',
         'transfer_category',
         'transfer_sub_category_id',
         'target_province',

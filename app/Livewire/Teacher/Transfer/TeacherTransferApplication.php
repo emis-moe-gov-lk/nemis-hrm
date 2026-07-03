@@ -69,6 +69,7 @@ class TeacherTransferApplication extends Component
     public $transferReason = '';
     public $hasDisciplinaryActions = false;
     public $disciplinaryDetails = '';
+    public $additionalNotes = '';
 
     public $transferReasonTypes = [];
 
@@ -178,7 +179,10 @@ class TeacherTransferApplication extends Component
 
     private function loadMetadata()
     {
-        $this->transferPolicies = TeacherTransferPolicy::active()
+        $this->transferPolicies = TransferAccess::applyPolicyViewScope(
+            TeacherTransferPolicy::active(),
+            Auth::user()
+        )
             ->orderByDesc('policy_year')
             ->pluck('title', 'policy_id')
             ->toArray();
@@ -221,6 +225,7 @@ class TeacherTransferApplication extends Component
         $this->transferReason = $app->reason_details; // Assuming this field exists or check names
         $this->hasDisciplinaryActions = $app->has_disciplinary_actions;
         $this->disciplinaryDetails = $app->disciplinary_actions_details;
+        $this->additionalNotes = (string) ($app->additional_notes ?? '');
         $this->selectedProvinceId = $app->target_province;
         $this->declarationTrue = $app->is_declared;
         $this->permanentAddress = filled($app->permanent_address) ? trim((string) $app->permanent_address) : $this->permanentAddress;
@@ -473,6 +478,7 @@ class TeacherTransferApplication extends Component
             'temporaryLatitude' => 'nullable|numeric|between:-90,90|required_with:temporaryLongitude',
             'temporaryLongitude' => 'nullable|numeric|between:-180,180|required_with:temporaryLatitude',
             'selectedProvinceId' => 'required|exists:provincial_education_offices,workplace_id',
+            'additionalNotes' => 'nullable|string|max:3000',
             'preferences.1' => 'required',
             'distanceInKm.1' => 'required|numeric|min:0',
             'declarationTrue' => 'accepted',
@@ -541,6 +547,8 @@ class TeacherTransferApplication extends Component
             session()->flash('success', __('Transfer Application submitted successfully.'));
 
             return $this->redirectToTransferTypeList();
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             report($e);
             session()->flash('error', __('Unable to submit the transfer application right now.'));
@@ -594,6 +602,9 @@ class TeacherTransferApplication extends Component
                 'reason_category' => $this->transferReasonTypeId,
                 'has_disciplinary_actions' => $this->hasDisciplinaryActions,
                 'disciplinary_actions_details' => filled($this->disciplinaryDetails) ? $this->disciplinaryDetails : null,
+                'additional_notes' => filled(trim((string) $this->additionalNotes))
+                    ? trim((string) $this->additionalNotes)
+                    : null,
                 'transfer_category' => $this->transferCategoryId,
                 'transfer_sub_category_id' => $this->transferSubCategoryId,
                 'target_province' => $this->selectedProvinceId ?: $this->currentProvinceId,
@@ -969,20 +980,7 @@ class TeacherTransferApplication extends Component
             ]);
         }
 
-        $duplicateExists = TeacherTransferApplicationModel::query()
-            ->where('employee_id', $this->employeeId)
-            ->where('transfer_category', $this->transferCategoryId)
-            ->when(
-                $this->isEditMode && filled($this->applicationId),
-                fn ($query) => $query->where('transfer_application_id', '!=', $this->applicationId)
-            )
-            ->exists();
-
-        if ($duplicateExists) {
-            throw ValidationException::withMessages([
-                'transferSubCategoryId' => __('This employee already has a transfer application for the selected transfer category.'),
-            ]);
-        }
+        $this->ensureUniqueApplicationForPolicyCategory();
 
         if (($selectedSubCategory['code'] ?? null) === TransferSubCategoryRules::CODE_ANOTHER_PROVINCE
             && $this->selectedProvinceId === $this->currentProvinceId) {
@@ -1008,6 +1006,28 @@ class TeacherTransferApplication extends Component
                     "selectedZones.{$index}" => __('For "To Another Zone", your current working zone cannot be selected as a preference.'),
                 ]);
             }
+        }
+    }
+
+    private function ensureUniqueApplicationForPolicyCategory(): void
+    {
+        if (!filled($this->employeeId) || !filled($this->policyId) || !filled($this->transferSubCategoryId)) {
+            return;
+        }
+
+        $duplicateQuery = TeacherTransferApplicationModel::query()
+            ->where('employee_id', $this->employeeId)
+            ->where('policy_id', $this->policyId)
+            ->where('transfer_sub_category_id', $this->transferSubCategoryId);
+
+        if ($this->applicationId) {
+            $duplicateQuery->where('transfer_application_id', '!=', $this->applicationId);
+        }
+
+        if ($duplicateQuery->exists()) {
+            throw ValidationException::withMessages([
+                'transferSubCategoryId' => __('You have already created an application for this category under the selected transfer policy.'),
+            ]);
         }
     }
 

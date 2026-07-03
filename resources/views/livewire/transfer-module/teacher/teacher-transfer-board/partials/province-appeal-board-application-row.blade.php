@@ -30,6 +30,9 @@
                     <span class="text-slate-300 dark:text-zinc-700">•</span>
                     <span>{{ $appeal->created_at?->format('Y-M-d') }}</span>
                 </div>
+                @if(filled($transferApplication?->additional_notes))
+                    <flux:badge color="blue" size="xs" class="mt-2 uppercase tracking-tighter">{{ __('Additional Notes') }}</flux:badge>
+                @endif
             </div>
         </div>
     </td>

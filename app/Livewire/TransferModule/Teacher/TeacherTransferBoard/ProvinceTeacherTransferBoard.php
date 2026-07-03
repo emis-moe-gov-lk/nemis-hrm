@@ -16,6 +16,7 @@ use App\Models\TeacherTransferPolicy;
 use App\Models\TeacherTransferSubCategory;
 use App\Models\Workplaces;
 use App\Services\TransferModule\TeacherTransferBoardSchoolBalanceService;
+use App\Support\Transfer\TransferAccess;
 use App\Support\Transfer\TransferSubCategoryRules;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -1272,7 +1273,10 @@ class ProvinceTeacherTransferBoard extends Component
 
     public function getAvailablePoliciesProperty()
     {
-        return TeacherTransferPolicy::active()
+        return TransferAccess::applyPolicyViewScope(
+            TeacherTransferPolicy::active(),
+            auth()->user()
+        )
             ->orderByDesc('policy_year')
             ->orderBy('title')
             ->get();
@@ -1671,7 +1675,10 @@ class ProvinceTeacherTransferBoard extends Component
             return;
         }
 
-        $policy = TeacherTransferPolicy::active()
+        $policy = TransferAccess::applyPolicyViewScope(
+            TeacherTransferPolicy::active(),
+            auth()->user()
+        )
             ->where('policy_id', $validated['createPolicyId'])
             ->first();
 

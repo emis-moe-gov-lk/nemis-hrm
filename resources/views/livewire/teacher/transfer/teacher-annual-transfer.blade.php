@@ -66,6 +66,11 @@
                                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-500/20">
                                                     {{ $app->display_category_name }}
                                                 </span>
+                                                @if(filled($app->additional_notes))
+                                                <span class="ml-2 inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest text-indigo-700 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-300">
+                                                    {{ __('Additional Notes') }}
+                                                </span>
+                                                @endif
                                             </div>
                                         </a>
                                     </div>

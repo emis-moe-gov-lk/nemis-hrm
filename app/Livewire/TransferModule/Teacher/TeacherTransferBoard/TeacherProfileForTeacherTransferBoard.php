@@ -659,14 +659,13 @@ class TeacherProfileForTeacherTransferBoard extends Component
     protected function formatWorkflowTimelineDecision($decision): array
     {
         $label = $decision->recommendation?->decision ?? __('Completed');
-        $labelText = Str::lower((string) $label);
 
         return [
             'label' => $label,
             'remarks' => $decision->remarks ?: __('No remarks captured for this step.'),
             'official' => $decision->approver?->name_with_initials ?? __('Official not recorded'),
             'date' => $decision->updated_at ?? $decision->created_at,
-            'color' => Str::contains($labelText, ['reject', 'cannot', 'not qualified', 'not recomemded', 'not recommended']) ? 'rose' : 'green',
+            'color' => ($decision->recommendation?->rejectsApplication() ?? false) ? 'rose' : 'green',
             'source' => __('Workflow recommendation'),
         ];
     }

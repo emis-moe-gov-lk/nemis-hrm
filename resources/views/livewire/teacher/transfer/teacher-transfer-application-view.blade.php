@@ -161,6 +161,15 @@
                         </p>
                     </div>
                     @endif
+
+                    @if(filled($application->additional_notes))
+                    <div class="p-5 bg-indigo-50/70 dark:bg-indigo-500/10 rounded-lg border border-indigo-100 dark:border-indigo-500/20">
+                        <p class="text-xs font-semibold text-indigo-500 dark:text-indigo-300 uppercase tracking-tight mb-2">{{ __('Additional Notes') }}</p>
+                        <p class="text-sm text-zinc-700 dark:text-zinc-200 leading-relaxed font-medium whitespace-pre-line wrap-break-word">
+                            {{ $application->additional_notes }}
+                        </p>
+                    </div>
+                    @endif
                 </div>
             </section>
 
@@ -258,8 +267,7 @@
                              });
                              $isCurrent = $application->current_step == $step->step_order && ($application->status == 'submitted' || $application->status == 'processing');
                              $isFuture = $application->current_step < $step->step_order;
-                             $recommendationDecisionText = strtolower($rec->recommendation?->decision ?? '');
-                             $isNegativeRecommendation = Str::contains($recommendationDecisionText, ['reject', 'cannot', 'not recommended']);
+                             $isNegativeRecommendation = $rec?->recommendation?->rejectsApplication() ?? false;
                                  @endphp
 
                                  <div class="relative pl-12 font-medium">

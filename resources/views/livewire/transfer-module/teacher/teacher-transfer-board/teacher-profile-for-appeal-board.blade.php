@@ -185,6 +185,13 @@
                     <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-zinc-100">{{ $application->reason?->title ?? __('N/A') }}</p>
                 </div>
             </div>
+
+            @if(filled($application->additional_notes))
+            <div class="mt-5 rounded-2xl border border-indigo-100 bg-indigo-50/70 p-4 dark:border-indigo-500/20 dark:bg-indigo-500/10">
+                <p class="text-xs font-bold uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-300">{{ __('Additional Notes') }}</p>
+                <p class="mt-2 whitespace-pre-line wrap-break-word text-sm font-medium leading-relaxed text-slate-700 dark:text-zinc-200">{{ $application->additional_notes }}</p>
+            </div>
+            @endif
         </div>
 
         <div class="rounded-3xl border border-slate-300 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">

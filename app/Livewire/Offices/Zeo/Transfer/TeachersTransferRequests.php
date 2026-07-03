@@ -13,7 +13,6 @@ use App\Support\Transfer\TransferAccess;
 use App\Support\Transfer\TransferSubCategoryRules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class TeachersTransferRequests extends Component
 {
@@ -131,7 +130,7 @@ class TeachersTransferRequests extends Component
             );
 
             // Handle rejection or advance step
-            if (Str::contains(strtolower($decision->decision), ['reject', 'not qualified', 'not recomemded', 'not recommended'])) {
+            if ($decision->rejectsApplication()) {
                 $this->selectedApplication->update(['status' => 'rejected']);
             } else {
                 // Advance to next step (e.g. Provincial)

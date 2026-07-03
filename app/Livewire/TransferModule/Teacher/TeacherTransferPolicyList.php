@@ -111,6 +111,13 @@ class TeacherTransferPolicyList extends Component
 
     public function showCategories($policyId)
     {
+        $policy = TeacherTransferPolicyModel::where('policy_id', $policyId)->first();
+
+        if (!$policy || !TransferAccess::canViewPolicy(Auth::user(), $policy)) {
+            session()->flash('error', __('Unauthorized action.'));
+            return;
+        }
+
         $this->selectedPolicyId = $policyId;
         $this->showCategoriesDrawer = true;
     }
@@ -119,7 +126,12 @@ class TeacherTransferPolicyList extends Component
     public function viewingPolicy()
     {
         if (!$this->selectedPolicyId) return null;
-        return TeacherTransferPolicyModel::where('policy_id', $this->selectedPolicyId)->first();
+        return TransferAccess::applyPolicyViewScope(
+            TeacherTransferPolicyModel::query(),
+            Auth::user()
+        )
+            ->where('policy_id', $this->selectedPolicyId)
+            ->first();
     }
 
     #[Computed]

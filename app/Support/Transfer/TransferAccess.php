@@ -7,6 +7,7 @@ use App\Models\TeacherTransferApplication as TeacherTransferApplicationModel;
 use App\Models\TeacherTransferPolicy;
 use App\Models\User;
 use App\Models\Workplaces;
+use Illuminate\Database\Eloquent\Builder;
 
 class TransferAccess
 {
@@ -120,6 +121,21 @@ class TransferAccess
         return $policy !== null && static::policyWithinUserScope($user, $policy);
     }
 
+    public static function applyPolicyViewScope(Builder $query, ?User $user): Builder
+    {
+        $authorityIds = static::policyAuthorityIdsForUser($user);
+
+        if ($authorityIds === null) {
+            return $query;
+        }
+
+        if ($authorityIds === []) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->whereIn('transfer_authority', $authorityIds);
+    }
+
     public static function canManagePolicies(?User $user): bool
     {
         if (static::isSuperAdmin($user)) {
@@ -143,10 +159,6 @@ class TransferAccess
             return true;
         }
 
-        if ($policy !== null && $policy->created_by === $user->people_id) {
-            return true;
-        }
-
         if (!static::canManagePolicies($user)) {
             return false;
         }
@@ -155,16 +167,9 @@ class TransferAccess
             return true;
         }
 
-        $policyAuthorityOfficeLevelId = $policy->authority?->office_level_id;
-
-        if ($policyAuthorityOfficeLevelId === null && filled($policy->transfer_authority)) {
-            $policyAuthorityOfficeLevelId = Workplaces::query()
-                ->where('workplace_id', $policy->transfer_authority)
-                ->value('office_level_id');
-        }
-
-        return filled($policyAuthorityOfficeLevelId)
-            && $policyAuthorityOfficeLevelId === static::officeLevelId($user);
+        return filled($policy->transfer_authority)
+            && filled($user->workplace_id)
+            && $policy->transfer_authority === $user->workplace_id;
     }
 
     public static function canViewRequestPipeline(?User $user): bool
@@ -397,27 +402,44 @@ class TransferAccess
 
     private static function policyWithinUserScope(User $user, TeacherTransferPolicy $policy): bool
     {
-        $userWorkplace = $user->workplace;
-        $policyAuthorityId = $policy->transfer_authority;
+        $authorityIds = static::policyAuthorityIdsForUser($user);
 
-        if (!$userWorkplace || blank($policyAuthorityId)) {
-            return false;
-        }
-
-        if ($userWorkplace->workplace_id === $policyAuthorityId) {
+        if ($authorityIds === null) {
             return true;
         }
 
-        $policyAuthority = $policy->relationLoaded('authority')
-            ? $policy->authority
-            : $policy->authority()->first();
-
-        if (!$policyAuthority) {
+        if ($authorityIds === [] || blank($policy->transfer_authority)) {
             return false;
         }
 
-        return in_array($userWorkplace->workplace_id, $policyAuthority->getAllChildWorkplaces(), true)
-            || in_array($policyAuthorityId, $userWorkplace->getAllChildWorkplaces(), true);
+        return in_array($policy->transfer_authority, $authorityIds, true);
+    }
+
+    private static function policyAuthorityIdsForUser(?User $user): ?array
+    {
+        if (static::isSuperAdmin($user)) {
+            return null;
+        }
+
+        if ($user === null || !static::isActiveUser($user)) {
+            return [];
+        }
+
+        $workplace = $user->workplace;
+
+        if (!$workplace) {
+            return [];
+        }
+
+        if ($workplace->office_level_id === 'OLID001') {
+            return null;
+        }
+
+        return collect($workplace->getAllParentWorkplaces())
+            ->merge($workplace->getAllChildWorkplaces())
+            ->unique()
+            ->values()
+            ->all();
     }
 
     private static function findAncestorWorkplaceId(?Workplaces $workplace, string $officeLevelId): ?string

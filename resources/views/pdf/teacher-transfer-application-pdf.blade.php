@@ -6,9 +6,8 @@
     <title>Teacher Transfer Application - {{ $application->transfer_application_id }}</title>
     <style>
         @page {
-            header: page-header;
             footer: page-footer;
-            margin: 30mm 15mm 20mm 15mm;
+            margin: 15mm 15mm 20mm 15mm;
         }
 
         body {
@@ -216,18 +215,22 @@
             );
     @endphp
 
-    <htmlpageheader name="page-header">
+    <div class="page-header" style="margin-bottom: 20px;">
         <table width="100%" style="vertical-align: bottom; border-bottom: 2px solid #1e293b; padding-bottom: 10px;">
             <tr>
                 <td width="80%" valign="bottom" style="border: none;">
-                    <span class="header-title">Teacher Transfer Application Form</span>
+                    <span class="header-title">Teacher Transfer Application Form  {{ $capitalizeData($application->policy?->policy_year ?? '') }}</span>
+                <br>
+                <span style="font-size: 11px; font-weight: bold; color: #475569; text-transform: uppercase;">
+                    {{ $capitalizeData($application->policy?->authority?->office_name ?? '') }}
+                </span>
                 </td>
                 <td width="20%" align="right" valign="bottom" style="border: none;">
                     <img src="{{ $qrCode }}" style="width: 50px; height: 50px;" />
                 </td>
             </tr>
         </table>
-    </htmlpageheader>
+    </div>
 
     <div class="section">
         <div class="section-title">Application Overview</div>
@@ -375,7 +378,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" style="text-align: center; color: #64748b;">No workplace history records
+                        <td colspan="4" style="text-align: center; color: #64748b;">No workplace history records
                             found.</td>
                     </tr>
                 @endforelse
@@ -399,6 +402,14 @@
                     <th>Detailed Reason</th>
                     <td colspan="3" style="font-style: italic; color: #475569;">
                         "{{ $capitalizeData($application->transfer_reason) }}"
+                    </td>
+                </tr>
+            @endif
+            @if ($application->additional_notes)
+                <tr>
+                    <th>Additional Notes</th>
+                    <td colspan="3" style="white-space: pre-line; color: #475569;">
+                        {{ $application->additional_notes }}
                     </td>
                 </tr>
             @endif
@@ -468,6 +479,11 @@
         </table>
     </div>
 
+    <div class="section">
+        <div class="section-title">Other Comments</div>
+        <div style="border: 1px solid #e2e8f0; height: 100px; background-color: #ffffff;"></div>
+    </div>
+
     <div class="section" style="margin-top: 40px;">
         <div style="border: 1px solid #e2e8f0; padding: 15px; background-color: #f8fafc;">
             <div style="font-weight: bold; margin-bottom: 10px; font-size: 11px;">Declaration & Verification</div>
@@ -480,12 +496,14 @@
                 <tr>
                     <td width="50%" style="border: none;">
                         <div style="border-top: 1px solid #333; width: 200px; margin-bottom: 5px;"></div>
+                        <div style="font-size: 8px; font-weight: bold;">________________________________________</div>
                         <div style="font-size: 8px; font-weight: bold;">Signature of the Applicant</div>
-                        <div style="font-size: 8px; color: #64748b;">Date: ____________________</div>
+                        <div style="font-size: 8px; color: #64748b;">Date: {{ $application->updated_at->format('Y-m-d') }}</div>
                     </td>
                     <td width="50%" style="border: none; text-align: right;">
                         <div style="border-top: 1px solid #333; width: 200px; margin-left: auto; margin-bottom: 5px;">
                         </div>
+                        <div style="font-size: 8px; font-weight: bold;">________________________________________</div>
                         <div style="font-size: 8px; font-weight: bold;">Signature of Head of Institution</div>
                         <div style="font-size: 8px; color: #64748b;">(Official Seal)</div>
                     </td>

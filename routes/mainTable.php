@@ -29,6 +29,7 @@ use App\Livewire\MainTables\MainTablesOccupationsLists;
 use App\Livewire\MainTables\MainTablesTeachingSubjects;
 use App\Livewire\MainTables\MainTablesTeacherCategories;
 use App\Livewire\MainTables\MainTablesTransferSubCategories;
+use App\Livewire\MainTables\MainTablesTeacherTransferRecommendations;
 use App\Livewire\MainTables\MainTablesInstitutionGenders;
 use App\Livewire\MainTables\MainTablesInstitutionLanguages;
 use App\Livewire\MainTables\MainTablesMediumOfInstructions;
@@ -83,6 +84,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('main-table/service-ranks', MainTablesServiceRanks::class)->name('main-tables.service-ranks');
         Route::get('main-table/teacher-categories', MainTablesTeacherCategories::class)->name('main-tables.teacher-categories');
         Route::get('main-table/transfer-categories', MainTablesTransferSubCategories::class)->name('main-tables.transfer-categories');
+        Route::get('main-table/teacher-transfer-recommendations', MainTablesTeacherTransferRecommendations::class)->name('main-tables.teacher-transfer-recommendations');
         Route::get('main-table/teacher-types', MainTablesTeacherTypes::class)->name('main-tables.teacher-types');
         Route::get('main-table/titles', MainTablesTitles::class)->name('main-tables.titles');
         Route::get('main-table/appointed-subjects', MainTablesApointedSubjects::class)->name('main-tables.appointed-subjects');

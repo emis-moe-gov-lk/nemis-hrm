@@ -13,17 +13,21 @@
                 {{ __('View Policy') }}
             </flux:button>
 
+            @if($latestApplication)
+                <flux:button href="{{ route('transfer.teacher-transfer-application.view', ['id' => $latestApplication->transfer_application_id]) }}" wire:navigate variant="subtle" icon="eye" size="sm" class="h-11 font-bold">
+                    {{ __('View Latest Application') }}
+                </flux:button>
+            @endif
+
             @if($editableApplication)
                 <flux:button href="{{ route('my-transfer.teacher-transfer-application', ['id' => $editableApplication->transfer_application_id]) }}" wire:navigate variant="primary" icon="pencil-square" size="sm" class="h-11 font-bold bg-indigo-600! hover:bg-indigo-700! border-none text-white">
                     {{ __('Continue Draft') }}
                 </flux:button>
-            @elseif($canStartNewApplication)
+            @endif
+
+            @if($canStartNewApplication)
                 <flux:button href="{{ route('my-transfer.teacher-transfer-application', ['policy' => $policy->policy_id]) }}" wire:navigate variant="primary" icon="plus" size="sm" class="h-11 font-bold bg-indigo-600! hover:bg-indigo-700! border-none text-white">
                     {{ __('Start New Application') }}
-                </flux:button>
-            @elseif($latestApplication)
-                <flux:button href="{{ route('transfer.teacher-transfer-application.view', ['id' => $latestApplication->transfer_application_id]) }}" wire:navigate variant="subtle" icon="eye" size="sm" class="h-11 font-bold">
-                    {{ __('View Latest Application') }}
                 </flux:button>
             @endif
         </x-slot:actions>
@@ -101,6 +105,9 @@
                                             <div class="mt-0.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">{{ $policy->title }}</div>
                                             <div class="mt-2 flex flex-wrap items-center gap-2">
                                                 <flux:badge variant="neutral" size="xs">{{ $application->display_category_name }}</flux:badge>
+                                                @if(filled($application->additional_notes))
+                                                    <flux:badge color="blue" size="xs">{{ __('Additional Notes') }}</flux:badge>
+                                                @endif
                                             </div>
                                         </a>
                                     </div>

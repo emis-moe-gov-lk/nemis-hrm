@@ -394,6 +394,13 @@
                             @else
                                 <p class="mt-4 text-sm leading-relaxed text-slate-500 dark:text-zinc-400">{{ __('No disciplinary note was recorded with this application.') }}</p>
                             @endif
+
+                            @if(filled($application->additional_notes))
+                                <div class="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50/70 p-4 dark:border-indigo-500/20 dark:bg-indigo-500/10">
+                                    <p class="text-[11px] font-black uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-300">{{ __('Additional Notes') }}</p>
+                                    <p class="mt-2 whitespace-pre-line wrap-break-word text-sm font-medium leading-relaxed text-slate-700 dark:text-zinc-200">{{ $application->additional_notes }}</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

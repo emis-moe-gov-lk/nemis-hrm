@@ -110,6 +110,9 @@
                                             <div>{{ $request->employee->nic ?? 'N/A' }}</div>
                                             <div>{{ $request->transfer_application_id ?? 'N/A' }}</div>
                                         </div>
+                                        @if(filled($request->additional_notes))
+                                        <flux:badge color="blue" size="xs" class="mt-2 uppercase tracking-tighter">{{ __('Additional Notes') }}</flux:badge>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
@@ -209,6 +212,15 @@
                 {{ __('Provide zonal-level recommendation for') }} <span class="font-bold text-slate-900 dark:text-white">{{ $selectedApplication?->employee?->full_name }}</span>
             </flux:subheading>
         </div>
+
+        @if(filled($selectedApplication?->additional_notes))
+        <div class="rounded-2xl border border-indigo-100 bg-indigo-50/70 px-4 py-3 text-sm dark:border-indigo-500/20 dark:bg-indigo-500/10">
+            <p class="text-[11px] font-black uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-300">{{ __('Teacher Additional Notes') }}</p>
+            <p class="mt-2 whitespace-pre-line wrap-break-word font-medium leading-relaxed text-slate-700 dark:text-zinc-200">
+                {{ $selectedApplication->additional_notes }}
+            </p>
+        </div>
+        @endif
 
         <div class="space-y-6">
             <flux:select wire:model.live="recommendationDecision" label="{{ __('Recommendation Decision') }}">

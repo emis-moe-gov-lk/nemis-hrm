@@ -61,6 +61,7 @@
                 <flux:navlist.item :href="route('main-tables.sleas-categories')" :current="request()->routeIs('main-tables.sleas-categories')" wire:navigate>{{ __('SLEAS Cat.') }}</flux:navlist.item>
                 <flux:navlist.item :href="route('main-tables.teacher-categories')" :current="request()->routeIs('main-tables.teacher-categories')" wire:navigate>{{ __('Teacher Cat.') }}</flux:navlist.item>
                 <flux:navlist.item :href="route('main-tables.transfer-categories')" :current="request()->routeIs('main-tables.transfer-categories')" wire:navigate>{{ __('Transfer Cat.') }}</flux:navlist.item>
+                <flux:navlist.item :href="route('main-tables.teacher-transfer-recommendations')" :current="request()->routeIs('main-tables.teacher-transfer-recommendations')" wire:navigate>{{ __('Transfer Rec.') }}</flux:navlist.item>
                 <flux:navlist.item :href="route('main-tables.teacher-types')" :current="request()->routeIs('main-tables.teacher-types')" wire:navigate>{{ __('Teacher Types') }}</flux:navlist.item>
                 <flux:navlist.item :href="route('main-tables.principal-recruitment-categories')" :current="request()->routeIs('main-tables.principal-recruitment-categories')" wire:navigate>{{ __('Principal Rec.') }}</flux:navlist.item>
             </div>

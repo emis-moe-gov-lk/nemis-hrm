@@ -11,7 +11,6 @@ use App\Models\TeacherTransferPolicyStep;
 use App\Support\Transfer\TransferAccess;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class TransferRequests extends Component
 {
@@ -118,14 +117,7 @@ class TransferRequests extends Component
             );
 
             // Handle rejection/release refusal or advance step.
-            $decisionText = str_replace(["'", "\xE2\x80\x99"], '', strtolower($decision->decision));
-            $isRejectedDecision = Str::contains($decisionText, [
-                'reject',
-                'cannot be released',
-                'cant be released',
-                'can t be released',
-                'not recommended',
-            ]);
+            $isRejectedDecision = $decision->rejectsApplication();
 
             $institutionStep = $this->institutionApprovalStep($this->selectedApplication);
 

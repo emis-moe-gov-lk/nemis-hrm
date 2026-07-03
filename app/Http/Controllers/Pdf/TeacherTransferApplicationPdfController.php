@@ -14,7 +14,7 @@ class TeacherTransferApplicationPdfController extends Controller
     public function download($id)
     {
         $application = TeacherTransferApplication::with([
-            'policy',
+            'policy.authority',
             'employee.title',
             'employee.gender',
             'appointment.service',

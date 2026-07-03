@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use App\Traits\Blameable;
 
@@ -19,10 +20,18 @@ class TeacherTransferRecommendationList extends Model
         'transfer_recommendation_list_id',
         'office_level_id',
         'decision',
+        'rejects_application',
         'created_by',
         'updated_by',
         'active_status',
     ];
+
+    protected $casts = [
+        'active_status' => 'boolean',
+        'rejects_application' => 'boolean',
+    ];
+
+    protected static ?bool $hasRejectsApplicationColumn = null;
 
     /*
     |--------------------------------------------------------------------------
@@ -65,6 +74,33 @@ class TeacherTransferRecommendationList extends Model
         return $query->where('active_status', false);
     }
 
+    public function rejectsApplication(): bool
+    {
+        if (static::hasRejectsApplicationColumn()) {
+            return (bool) $this->rejects_application;
+        }
+
+        $decisionText = str_replace(["'", "\xE2\x80\x99"], '', Str::lower((string) $this->decision));
+
+        return Str::contains($decisionText, [
+            'reject',
+            'cannot be released',
+            'cant be released',
+            'can t be released',
+            'not qualified',
+            'not recomemded',
+            'not recommended',
+        ]);
+    }
+
+    public static function hasRejectsApplicationColumn(): bool
+    {
+        return static::$hasRejectsApplicationColumn ??= Schema::hasColumn(
+            'teacher_transfer_recommendation_lists',
+            'rejects_application'
+        );
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Relationships
@@ -78,6 +114,15 @@ class TeacherTransferRecommendationList extends Model
             OfficeLevel::class,
             'office_level_id',
             'office_level_id'
+        );
+    }
+
+    public function applicationRecommendations()
+    {
+        return $this->hasMany(
+            TeacherTransferApplicationRecommendation::class,
+            'transfer_recommendation_list_id',
+            'transfer_recommendation_list_id'
         );
     }
 

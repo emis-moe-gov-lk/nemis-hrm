@@ -87,9 +87,23 @@ class TeacherTransferPolicyRequests extends Component
             return false;
         }
 
-        return !$applications->contains(
-            fn (TeacherTransferApplication $application) => in_array($application->status, ['draft', 'submitted', 'processing', 'approved'], true)
-        );
+        $availableSubCategoryIds = $this->policy->categoriesQuery()
+            ->pluck('transfer_sub_category_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($availableSubCategoryIds->isEmpty()) {
+            return false;
+        }
+
+        $usedSubCategoryIds = $applications
+            ->pluck('transfer_sub_category_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        return $availableSubCategoryIds->diff($usedSubCategoryIds)->isNotEmpty();
     }
 
     private function isApplicationWindowOpen(): bool

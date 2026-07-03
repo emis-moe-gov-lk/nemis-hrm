@@ -102,6 +102,11 @@
                                 <span class="block max-w-full truncate text-xs font-medium text-slate-500 dark:text-zinc-400 bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md w-fit">
                                     {{ $app->display_category_name }}
                                 </span>
+                                @if(filled($app->additional_notes))
+                                <span class="block w-fit rounded-md border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-300">
+                                    {{ __('Additional Notes') }}
+                                </span>
+                                @endif
                             </div>
                         </td>
 

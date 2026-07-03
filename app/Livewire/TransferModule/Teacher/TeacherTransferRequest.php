@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\TeacherTransferApplication;
 use App\Models\TeacherTransferScoreRouteDistance;
+use App\Models\TeacherTransferPolicy;
 use App\Support\Transfer\TransferAccess;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -153,7 +154,18 @@ class TeacherTransferRequest extends Component
 
     public function render()
     {
-        $policies = \App\Models\TeacherTransferPolicy::active()->orderByDesc('policy_year')->get();
+        $policies = TransferAccess::applyPolicyViewScope(
+            TeacherTransferPolicy::active(),
+            Auth::user()
+        )
+            ->orderByDesc('policy_year')
+            ->get();
+
+        if ($this->filterPolicy && !$policies->contains('policy_id', $this->filterPolicy)) {
+            $this->filterPolicy = '';
+            $this->filterCategory = '';
+            $this->filterSubCategory = '';
+        }
 
         $transferSubCategories = \App\Models\TeacherTransferSubCategory::active()
             ->orderBy('display_order')

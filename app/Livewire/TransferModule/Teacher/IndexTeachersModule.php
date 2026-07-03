@@ -30,13 +30,18 @@ class IndexTeachersModule extends Component
         $canManageAnnouncements = TransferAccess::canManageAnnouncements($user);
 
         if ($shouldUseTeacherSelfServiceDashboard) {
-            $activePolicies = TeacherTransferPolicy::with(['authority'])
-                ->active()
+            $activePolicies = TransferAccess::applyPolicyViewScope(
+                TeacherTransferPolicy::with(['authority'])->active(),
+                $user
+            )
                 ->orderByDesc('policy_year')
                 ->orderByDesc('created_at')
                 ->get();
 
-            $allPolicies = TeacherTransferPolicy::with(['authority'])
+            $allPolicies = TransferAccess::applyPolicyViewScope(
+                TeacherTransferPolicy::with(['authority']),
+                $user
+            )
                 ->orderByDesc('policy_year')
                 ->orderByDesc('created_at')
                 ->get();
@@ -55,16 +60,24 @@ class IndexTeachersModule extends Component
             ]);
         }
 
+        $policyStatsQuery = TransferAccess::applyPolicyViewScope(
+            TeacherTransferPolicy::query(),
+            $user
+        );
+
         $stats = [
-            'total_policies' => TeacherTransferPolicy::count(),
-            'active_policies' => TeacherTransferPolicy::active()->count(),
-            'locked_policies' => TeacherTransferPolicy::where('is_locked', true)->count(),
+            'total_policies' => (clone $policyStatsQuery)->count(),
+            'active_policies' => (clone $policyStatsQuery)->active()->count(),
+            'locked_policies' => (clone $policyStatsQuery)->where('is_locked', true)->count(),
             'total_applications' => TeacherTransferApplication::count(),
             'pending_applications' => TeacherTransferApplication::whereIn('status', ['submitted', 'processing'])->count(),
         ];
 
         $policies = $canBrowseActivePolicies
-            ? TeacherTransferPolicy::with(['authority'])
+            ? TransferAccess::applyPolicyViewScope(
+                TeacherTransferPolicy::with(['authority']),
+                $user
+            )
                 ->orderBy('policy_year', 'desc')
                 ->orderBy('created_at', 'desc')
                 ->take(5)

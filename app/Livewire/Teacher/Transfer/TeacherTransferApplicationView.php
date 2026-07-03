@@ -11,7 +11,6 @@ use App\Models\TeacherTransferPolicyStep;
 use App\Support\Transfer\TransferAccess;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class TeacherTransferApplicationView extends Component
 {
@@ -167,14 +166,7 @@ class TeacherTransferApplicationView extends Component
             );
 
             // Handle rejection/release refusal.
-            $decisionText = str_replace(["'", "\xE2\x80\x99"], '', strtolower($decision->decision));
-            $isRejectedDecision = Str::contains($decisionText, [
-                'reject',
-                'cannot be released',
-                'cant be released',
-                'can t be released',
-                'not recommended',
-            ]);
+            $isRejectedDecision = $decision->rejectsApplication();
 
             if ($isRejectedDecision) {
                 $this->application->update(['status' => 'rejected']);
